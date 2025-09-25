@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '../context/AuthContext';
+import { PoliciesIcon, AuditsIcon, ReportsIcon, TeamIcon } from './icons/NavIcons';
 
 export default function DashboardContent() {
   const { user } = useAuth();
@@ -179,20 +180,28 @@ export default function DashboardContent() {
       <div className="glass-card rounded-2xl p-6">
         <h3 className="text-lg font-semibold text-[#26558e] mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <button className="glass-button p-4 rounded-xl text-center hover-lift">
-            <div className="text-2xl mb-2">📋</div>
+          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
+            <div className="mb-3 flex justify-center">
+              <PoliciesIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
+            </div>
             <p className="text-sm font-medium text-gray-900">New Policy</p>
           </button>
-          <button className="glass-button p-4 rounded-xl text-center hover-lift">
-            <div className="text-2xl mb-2">🔍</div>
+          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
+            <div className="mb-3 flex justify-center">
+              <AuditsIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
+            </div>
             <p className="text-sm font-medium text-gray-900">Start Audit</p>
           </button>
-          <button className="glass-button p-4 rounded-xl text-center hover-lift">
-            <div className="text-2xl mb-2">📈</div>
+          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
+            <div className="mb-3 flex justify-center">
+              <ReportsIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
+            </div>
             <p className="text-sm font-medium text-gray-900">Generate Report</p>
           </button>
-          <button className="glass-button p-4 rounded-xl text-center hover-lift">
-            <div className="text-2xl mb-2">👥</div>
+          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
+            <div className="mb-3 flex justify-center">
+              <TeamIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
+            </div>
             <p className="text-sm font-medium text-gray-900">Invite Team</p>
           </button>
         </div>

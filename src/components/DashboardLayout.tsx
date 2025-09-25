@@ -4,6 +4,16 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
+import {
+  DashboardIcon,
+  ComplianceIcon,
+  RiskIcon,
+  PoliciesIcon,
+  AuditsIcon,
+  ReportsIcon,
+  TeamIcon,
+  SettingsIcon
+} from './icons/NavIcons';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -20,14 +30,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: '📊', current: true },
-    { name: 'Compliance', href: '/dashboard/compliance', icon: '✅', current: false },
-    { name: 'Risk Assessment', href: '/dashboard/risk', icon: '⚠️', current: false },
-    { name: 'Policies', href: '/dashboard/policies', icon: '📋', current: false },
-    { name: 'Audits', href: '/dashboard/audits', icon: '🔍', current: false },
-    { name: 'Reports', href: '/dashboard/reports', icon: '📈', current: false },
-    { name: 'Team', href: '/dashboard/team', icon: '👥', current: false },
-    { name: 'Settings', href: '/dashboard/settings', icon: '⚙️', current: false },
+    { name: 'Dashboard', href: '/dashboard', icon: DashboardIcon, current: true },
+    { name: 'Compliance', href: '/dashboard/compliance', icon: ComplianceIcon, current: false },
+    { name: 'Risk Assessment', href: '/dashboard/risk', icon: RiskIcon, current: false },
+    { name: 'Policies', href: '/dashboard/policies', icon: PoliciesIcon, current: false },
+    { name: 'Audits', href: '/dashboard/audits', icon: AuditsIcon, current: false },
+    { name: 'Reports', href: '/dashboard/reports', icon: ReportsIcon, current: false },
+    { name: 'Team', href: '/dashboard/team', icon: TeamIcon, current: false },
+    { name: 'Settings', href: '/dashboard/settings', icon: SettingsIcon, current: false },
   ];
 
   return (
@@ -45,20 +55,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
         
         <nav className="mt-8 px-4 space-y-2 flex-1 overflow-y-auto">
-          {navigation.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className={`group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                item.current 
-                  ? 'bg-[#26558e] text-white' 
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-[#26558e]'
-              }`}
-            >
-              <span className="mr-3 text-lg">{item.icon}</span>
-              {item.name}
-            </a>
-          ))}
+          {navigation.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <a
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  item.current 
+                    ? 'bg-[#26558e] text-white shadow-lg' 
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-[#26558e] hover:shadow-md'
+                }`}
+              >
+                <IconComponent className={`mr-3 w-5 h-5 ${
+                  item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#26558e]'
+                }`} />
+                {item.name}
+              </a>
+            );
+          })}
         </nav>
       </div>
 
