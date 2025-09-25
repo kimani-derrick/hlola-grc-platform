@@ -348,3 +348,94 @@ body {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
+
+/* Enhanced Sidebar Gradient */
+.sidebar-gradient {
+  background: linear-gradient(180deg, 
+    #41c3d6 0%,    /* Cyan at top */
+    #2dd4da 25%,   /* Light cyan-blue */
+    #1e90a0 50%,   /* Medium cyan-blue */
+    #26558e 75%,   /* Hlola blue */
+    #1e4470 100%   /* Darker blue at bottom */
+  );
+}
+
+/* Navigation Items */
+.nav-item {
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown Animations */
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.2s ease;
+}
+
+.dropdown-arrow {
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Sub-menu styling */
+.sub-menu-item {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.sub-menu-item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.sub-menu-item:hover::before {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-50%) scale(1.5);
+}
+
+/* Scrollbar for sidebar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}

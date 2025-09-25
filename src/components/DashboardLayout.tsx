@@ -6,14 +6,37 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import {
   DashboardIcon,
-  ComplianceIcon,
-  RiskIcon,
-  PoliciesIcon,
-  AuditsIcon,
-  ReportsIcon,
-  TeamIcon,
   SettingsIcon
 } from './icons/NavIcons';
+import {
+  PrivacyHubIcon,
+  ControlsIcon,
+  DocumentsIcon,
+  AuditCentreIcon,
+  AssessmentsIcon,
+  ConsentManagementIcon,
+  DSRManagementIcon,
+  VendorRiskManagementIcon,
+  DataManagementIcon,
+  IncidentManagementIcon,
+  LearningCentreIcon,
+  DropdownArrowIcon
+} from './icons/ExtendedNavIcons';
+import { ReportsIcon } from './icons/NavIcons';
+
+interface SubMenuItem {
+  name: string;
+  href: string;
+}
+
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  current: boolean;
+  hasDropdown?: boolean;
+  subItems?: SubMenuItem[];
+}
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -23,30 +46,92 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
 
   const handleLogout = () => {
     logout();
     router.push('/');
   };
 
-  const navigation = [
+  const toggleDropdown = (itemName: string) => {
+    setOpenDropdowns(prev => 
+      prev.includes(itemName) 
+        ? prev.filter(name => name !== itemName)
+        : [...prev, itemName]
+    );
+  };
+
+  const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: DashboardIcon, current: true },
-    { name: 'Compliance', href: '/dashboard/compliance', icon: ComplianceIcon, current: false },
-    { name: 'Risk Assessment', href: '/dashboard/risk', icon: RiskIcon, current: false },
-    { name: 'Policies', href: '/dashboard/policies', icon: PoliciesIcon, current: false },
-    { name: 'Audits', href: '/dashboard/audits', icon: AuditsIcon, current: false },
+    { 
+      name: 'Privacy Hub', 
+      href: '/dashboard/privacy-hub', 
+      icon: PrivacyHubIcon, 
+      current: false,
+      hasDropdown: true,
+      subItems: [
+        { name: 'Frameworks', href: '/dashboard/privacy-hub/frameworks' },
+        { name: 'Controls', href: '/dashboard/privacy-hub/controls' },
+        { name: 'Documents', href: '/dashboard/privacy-hub/documents' },
+        { name: 'Audit Center', href: '/dashboard/privacy-hub/audit-center' },
+        { name: 'Reports', href: '/dashboard/privacy-hub/reports' }
+      ]
+    },
+    { name: 'Controls', href: '/dashboard/controls', icon: ControlsIcon, current: false },
+    { name: 'Documents', href: '/dashboard/documents', icon: DocumentsIcon, current: false },
+    { name: 'Audit Centre', href: '/dashboard/audit-centre', icon: AuditCentreIcon, current: false },
     { name: 'Reports', href: '/dashboard/reports', icon: ReportsIcon, current: false },
-    { name: 'Team', href: '/dashboard/team', icon: TeamIcon, current: false },
-    { name: 'Settings', href: '/dashboard/settings', icon: SettingsIcon, current: false },
+    { 
+      name: 'Assessments', 
+      href: '/dashboard/assessments', 
+      icon: AssessmentsIcon, 
+      current: false,
+      hasDropdown: true,
+      subItems: [
+        { name: 'Risk Assessments', href: '/dashboard/assessments/risk' },
+        { name: 'Compliance Assessments', href: '/dashboard/assessments/compliance' },
+        { name: 'Security Assessments', href: '/dashboard/assessments/security' }
+      ]
+    },
+    { name: 'Consent Management', href: '/dashboard/consent-management', icon: ConsentManagementIcon, current: false },
+    { name: 'DSR Management', href: '/dashboard/dsr-management', icon: DSRManagementIcon, current: false },
+    { name: 'Vendor Risk Management', href: '/dashboard/vendor-risk-management', icon: VendorRiskManagementIcon, current: false },
+    { 
+      name: 'Data Management', 
+      href: '/dashboard/data-management', 
+      icon: DataManagementIcon, 
+      current: false,
+      hasDropdown: true,
+      subItems: [
+        { name: 'Data Discovery', href: '/dashboard/data-management/discovery' },
+        { name: 'Data Classification', href: '/dashboard/data-management/classification' },
+        { name: 'Data Lineage', href: '/dashboard/data-management/lineage' }
+      ]
+    },
+    { name: 'Incident Management', href: '/dashboard/incident-management', icon: IncidentManagementIcon, current: false },
+    { name: 'Learning Centre', href: '/dashboard/learning-centre', icon: LearningCentreIcon, current: false },
+    { 
+      name: 'Settings', 
+      href: '/dashboard/settings', 
+      icon: SettingsIcon, 
+      current: false,
+      hasDropdown: true,
+      subItems: [
+        { name: 'Account Settings', href: '/dashboard/settings/account' },
+        { name: 'Organization Settings', href: '/dashboard/settings/organization' },
+        { name: 'Integrations', href: '/dashboard/settings/integrations' }
+      ]
+    },
   ];
 
   return (
     <div className="dashboard-container bg-hlola-gradient">
       {/* Sidebar */}
-      <div className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex lg:flex-col`}>
-        <div className="flex items-center justify-center h-16 px-4 glass-nav border-b border-gray-200">
+      <div className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 sidebar-gradient shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex lg:flex-col`}>
+        
+        <div className="flex items-center justify-center h-16 px-4 border-b border-white/10">
           <Image
-            src="/brand/Hlola Full Color.svg"
+            src="/brand/Hlola Full White.svg"
             alt="hlola"
             width={120}
             height={36}
@@ -54,24 +139,58 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
         </div>
         
-        <nav className="mt-8 px-4 space-y-2 flex-1 overflow-y-auto">
+        <nav className="mt-6 px-4 space-y-1 flex-1 overflow-y-auto sidebar-scroll">
           {navigation.map((item) => {
             const IconComponent = item.icon;
+            const isDropdownOpen = openDropdowns.includes(item.name);
+            
             return (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                  item.current 
-                    ? 'bg-[#26558e] text-white shadow-lg' 
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-[#26558e] hover:shadow-md'
-                }`}
-              >
-                <IconComponent className={`mr-3 w-5 h-5 ${
-                  item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#26558e]'
-                }`} />
-                {item.name}
-              </a>
+              <div key={item.name}>
+                <a
+                  href={item.href}
+                  onClick={(e) => {
+                    if (item.hasDropdown) {
+                      e.preventDefault();
+                      toggleDropdown(item.name);
+                    }
+                  }}
+                  className={`nav-item group flex items-center justify-between px-3 py-3 text-sm font-medium rounded-lg ${
+                    item.current 
+                      ? 'active text-white' 
+                      : 'text-white/90 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <IconComponent className={`mr-3 w-5 h-5 ${
+                      item.current ? 'text-white' : 'text-white/80 group-hover:text-white'
+                    }`} />
+                    <span>{item.name}</span>
+                  </div>
+                  
+                  {item.hasDropdown && (
+                    <DropdownArrowIcon 
+                      className={`dropdown-arrow w-4 h-4 text-white/70 ${
+                        isDropdownOpen ? 'open' : ''
+                      }`} 
+                    />
+                  )}
+                </a>
+
+                {/* Dropdown Sub-menu */}
+                {item.hasDropdown && isDropdownOpen && (
+                  <div className="mt-2 ml-8 space-y-1 dropdown-enter-active">
+                    {item.subItems?.map((subItem) => (
+                      <a
+                        key={subItem.name}
+                        href={subItem.href}
+                        className="sub-menu-item block px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                      >
+                        {subItem.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
@@ -123,18 +242,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                   </svg>
                 </button>
-                
-                {/* Dropdown menu would go here */}
-                <div className="absolute right-0 mt-2 w-48 glass-card rounded-lg shadow-lg py-2 hidden">
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
-                  <button 
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Sign out
-                  </button>
-                </div>
               </div>
               
               <button 
