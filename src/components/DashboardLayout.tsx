@@ -139,7 +139,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
         </div>
         
-        <nav className="mt-6 px-4 space-y-1 flex-1 overflow-y-auto sidebar-scroll">
+        <nav className="mt-6 px-3 space-y-2 flex-1 overflow-y-auto sidebar-scroll">
           {navigation.map((item) => {
             const IconComponent = item.icon;
             const isDropdownOpen = openDropdowns.includes(item.name);
@@ -154,14 +154,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       toggleDropdown(item.name);
                     }
                   }}
-                  className={`nav-item group flex items-center justify-between px-3 py-3 text-sm font-medium rounded-lg ${
+                  className={`nav-item group flex items-center justify-between px-4 py-4 text-base font-medium rounded-lg ${
                     item.current 
                       ? 'active text-white' 
                       : 'text-white/90 hover:text-white'
                   }`}
                 >
                   <div className="flex items-center">
-                    <IconComponent className={`mr-3 w-5 h-5 ${
+                    <IconComponent className={`mr-3 w-6 h-6 ${
                       item.current ? 'text-white' : 'text-white/80 group-hover:text-white'
                     }`} />
                     <span>{item.name}</span>
@@ -183,7 +183,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       <a
                         key={subItem.name}
                         href={subItem.href}
-                        className="sub-menu-item block px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                        className="sub-menu-item block px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
                       >
                         {subItem.name}
                       </a>
