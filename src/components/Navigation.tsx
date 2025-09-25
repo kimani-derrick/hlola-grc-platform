@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import Link from "next/link";
 
 interface NavigationProps {
   scrollY: number;
@@ -9,6 +11,7 @@ interface NavigationProps {
 
 export default function Navigation({ scrollY }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -37,10 +40,37 @@ export default function Navigation({ scrollY }: NavigationProps) {
             </div>
           </div>
 
-          <div className="hidden md:block">
-            <button className="bg-[#26558e] text-white px-6 py-2 rounded-lg hover:bg-[#1e4470] transition-colors">
-              Get Started
-            </button>
+          <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <>
+                <Link href="/dashboard" className="text-gray-700 hover:text-[#26558e] transition-colors">
+                  Dashboard
+                </Link>
+                <div className="flex items-center space-x-2">
+                  <div className="h-8 w-8 rounded-full bg-[#26558e] flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">
+                      {user.name.split(' ').map(n => n[0]).join('')}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-700">{user.name.split(' ')[0]}</span>
+                </div>
+                <button 
+                  onClick={logout}
+                  className="text-gray-700 hover:text-[#26558e] transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="text-gray-700 hover:text-[#26558e] transition-colors">
+                  Login
+                </Link>
+                <button className="bg-[#26558e] text-white px-6 py-2 rounded-lg hover:bg-[#1e4470] transition-colors">
+                  Get Started
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -64,9 +94,24 @@ export default function Navigation({ scrollY }: NavigationProps) {
               <a href="#solutions" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Solutions</a>
               <a href="#resources" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Resources</a>
               <a href="#pricing" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Pricing</a>
-              <button className="w-full text-left bg-[#26558e] text-white px-3 py-2 rounded-lg mt-4">
-                Get Started
-              </button>
+              {user ? (
+                <>
+                  <Link href="/dashboard" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Dashboard</Link>
+                  <button 
+                    onClick={logout}
+                    className="w-full text-left px-3 py-2 text-gray-700 hover:text-[#26558e]"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Login</Link>
+                  <button className="w-full text-left bg-[#26558e] text-white px-3 py-2 rounded-lg mt-4">
+                    Get Started
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
