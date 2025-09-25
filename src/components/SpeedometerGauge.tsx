@@ -26,8 +26,8 @@ export default function SpeedometerGauge({
     return () => clearTimeout(timer);
   }, [value]);
 
-  // Calculate angle for needle (-90 to +90 degrees, 180 degree range)
-  const angle = ((animatedValue / maxValue) * 180) - 90;
+  // Calculate angle for needle (-90° at value 0, +90° at value maxValue)
+  const angle = ((animatedValue / maxValue) * 180) - 90 - 90;
   
   // Status colors with enhanced gradients
   const statusConfig = {
