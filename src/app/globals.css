@@ -272,3 +272,79 @@ body {
 .quick-action-btn:hover::before {
   left: 100%;
 }
+
+/* Speedometer and Dashboard Effects */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 30px rgba(239, 68, 68, 0.6);
+  }
+}
+
+@keyframes needle-sweep {
+  0% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(var(--needle-angle));
+  }
+}
+
+@keyframes progress-fill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--progress-width);
+  }
+}
+
+.speedometer-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+.progress-animated {
+  animation: progress-fill 1.5s ease-out forwards;
+}
+
+/* Gradient backgrounds for cards */
+.bg-gradient-red {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.bg-gradient-green {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.bg-gradient-orange {
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+}
+
+.bg-gradient-cyan {
+  background: linear-gradient(135deg, #ecfeff 0%, #a5f3fc 100%);
+}
+
+/* Enhanced metric cards */
+.metric-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+  z-index: -1;
+  border-radius: inherit;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}

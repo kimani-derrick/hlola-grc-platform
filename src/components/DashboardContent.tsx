@@ -1,39 +1,11 @@
 'use client';
 
 import { useAuth } from '../context/AuthContext';
-import { PoliciesIcon, AuditsIcon, ReportsIcon, TeamIcon } from './icons/NavIcons';
+import SpeedometerGauge from './SpeedometerGauge';
+import MetricCard from './MetricCard';
 
 export default function DashboardContent() {
   const { user } = useAuth();
-
-  const stats = [
-    { name: 'Compliance Score', value: '94%', change: '+2.1%', changeType: 'positive', icon: '📊' },
-    { name: 'Active Policies', value: '12', change: '+1', changeType: 'positive', icon: '📋' },
-    { name: 'Pending Reviews', value: '3', change: '-2', changeType: 'positive', icon: '⏳' },
-    { name: 'Risk Score', value: 'Low', change: 'Stable', changeType: 'neutral', icon: '🛡️' },
-  ];
-
-  const recentActivities = [
-    { id: 1, type: 'completed', message: 'Data mapping completed for EU operations', time: '2 hours ago', icon: '✅' },
-    { id: 2, type: 'warning', message: 'Policy review due tomorrow: Privacy Policy v2.1', time: '4 hours ago', icon: '⚠️' },
-    { id: 3, type: 'info', message: 'New team member Sarah joined Compliance team', time: '1 day ago', icon: '👥' },
-    { id: 4, type: 'completed', message: 'Monthly compliance report generated', time: '2 days ago', icon: '📈' },
-    { id: 5, type: 'info', message: 'GDPR assessment started for Q1 2025', time: '3 days ago', icon: '🔍' },
-  ];
-
-  const upcomingTasks = [
-    { id: 1, title: 'Review Privacy Policy v2.1', dueDate: 'Tomorrow', priority: 'high', assignee: 'Sarah O.' },
-    { id: 2, title: 'Complete vendor risk assessment', dueDate: 'Jan 30', priority: 'medium', assignee: 'John D.' },
-    { id: 3, title: 'Update employee training modules', dueDate: 'Feb 5', priority: 'low', assignee: 'Maria K.' },
-    { id: 4, title: 'Audit preparation checklist', dueDate: 'Feb 12', priority: 'high', assignee: 'Sarah O.' },
-  ];
-
-  const complianceModules = [
-    { name: 'GDPR', status: 'compliant', score: 96, icon: '🇪🇺' },
-    { name: 'POPIA', status: 'compliant', score: 94, icon: '🇿🇦' },
-    { name: 'SOC 2', status: 'in-progress', score: 89, icon: '🔒' },
-    { name: 'ISO 27001', status: 'compliant', score: 92, icon: '🛡️' },
-  ];
 
   return (
     <div className="space-y-8">
@@ -62,148 +34,162 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.name} className="glass-card rounded-2xl p-6 hover-lift">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-2xl font-bold text-[#26558e]">{stat.value}</p>
-              </div>
-              <div className="text-3xl">{stat.icon}</div>
-            </div>
-            <div className="mt-2 flex items-center">
-              <span className={`text-sm font-medium ${
-                stat.changeType === 'positive' ? 'text-green-600' : 
-                stat.changeType === 'negative' ? 'text-red-600' : 'text-gray-500'
-              }`}>
-                {stat.change}
+      {/* Main Compliance Dashboard */}
+      <div className="grid lg:grid-cols-5 gap-8">
+        {/* Speedometer Gauge - Left Side */}
+        <div className="lg:col-span-2">
+          <div className="glass-card rounded-2xl p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100">
+            <SpeedometerGauge
+              value={11}
+              maxValue={100}
+              title="critical"
+              status="critical"
+              size={280}
+            />
+          </div>
+        </div>
+
+        {/* Overall Compliance Details - Right Side */}
+        <div className="lg:col-span-3">
+          <div className="glass-card rounded-2xl p-6 h-full bg-gradient-to-br from-red-50 to-red-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Overall Compliance</h2>
+              <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                Critical Priority
               </span>
-              <span className="text-sm text-gray-500 ml-1">from last week</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              <div>
+                <div className="text-sm text-blue-600 font-medium mb-1">Current Progress</div>
+                <div className="text-3xl font-bold text-red-500">10.89%</div>
+              </div>
+              <div>
+                <div className="text-sm text-blue-600 font-medium mb-1">Next Milestone</div>
+                <div className="text-sm text-gray-600">Target 50%</div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-blue-600 font-medium">Progress to target</span>
+                <span className="text-sm font-semibold text-gray-800">12%</span>
+              </div>
+              <div className="w-full bg-gray-300 rounded-full h-3">
+                <div 
+                  className="h-3 bg-red-500 rounded-full transition-all duration-1000 ease-out"
+                  style={{ 
+                    width: '12%',
+                    boxShadow: '0 0 8px #ef444440'
+                  }}
+                ></div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-800">170</div>
+                <div className="text-sm text-gray-600">Total Controls</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">99</div>
+                <div className="text-sm text-gray-600">Completed</div>
+              </div>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* Main Content Grid */}
+      {/* Metrics Cards */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          value={86}
+          label="Controls"
+          progress={75}
+          change="+5%"
+          changeType="positive"
+          color="green"
+        />
+        <MetricCard
+          value={30}
+          label="Policies"
+          progress={78}
+          change="+5%"
+          changeType="positive"
+          color="orange"
+        />
+        <MetricCard
+          value={16}
+          label="Risks"
+          progress={75}
+          change="-2%"
+          changeType="negative"
+          color="red"
+        />
+        <MetricCard
+          value={38}
+          label="Tasks"
+          progress={70}
+          change="0%"
+          changeType="neutral"
+          color="cyan"
+        />
+      </div>
+
+      {/* Recent Activities - Simplified */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {/* Recent Activities */}
         <div className="glass-card rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-[#26558e] mb-4">Recent Activities</h3>
           <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-3">
-                <div className="text-lg">{activity.icon}</div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">{activity.message}</p>
-                  <p className="text-xs text-gray-500">{activity.time}</p>
-                </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-900">Critical compliance gap identified in data processing</p>
+                <p className="text-xs text-gray-500">2 hours ago</p>
               </div>
-            ))}
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-900">Policy review due tomorrow: Privacy Policy v2.1</p>
+                <p className="text-xs text-gray-500">4 hours ago</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-900">New team member Sarah joined Compliance team</p>
+                <p className="text-xs text-gray-500">1 day ago</p>
+              </div>
+            </div>
           </div>
-          <button className="mt-4 text-sm text-[#41c3d6] hover:text-[#359bb0] font-medium">
-            View all activities →
-          </button>
         </div>
 
-        {/* Upcoming Tasks */}
         <div className="glass-card rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-[#26558e] mb-4">Upcoming Tasks</h3>
+          <h3 className="text-lg font-semibold text-[#26558e] mb-4">Priority Actions</h3>
           <div className="space-y-4">
-            {upcomingTasks.map((task) => (
-              <div key={task.id} className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{task.title}</p>
-                  <p className="text-xs text-gray-500">Assigned to {task.assignee}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">{task.dueDate}</p>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    task.priority === 'high' ? 'bg-red-100 text-red-800' :
-                    task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
-                  }`}>
-                    {task.priority}
-                  </span>
-                </div>
+            <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Address critical compliance gaps</p>
+                <p className="text-xs text-gray-500">Due: Today</p>
               </div>
-            ))}
+              <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-1 rounded">URGENT</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Review high-risk policies</p>
+                <p className="text-xs text-gray-500">Due: Tomorrow</p>
+              </div>
+              <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded">HIGH</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Update compliance training</p>
+                <p className="text-xs text-gray-500">Due: Next week</p>
+              </div>
+              <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded">MEDIUM</span>
+            </div>
           </div>
-          <button className="mt-4 text-sm text-[#41c3d6] hover:text-[#359bb0] font-medium">
-            View all tasks →
-          </button>
-        </div>
-      </div>
-
-      {/* Compliance Modules */}
-      <div className="glass-card rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-[#26558e] mb-6">Compliance Modules</h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {complianceModules.map((module) => (
-            <div key={module.name} className="bg-white/50 rounded-xl p-4 hover-lift">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-2">
-                  <span className="text-2xl">{module.icon}</span>
-                  <h4 className="font-medium text-gray-900">{module.name}</h4>
-                </div>
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  module.status === 'compliant' ? 'bg-green-100 text-green-800' :
-                  module.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {module.status}
-                </span>
-              </div>
-              
-              <div className="mb-2">
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Score</span>
-                  <span className="font-semibold">{module.score}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full ${
-                      module.score >= 95 ? 'bg-green-500' :
-                      module.score >= 90 ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}
-                    style={{ width: `${module.score}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="glass-card rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-[#26558e] mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
-            <div className="mb-3 flex justify-center">
-              <PoliciesIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
-            </div>
-            <p className="text-sm font-medium text-gray-900">New Policy</p>
-          </button>
-          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
-            <div className="mb-3 flex justify-center">
-              <AuditsIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
-            </div>
-            <p className="text-sm font-medium text-gray-900">Start Audit</p>
-          </button>
-          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
-            <div className="mb-3 flex justify-center">
-              <ReportsIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
-            </div>
-            <p className="text-sm font-medium text-gray-900">Generate Report</p>
-          </button>
-          <button className="glass-button p-4 rounded-xl text-center hover-lift group">
-            <div className="mb-3 flex justify-center">
-              <TeamIcon className="w-8 h-8 text-[#26558e] group-hover:text-[#41c3d6] transition-colors" />
-            </div>
-            <p className="text-sm font-medium text-gray-900">Invite Team</p>
-          </button>
         </div>
       </div>
     </div>
