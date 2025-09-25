@@ -17,7 +17,7 @@ export default function DashboardContent() {
               Welcome back, {user?.name.split(' ')[0]}! 👋
             </h1>
             <p className="text-gray-600 mt-1">
-              Here's your compliance overview for today
+              Here&apos;s your compliance overview for today
             </p>
           </div>
           <div className="text-right">

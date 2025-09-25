@@ -170,7 +170,7 @@ export default function LoginForm() {
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <a href="#" className="text-[#41c3d6] hover:text-[#359bb0] font-medium">
                   Start your free trial
                 </a>
