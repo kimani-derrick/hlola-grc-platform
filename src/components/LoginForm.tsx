@@ -35,7 +35,7 @@ export default function LoginForm() {
     <div className="relative min-h-screen flex items-center justify-center bg-hlola-gradient py-12 px-4 sm:px-6 lg:px-8">
       <Link
         href="/"
-        className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 text-sm font-semibold text-[#26558e] bg-white/70 hover:bg-white transition-colors px-4 py-2 rounded-full shadow-lg backdrop-blur"
+        className="absolute top-6 left-4 sm:left-6 z-20 inline-flex items-center gap-2 text-sm font-semibold text-[#26558e] bg-white/80 hover:bg-white transition-colors px-3 sm:px-4 py-2 rounded-full shadow-lg backdrop-blur"
       >
         <svg
           className="h-4 w-4"
@@ -57,8 +57,8 @@ export default function LoginForm() {
         <div className="absolute top-20 left-1/2 w-80 h-80 bg-[#41c3d6] rounded-full mix-blend-normal filter blur-2xl opacity-10 float-animation" style={{animationDelay: '6s'}}></div>
       </div>
 
-      <div className="max-w-md w-full space-y-8 relative z-10">
-        <div className="glass-card rounded-3xl p-8 md:p-12 shadow-2xl">
+      <div className="max-w-md w-full space-y-8 relative z-10 px-2 sm:px-0">
+        <div className="glass-card rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl">
           <div className="text-center mb-8">
             <Image
               src="/brand/Hlola Full Color.svg"

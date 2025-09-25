@@ -45,7 +45,7 @@ export default function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
             <div key={index} className="glass-card rounded-2xl p-6 hover-lift">
               <div className="text-3xl mb-4">{feature.icon}</div>

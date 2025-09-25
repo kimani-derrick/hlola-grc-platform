@@ -32,7 +32,7 @@ export default function ProblemSolutionSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {problems.map((item, index) => (
             <div key={index} className="glass-card rounded-2xl p-6 hover-lift">
               <div className="text-4xl mb-4">{item.icon}</div>

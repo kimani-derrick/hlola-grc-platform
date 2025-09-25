@@ -1,11 +1,32 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import SpeedometerGauge from './SpeedometerGauge';
 import MetricCard from './MetricCard';
 
 export default function DashboardContent() {
   const { user } = useAuth();
+  const [gaugeSize, setGaugeSize] = useState(320);
+
+  useEffect(() => {
+    const updateGaugeSize = () => {
+      const width = window.innerWidth;
+      if (width < 480) {
+        setGaugeSize(220);
+      } else if (width < 768) {
+        setGaugeSize(260);
+      } else if (width < 1024) {
+        setGaugeSize(300);
+      } else {
+        setGaugeSize(320);
+      }
+    };
+
+    updateGaugeSize();
+    window.addEventListener('resize', updateGaugeSize);
+    return () => window.removeEventListener('resize', updateGaugeSize);
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -38,14 +59,14 @@ export default function DashboardContent() {
       <div className="grid lg:grid-cols-5 gap-8">
         {/* Speedometer Gauge - Left Side */}
         <div className="lg:col-span-2">
-          <div className="glass-card rounded-2xl p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 gauge-container">
+          <div className="glass-card rounded-2xl p-6 sm:p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 gauge-container">
             <div className="gauge-glow">
               <SpeedometerGauge
                 value={11}
                 maxValue={100}
                 title="critical"
                 status="critical"
-                size={320}
+                size={gaugeSize}
               />
             </div>
           </div>
@@ -53,7 +74,7 @@ export default function DashboardContent() {
 
         {/* Overall Compliance Details - Right Side */}
         <div className="lg:col-span-3">
-          <div className="glass-card rounded-2xl p-6 h-full bg-gradient-to-br from-red-50 to-red-100">
+          <div className="glass-card rounded-2xl p-6 sm:p-8 h-full bg-gradient-to-br from-red-50 to-red-100">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-800">Overall Compliance</h2>
               <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold">

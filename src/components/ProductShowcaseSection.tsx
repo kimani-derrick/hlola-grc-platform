@@ -10,8 +10,8 @@ export default function ProductShowcaseSection() {
   return (
     <section className="py-20 bg-hlola-gradient" id="product">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
+        <div className="grid gap-12 items-center lg:grid-cols-2">
+          <div className="order-2 lg:order-1">
             <h2 className="text-4xl font-bold text-[#26558e] mb-6">
               Meet hlola privacy suite
             </h2>
@@ -38,7 +38,7 @@ export default function ProductShowcaseSection() {
             </button>
           </div>
           
-          <div className="glass-card rounded-2xl p-8 hover-lift">
+          <div className="order-1 lg:order-2 glass-card rounded-2xl p-6 sm:p-8 hover-lift">
             <div className="bg-gradient-to-br from-[#26558e] to-[#41c3d6] rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-4">Dashboard Preview</h3>
               <div className="space-y-3">
