@@ -31,10 +31,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-hlola-gradient">
+    <div className="dashboard-container bg-hlola-gradient">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-        <div className="flex items-center justify-center h-16 px-4 glass-nav">
+      <div className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex lg:flex-col`}>
+        <div className="flex items-center justify-center h-16 px-4 glass-nav border-b border-gray-200">
           <Image
             src="/brand/Hlola Full Color.svg"
             alt="hlola"
@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
         </div>
         
-        <nav className="mt-8 px-4 space-y-2">
+        <nav className="mt-8 px-4 space-y-2 flex-1 overflow-y-auto">
           {navigation.map((item) => (
             <a
               key={item.name}
@@ -63,9 +63,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64 flex flex-col flex-1">
+      <div className="dashboard-main">
         {/* Top navigation */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 glass-nav px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 glass-nav px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 w-full">
           <button
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
@@ -133,7 +133,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
 
         {/* Page content */}
-        <main className="flex-1">
+        <main className="dashboard-content">
           <div className="px-4 py-8 sm:px-6 lg:px-8">
             {children}
           </div>

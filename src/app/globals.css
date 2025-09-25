@@ -196,3 +196,45 @@ body {
     rgba(255, 255, 255, 0.8) 50%,
     rgba(38, 85, 142, 0.1) 100%);
 }
+
+/* Dashboard Layout Fixes */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.dashboard-sidebar {
+  width: 16rem; /* 64 in rem */
+  flex-shrink: 0;
+}
+
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Ensure proper scrolling */
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 1023px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  
+  .dashboard-sidebar {
+    width: 100%;
+    height: auto;
+  }
+  
+  .dashboard-main {
+    width: 100%;
+  }
+}
