@@ -38,14 +38,16 @@ export default function DashboardContent() {
       <div className="grid lg:grid-cols-5 gap-8">
         {/* Speedometer Gauge - Left Side */}
         <div className="lg:col-span-2">
-          <div className="glass-card rounded-2xl p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100">
-            <SpeedometerGauge
-              value={11}
-              maxValue={100}
-              title="critical"
-              status="critical"
-              size={280}
-            />
+          <div className="glass-card rounded-2xl p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 gauge-container">
+            <div className="gauge-glow">
+              <SpeedometerGauge
+                value={11}
+                maxValue={100}
+                title="critical"
+                status="critical"
+                size={320}
+              />
+            </div>
           </div>
         </div>
 

@@ -439,3 +439,80 @@ body {
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
 }
+
+/* Enhanced Speedometer Animations */
+@keyframes needle-sweep {
+  0% {
+    transform: rotate(-90deg);
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--final-angle));
+    opacity: 1;
+  }
+}
+
+@keyframes arc-fill {
+  0% {
+    stroke-dashoffset: 100%;
+  }
+  100% {
+    stroke-dashoffset: var(--final-offset);
+  }
+}
+
+@keyframes digital-glow {
+  0%, 100% {
+    text-shadow: 0 0 5px currentColor;
+  }
+  50% {
+    text-shadow: 0 0 15px currentColor, 0 0 25px currentColor;
+  }
+}
+
+.speedometer-needle {
+  animation: needle-sweep 2s ease-out;
+}
+
+.speedometer-arc {
+  animation: arc-fill 2s ease-out;
+}
+
+.digital-display {
+  animation: digital-glow 2s infinite;
+}
+
+/* Premium gauge effects */
+.gauge-glow {
+  filter: drop-shadow(0 0 20px rgba(220, 38, 38, 0.4))
+          drop-shadow(0 0 40px rgba(220, 38, 38, 0.2))
+          drop-shadow(0 0 60px rgba(220, 38, 38, 0.1));
+}
+
+.gauge-container {
+  position: relative;
+}
+
+.gauge-container::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes gauge-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}

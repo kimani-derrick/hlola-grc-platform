@@ -183,7 +183,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       <a
                         key={subItem.name}
                         href={subItem.href}
-                        className="sub-menu-item block px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                        className="sub-menu-item block px-4 py-2.5 text-base text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
                       >
                         {subItem.name}
                       </a>

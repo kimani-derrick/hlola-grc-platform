@@ -15,41 +15,41 @@ export default function SpeedometerGauge({
   maxValue = 100, 
   title, 
   status,
-  size = 200 
+  size = 300 
 }: SpeedometerGaugeProps) {
   const [animatedValue, setAnimatedValue] = useState(0);
   
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedValue(value);
-    }, 100);
+    }, 500);
     return () => clearTimeout(timer);
   }, [value]);
 
   // Calculate angle for needle (-90 to +90 degrees, 180 degree range)
   const angle = ((animatedValue / maxValue) * 180) - 90;
   
-  // Status colors
-  const statusColors = {
-    critical: '#ef4444', // red-500
-    warning: '#f97316',  // orange-500
-    good: '#22c55e'      // green-500
+  // Status colors with enhanced gradients
+  const statusConfig = {
+    critical: {
+      color: '#dc2626',
+      glowColor: '#dc2626',
+      bgGradient: 'from-red-500/20 to-red-700/30'
+    },
+    warning: {
+      color: '#ea580c', 
+      glowColor: '#ea580c',
+      bgGradient: 'from-orange-500/20 to-orange-700/30'
+    },
+    good: {
+      color: '#16a34a',
+      glowColor: '#16a34a', 
+      bgGradient: 'from-green-500/20 to-green-700/30'
+    }
   };
 
-  const statusColor = statusColors[status];
+  const config = statusConfig[status];
   
-  // Create arc path for the gauge background
-  const createArcPath = (centerX: number, centerY: number, radius: number, startAngle: number, endAngle: number) => {
-    const start = polarToCartesian(centerX, centerY, radius, endAngle);
-    const end = polarToCartesian(centerX, centerY, radius, startAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-    
-    return [
-      "M", start.x, start.y, 
-      "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
-    ].join(" ");
-  };
-
   const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
     const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
     return {
@@ -59,123 +59,225 @@ export default function SpeedometerGauge({
   };
 
   const center = size / 2;
-  const radius = size * 0.35;
-  const needleLength = radius - 10;
+  const outerRadius = size * 0.4;
+  const innerRadius = size * 0.32;
+  const needleLength = outerRadius - 20;
 
   return (
     <div className="relative flex flex-col items-center">
-      <svg width={size} height={size * 0.7} className="overflow-visible">
-        {/* Gauge Background Circle */}
-        <circle
-          cx={center}
-          cy={center}
-          r={radius}
-          fill="none"
-          stroke="#e5e7eb"
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={`${Math.PI * radius} ${Math.PI * radius}`}
-          strokeDashoffset={Math.PI * radius / 2}
-        />
-        
-        {/* Progress Arc */}
-        <circle
-          cx={center}
-          cy={center}
-          r={radius}
-          fill="none"
-          stroke={statusColor}
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={`${Math.PI * radius} ${Math.PI * radius}`}
-          strokeDashoffset={Math.PI * radius - (Math.PI * radius * (animatedValue / maxValue)) / 2}
-          className="transition-all duration-1000 ease-out"
-          style={{
-            filter: `drop-shadow(0 0 6px ${statusColor}40)`,
-          }}
-        />
-
-        {/* Tick marks */}
-        {Array.from({ length: 11 }, (_, i) => {
-          const tickAngle = -90 + (i * 18); // 180 degrees / 10 intervals
-          const outerRadius = radius + 5;
-          const innerRadius = radius - 5;
-          const isMain = i % 2 === 0;
-          
-          const outer = polarToCartesian(center, center, outerRadius, tickAngle);
-          const inner = polarToCartesian(center, center, innerRadius, tickAngle);
-          
-          return (
-            <line
-              key={i}
-              x1={outer.x}
-              y1={outer.y}
-              x2={inner.x}
-              y2={inner.y}
-              stroke="#9ca3af"
-              strokeWidth={isMain ? "2" : "1"}
-            />
-          );
-        })}
-
-        {/* Needle */}
-        <g transform={`rotate(${angle} ${center} ${center})`}>
-          <line
-            x1={center}
-            y1={center}
-            x2={center + needleLength}
-            y2={center}
-            stroke={statusColor}
-            strokeWidth="3"
-            strokeLinecap="round"
-            className="transition-all duration-1000 ease-out"
-            style={{
-              filter: `drop-shadow(0 2px 4px ${statusColor}60)`,
-            }}
-          />
+      {/* Digital Display Counter - Top Left Inside Card */}
+      <div className="absolute -top-2 -left-36 z-10">
+        <div className="bg-black/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-2xl border border-gray-300">
+          <div 
+            className="text-2xl font-mono font-bold text-center transition-all duration-1000 ease-out"
+            style={{ color: config.color }}
+          >
+            {Math.round(animatedValue)}
+          </div>
+          <div className="text-xs text-gray-300 text-center mt-1 font-semibold tracking-wider">
+            {title.toUpperCase()}
+          </div>
+        </div>
+      </div>
+      <div className="relative">
+        <svg width={size} height={size * 0.75} className="overflow-visible drop-shadow-2xl">
+          {/* Outer Ring - Decorative */}
           <circle
             cx={center}
             cy={center}
-            r="6"
-            fill={statusColor}
-            className="transition-all duration-1000 ease-out"
+            r={outerRadius + 8}
+            fill="none"
+            stroke="url(#outerGradient)"
+            strokeWidth="2"
+            className="opacity-60"
           />
-        </g>
 
-        {/* Needle tip glow effect */}
-        <g transform={`rotate(${angle} ${center} ${center})`}>
-          <circle
-            cx={center + needleLength - 5}
-            cy={center}
-            r="3"
-            fill={statusColor}
-            className="transition-all duration-1000 ease-out animate-pulse"
+          {/* Main Gauge Background Arc */}
+          <path
+            d={`M ${center - outerRadius} ${center} A ${outerRadius} ${outerRadius} 0 0 1 ${center + outerRadius} ${center}`}
+            fill="none"
+            stroke="#e5e7eb"
+            strokeWidth="20"
+            strokeLinecap="round"
+            className="drop-shadow-sm"
+          />
+          
+          {/* Progress Arc with Enhanced Styling */}
+          <path
+            d={`M ${center - outerRadius} ${center} A ${outerRadius} ${outerRadius} 0 0 1 ${center + outerRadius} ${center}`}
+            fill="none"
+            stroke="url(#progressGradient)"
+            strokeWidth="20"
+            strokeLinecap="round"
+            strokeDasharray={Math.PI * outerRadius}
+            strokeDashoffset={Math.PI * outerRadius - (Math.PI * outerRadius * (animatedValue / maxValue))}
+            className="transition-all duration-2000 ease-out drop-shadow-lg"
             style={{
-              filter: `drop-shadow(0 0 8px ${statusColor})`,
+              filter: `drop-shadow(0 0 10px ${config.color}60) drop-shadow(0 0 20px ${config.color}30)`,
             }}
           />
-        </g>
-      </svg>
 
-      {/* Value Display */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-        <div 
-          className="text-4xl font-bold transition-all duration-1000 ease-out"
-          style={{ color: statusColor }}
-        >
-          {Math.round(animatedValue)}
-        </div>
-        <div className={`text-xs font-semibold px-2 py-1 rounded-full text-white mt-1 inline-block`}
-             style={{ backgroundColor: statusColor }}>
-          {title.toUpperCase()}
-        </div>
+          {/* Inner Ring for Depth */}
+          <circle
+            cx={center}
+            cy={center}
+            r={innerRadius}
+            fill="none"
+            stroke="#f3f4f6"
+            strokeWidth="1"
+            className="opacity-40"
+          />
+
+          {/* Enhanced Tick Marks */}
+          {Array.from({ length: 21 }, (_, i) => {
+            const tickAngle = -90 + (i * 9); // 180 degrees / 20 intervals
+            const isMainTick = i % 5 === 0;
+            const isMidTick = i % 5 === 2.5;
+            
+            const outerTickRadius = outerRadius + (isMainTick ? 15 : isMidTick ? 8 : 5);
+            const innerTickRadius = outerRadius - (isMainTick ? 8 : isMidTick ? 4 : 2);
+            
+            const outer = polarToCartesian(center, center, outerTickRadius, tickAngle);
+            const inner = polarToCartesian(center, center, innerTickRadius, tickAngle);
+            
+            return (
+              <line
+                key={i}
+                x1={outer.x}
+                y1={outer.y}
+                x2={inner.x}
+                y2={inner.y}
+                stroke={isMainTick ? "#4b5563" : isMidTick ? "#6b7280" : "#9ca3af"}
+                strokeWidth={isMainTick ? "3" : isMidTick ? "2" : "1"}
+                strokeLinecap="round"
+                className="drop-shadow-sm"
+              />
+            );
+          })}
+
+          {/* Scale Numbers */}
+          {Array.from({ length: 11 }, (_, i) => {
+            const tickAngle = -90 + (i * 18);
+            const numberRadius = outerRadius + 35;
+            const pos = polarToCartesian(center, center, numberRadius, tickAngle);
+            const number = (i * 10).toString();
+            
+            return (
+              <text
+                key={i}
+                x={pos.x}
+                y={pos.y + 6}
+                textAnchor="middle"
+                className="text-sm font-bold fill-gray-600"
+                style={{ fontSize: '14px' }}
+              >
+                {number}
+              </text>
+            );
+          })}
+
+          {/* Premium Needle Design */}
+          <g 
+            transform={`rotate(${angle} ${center} ${center})`}
+            className="transition-all duration-2000 ease-out"
+          >
+            {/* Needle Shadow */}
+            <polygon
+              points={`${center},${center} ${center + needleLength - 5},${center - 2} ${center + needleLength},${center} ${center + needleLength - 5},${center + 2}`}
+              fill="rgba(0,0,0,0.3)"
+              transform="translate(2,2)"
+            />
+            
+            {/* Main Needle Body */}
+            <polygon
+              points={`${center},${center} ${center + needleLength - 5},${center - 4} ${center + needleLength},${center} ${center + needleLength - 5},${center + 4}`}
+              fill={`url(#needleGradient)`}
+              stroke={config.color}
+              strokeWidth="1"
+              className="drop-shadow-lg"
+            />
+            
+            {/* Needle Tip */}
+            <circle
+              cx={center + needleLength - 2}
+              cy={center}
+              r="3"
+              fill={config.color}
+              className="animate-pulse"
+              style={{
+                filter: `drop-shadow(0 0 6px ${config.color}) drop-shadow(0 0 12px ${config.color}60)`,
+              }}
+            />
+          </g>
+
+          {/* Center Hub - Enhanced */}
+          <circle
+            cx={center}
+            cy={center}
+            r="20"
+            fill="url(#hubGradient)"
+            stroke="#374151"
+            strokeWidth="2"
+            className="drop-shadow-xl"
+          />
+          
+          <circle
+            cx={center}
+            cy={center}
+            r="12"
+            fill={config.color}
+            className="drop-shadow-lg animate-pulse"
+            style={{
+              filter: `drop-shadow(0 0 8px ${config.color}80)`,
+            }}
+          />
+
+          {/* Gradient Definitions */}
+          <defs>
+            <linearGradient id="outerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#d1d5db" />
+              <stop offset="100%" stopColor="#9ca3af" />
+            </linearGradient>
+            
+            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={config.color} />
+              <stop offset="50%" stopColor={config.color} stopOpacity="0.8" />
+              <stop offset="100%" stopColor={config.color} stopOpacity="0.9" />
+            </linearGradient>
+            
+            <radialGradient id="needleGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#f9fafb" />
+              <stop offset="50%" stopColor="#e5e7eb" />
+              <stop offset="100%" stopColor="#9ca3af" />
+            </radialGradient>
+            
+            <radialGradient id="hubGradient" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#f3f4f6" />
+              <stop offset="70%" stopColor="#d1d5db" />
+              <stop offset="100%" stopColor="#9ca3af" />
+            </radialGradient>
+          </defs>
+        </svg>
+
       </div>
 
-      {/* Scale labels */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
-        <div className="text-sm font-medium text-gray-600">{title} Score</div>
-        <div className="text-xs text-gray-500">Below Standards</div>
+      {/* Status Indicator */}
+      <div className="mt-16 text-center">
+        <div className="text-lg font-bold text-gray-800 mb-1">Overall Compliance Score</div>
+        <div className="flex items-center justify-center gap-2">
+          <div 
+            className="w-3 h-3 rounded-full animate-pulse"
+            style={{ backgroundColor: config.color }}
+          />
+          <span className="text-sm font-medium text-gray-600">
+            {status === 'critical' ? 'Below Standards' : 
+             status === 'warning' ? 'Needs Attention' : 'Good Standing'}
+          </span>
+        </div>
       </div>
+      
+      {/* Extra spacing for bottom text */}
+      <div className="h-16"></div>
     </div>
   );
 }
