@@ -20,13 +20,19 @@ import {
   DataManagementIcon,
   IncidentManagementIcon,
   LearningCentreIcon,
-  DropdownArrowIcon
+  DropdownArrowIcon,
+  FrameworksIcon,
+  ControlsSubIcon,
+  DocumentsSubIcon,
+  AuditCenterSubIcon,
+  ReportsSubIcon
 } from './icons/ExtendedNavIcons';
 import { ReportsIcon } from './icons/NavIcons';
 
 interface SubMenuItem {
   name: string;
   href: string;
+  icon?: React.ComponentType<{ className?: string }>;
 }
 
 interface NavigationItem {
@@ -70,11 +76,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       current: false,
       hasDropdown: true,
       subItems: [
-        { name: 'Frameworks', href: '/dashboard/privacy-hub/frameworks' },
-        { name: 'Controls', href: '/dashboard/privacy-hub/controls' },
-        { name: 'Documents', href: '/dashboard/privacy-hub/documents' },
-        { name: 'Audit Center', href: '/dashboard/privacy-hub/audit-center' },
-        { name: 'Reports', href: '/dashboard/privacy-hub/reports' }
+        { name: 'Frameworks', href: '/dashboard/privacy-hub/frameworks', icon: FrameworksIcon },
+        { name: 'Controls', href: '/dashboard/privacy-hub/controls', icon: ControlsSubIcon },
+        { name: 'Documents', href: '/dashboard/privacy-hub/documents', icon: DocumentsSubIcon },
+        { name: 'Audit Center', href: '/dashboard/privacy-hub/audit-center', icon: AuditCenterSubIcon },
+        { name: 'Reports', href: '/dashboard/privacy-hub/reports', icon: ReportsSubIcon }
       ]
     },
     { name: 'Controls', href: '/dashboard/controls', icon: ControlsIcon, current: false },
@@ -127,7 +133,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="dashboard-container bg-hlola-gradient">
       {/* Sidebar */}
-      <div className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 sidebar-gradient shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex lg:flex-col`}>
+      <div className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 sidebar-gradient shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0`}>
         
         <div className="flex items-center justify-center h-16 px-4 border-b border-white/10">
           <Image
@@ -179,15 +185,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {/* Dropdown Sub-menu */}
                 {item.hasDropdown && isDropdownOpen && (
                   <div className="mt-2 ml-8 space-y-1 dropdown-enter-active">
-                    {item.subItems?.map((subItem) => (
-                      <a
-                        key={subItem.name}
-                        href={subItem.href}
-                        className="sub-menu-item block px-4 py-2.5 text-base text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
-                      >
-                        {subItem.name}
-                      </a>
-                    ))}
+                    {item.subItems?.map((subItem) => {
+                      const SubItemIcon = subItem.icon;
+                      return (
+                        <a
+                          key={subItem.name}
+                          href={subItem.href}
+                          className="sub-menu-item flex items-center px-4 py-2.5 text-base text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                        >
+                          {SubItemIcon && (
+                            <SubItemIcon className="w-4 h-4 mr-3 text-white/60" />
+                          )}
+                          {subItem.name}
+                        </a>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -199,7 +211,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content */}
       <div className="dashboard-main">
         {/* Top navigation */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 glass-nav px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 w-full">
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-2 glass-nav px-2 shadow-sm sm:gap-x-3 sm:px-4 lg:px-6 w-full">
           <button
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
@@ -212,33 +224,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           <div className="h-6 w-px bg-gray-200 lg:hidden" />
 
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="relative flex flex-1 items-center">
-              <div className="flex items-center gap-4">
-                <h1 className="text-xl font-semibold text-[#26558e]">Dashboard</h1>
+          <div className="flex flex-1 gap-x-2 self-stretch lg:gap-x-3">
+            <div className="relative flex flex-1 items-center min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-semibold text-[#26558e]">Dashboard</h1>
               </div>
             </div>
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
+            <div className="flex items-center gap-x-1 lg:gap-x-2 flex-shrink-0">
               {/* Notifications */}
-              <button type="button" className="glass-button p-2 rounded-lg">
-                <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <button type="button" className="glass-button p-1.5 rounded-lg">
+                <svg className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                 </svg>
               </button>
 
               {/* Profile dropdown */}
-              <div className="relative">
-                <button className="flex items-center gap-x-3 glass-card rounded-lg px-4 py-2 hover-lift">
-                  <div className="h-8 w-8 rounded-full bg-[#26558e] flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">
+              <div className="relative flex-shrink-0">
+                <button className="flex items-center gap-x-1 lg:gap-x-2 glass-card rounded-lg px-1.5 lg:px-3 py-1.5 hover-lift">
+                  <div className="h-7 w-7 rounded-full bg-[#26558e] flex items-center justify-center">
+                    <span className="text-white font-semibold text-xs">
                       {user?.name.split(' ').map(n => n[0]).join('')}
                     </span>
                   </div>
                   <div className="hidden lg:block text-left">
-                    <div className="text-sm font-semibold text-gray-900">{user?.name}</div>
+                    <div className="text-xs font-semibold text-gray-900">{user?.name}</div>
                     <div className="text-xs text-gray-500">{user?.role}</div>
                   </div>
-                  <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                   </svg>
                 </button>
@@ -246,7 +258,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               
               <button 
                 onClick={handleLogout}
-                className="glass-button px-4 py-2 rounded-lg text-sm font-medium text-[#26558e]"
+                className="glass-button px-2 lg:px-3 py-1.5 rounded-lg text-xs font-medium text-[#26558e] flex-shrink-0 whitespace-nowrap"
               >
                 Logout
               </button>
@@ -256,7 +268,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Page content */}
         <main className="dashboard-content">
-          <div className="px-4 py-8 sm:px-6 lg:px-8">
+          <div className="px-2 py-6 sm:px-4 lg:px-6 max-w-full">
             {children}
           </div>
         </main>

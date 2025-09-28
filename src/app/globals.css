@@ -32,6 +32,16 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Prevent horizontal scroll globally */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 /* Glassmorphism Utilities */
@@ -199,8 +209,8 @@ body {
 
 /* Dashboard Layout Fixes */
 .dashboard-container {
-  display: flex;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .dashboard-sidebar {
@@ -209,33 +219,44 @@ body {
 }
 
 .dashboard-main {
-  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow-x: hidden;
+}
+
+/* On large screens, add left margin to main content to account for fixed sidebar */
+@media (min-width: 1024px) {
+  .dashboard-main {
+    margin-left: 16rem; /* Same as sidebar width */
+    max-width: calc(100vw - 16rem); /* Ensure content doesn't exceed viewport */
+  }
 }
 
 /* Ensure proper scrolling */
 .dashboard-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   max-width: 100%;
+}
+
+/* Prevent wide content from causing horizontal scroll */
+.dashboard-main > * {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Mobile responsive fixes */
 @media (max-width: 1023px) {
-  .dashboard-container {
-    flex-direction: column;
+  .dashboard-main {
+    margin-left: 0; /* Remove left margin on mobile */
+    width: 100%;
   }
   
   .dashboard-sidebar {
-    width: 100%;
-    height: auto;
-  }
-  
-  .dashboard-main {
-    width: 100%;
+    width: 16rem; /* Keep fixed width even on mobile for overlay */
   }
 }
 

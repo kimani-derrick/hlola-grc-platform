@@ -4,12 +4,16 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import SpeedometerGauge from './SpeedometerGauge';
 import MetricCard from './MetricCard';
+import AuditOverview from './AuditOverview';
 
 export default function DashboardContent() {
   const { user } = useAuth();
   const [gaugeSize, setGaugeSize] = useState(320);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    
     const updateGaugeSize = () => {
       const width = window.innerWidth;
       if (width < 480) {
@@ -29,27 +33,27 @@ export default function DashboardContent() {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 max-w-full">
       {/* Welcome Section */}
-      <div className="glass-card rounded-2xl p-6">
+      <div className="glass-card rounded-2xl p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#26558e]">
+            <h1 className="text-xl font-bold text-[#26558e]">
               Welcome back, {user?.name.split(' ')[0]}! 👋
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 mt-1 text-sm">
               Here&apos;s your compliance overview for today
             </p>
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-500">Today</p>
             <p className="text-lg font-semibold text-[#26558e]">
-              {new Date().toLocaleDateString('en-US', { 
+              {isClient ? new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
                 day: 'numeric' 
-              })}
+              }) : 'Loading...'}
             </p>
           </div>
         </div>
@@ -59,7 +63,18 @@ export default function DashboardContent() {
       <div className="grid lg:grid-cols-5 gap-8">
         {/* Speedometer Gauge - Left Side */}
         <div className="lg:col-span-2">
-          <div className="glass-card rounded-2xl p-6 sm:p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 gauge-container">
+          <div className="glass-card rounded-2xl p-6 sm:p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 gauge-container relative">
+            {/* Digital Display Counter - Top Left Inside Card */}
+            <div className="absolute top-4 left-4 z-20">
+              <div className="bg-black/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-2xl border border-gray-300">
+                <div className="text-2xl font-mono font-bold text-center transition-all duration-1000 ease-out text-red-600">
+                  11
+                </div>
+                <div className="text-xs text-gray-300 text-center mt-1 font-semibold tracking-wider">
+                  CRITICAL
+                </div>
+              </div>
+            </div>
             <div className="gauge-glow">
               <SpeedometerGauge
                 value={11}
@@ -124,7 +139,7 @@ export default function DashboardContent() {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-full">
         <MetricCard
           value={86}
           label="Controls"
@@ -160,7 +175,7 @@ export default function DashboardContent() {
       </div>
 
       {/* Recent Activities - Simplified */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 max-w-full">
         <div className="glass-card rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-[#26558e] mb-4">Recent Activities</h3>
           <div className="space-y-4">
@@ -215,6 +230,9 @@ export default function DashboardContent() {
           </div>
         </div>
       </div>
+
+      {/* Audit Overview Section */}
+      <AuditOverview />
     </div>
   );
 }

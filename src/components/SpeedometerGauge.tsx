@@ -13,13 +13,16 @@ interface SpeedometerGaugeProps {
 export default function SpeedometerGauge({ 
   value, 
   maxValue = 100, 
-  title, 
+  title: _title, 
   status,
   size = 300 
 }: SpeedometerGaugeProps) {
   const [animatedValue, setAnimatedValue] = useState(0);
+  const [isClient, setIsClient] = useState(false);
   
   useEffect(() => {
+    setIsClient(true);
+    
     const timer = setTimeout(() => {
       setAnimatedValue(value);
     }, 500);
@@ -63,22 +66,18 @@ export default function SpeedometerGauge({
   const innerRadius = size * 0.32;
   const needleLength = outerRadius - 20;
 
-  return (
-    <div className="relative flex flex-col items-center">
-      {/* Digital Display Counter - Top Left Inside Card */}
-      <div className="absolute -top-2 -left-36 z-10">
-        <div className="bg-black/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-2xl border border-gray-300">
-          <div 
-            className="text-2xl font-mono font-bold text-center transition-all duration-1000 ease-out"
-            style={{ color: config.color }}
-          >
-            {Math.round(animatedValue)}
-          </div>
-          <div className="text-xs text-gray-300 text-center mt-1 font-semibold tracking-wider">
-            {title.toUpperCase()}
-          </div>
+  if (!isClient) {
+    return (
+      <div className="relative flex flex-col items-center">
+        <div className="w-80 h-60 bg-gray-200 rounded-lg animate-pulse flex items-center justify-center">
+          <span className="text-gray-500">Loading...</span>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="relative flex flex-col items-center">
       <div className="relative">
         <svg width={size} height={size * 0.75} className="overflow-visible drop-shadow-2xl">
           {/* Outer Ring - Decorative */}
