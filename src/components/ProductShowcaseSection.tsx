@@ -15,7 +15,7 @@ const steps = [
 
 export default function ProductShowcaseSection() {
   return (
-    <section id="how-it-works" className="py-20 bg-gradient-to-br from-[#e0f2ff] via-white to-[#f1f5f9]">
+    <section id="how-it-works" className="relative py-20 bg-gradient-to-br from-[#e8f4f8] via-white to-[#f0f9ff]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#41c3d6] mb-4">Implementation in days</p>

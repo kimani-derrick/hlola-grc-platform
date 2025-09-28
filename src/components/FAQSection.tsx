@@ -25,6 +25,7 @@ export default function FAQSection() {
   return (
     <section id="faq" className="py-20 bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#41c3d6]/30 to-transparent mb-12" />
         <div className="text-center mb-12">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#41c3d6] mb-4">Frequently Asked Questions</p>
           <h2 className="text-4xl font-bold text-[#26558e] mb-4">Answers before your auditors even ask</h2>

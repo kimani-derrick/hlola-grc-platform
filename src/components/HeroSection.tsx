@@ -1,6 +1,6 @@
 export default function HeroSection() {
   return (
-    <section id="hero" className="min-h-screen flex items-center bg-hlola-gradient relative overflow-hidden pt-24">
+    <section id="hero" className="min-h-screen flex items-center bg-hlola-gradient relative overflow-hidden pt-24 pb-16">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#41c3d6] rounded-full mix-blend-normal filter blur-3xl opacity-30 float-animation"></div>
@@ -9,8 +9,8 @@ export default function HeroSection() {
         <div className="absolute top-20 right-20 w-60 h-60 bg-gradient-to-r from-[#41c3d6] to-[#26558e] rounded-full filter blur-2xl opacity-25 float-animation" style={{animationDelay: '1s'}}></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center hero-glow">
-          <div className="glass-card rounded-3xl p-6 sm:p-10 lg:p-12 fade-in-up shadow-2xl">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center hero-glow">
+          <div className="glass-card rounded-3xl p-6 sm:p-8 lg:p-10 fade-in-up shadow-2xl max-w-2xl">
             <div className="flex flex-wrap items-center gap-3 mb-6 text-sm text-[#26558e] font-semibold">
               <span className="px-3 py-1 bg-white/70 rounded-full">GRC made joyful</span>
               <span className="flex items-center gap-1 text-yellow-500">
@@ -18,46 +18,45 @@ export default function HeroSection() {
                 Rated 4.9/5 by compliance teams
               </span>
             </div>
-            <h1 className="hero-title text-[#26558e] mb-6 text-left">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#26558e] mb-4 text-left leading-tight">
               Transform Compliance Into Your
               <span className="text-[#41c3d6] font-bold"> Competitive Advantage</span>
             </h1>
-            <p className="hero-subtitle text-gray-600 mb-4 text-left">
+            <p className="text-base text-gray-600 mb-3 text-left">
               <span className="font-semibold text-[#26558e]">hlola:</span> to see, inspect, examine, investigate
             </p>
-            <p className="text-lg sm:text-xl text-gray-800 mb-8 font-medium text-left">
+            <p className="text-base sm:text-lg text-gray-700 mb-6 font-medium text-left leading-relaxed">
               Tame regulations, automate evidence, and keep your team accountable inside one joyful workspace.
-              Launch hlola in minutes and replace endless spreadsheets with crystal-clear compliance.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-[#26558e] text-white px-8 py-4 rounded-xl text-base sm:text-lg font-semibold hover:bg-[#1e4470] transition-all hover-lift">
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <button className="bg-[#26558e] text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-[#1e4470] transition-all hover-lift">
                 Start Your Free Trial
               </button>
-              <button className="glass-button text-[#26558e] px-8 py-4 rounded-xl text-base sm:text-lg font-semibold">
+              <button className="glass-button text-[#26558e] px-6 py-3 rounded-xl text-base font-semibold">
                 <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                   </svg>
                   Watch 2-min demo
                 </div>
               </button>
             </div>
-            <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-gray-600">
-              <div className="flex -space-x-3">
-                {[...Array(5)].map((_, idx) => (
-                  <span key={idx} className="w-10 h-10 rounded-full border-2 border-white bg-[#26558e]/80" />
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <div className="flex -space-x-2">
+                {[...Array(4)].map((_, idx) => (
+                  <span key={idx} className="w-8 h-8 rounded-full border-2 border-white bg-[#26558e]/80" />
                 ))}
               </div>
               <div>
-                <p className="font-semibold text-[#26558e]">12,000+ African compliance leaders</p>
-                <p>Already replacing manual audits with hlola.</p>
+                <p className="font-semibold text-[#26558e] text-sm">12,000+ compliance leaders</p>
+                <p className="text-xs text-gray-600">trust hlola across Africa</p>
               </div>
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative max-w-2xl">
             <div className="glass-card rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl">
-              <div className="bg-gradient-to-br from-[#26558e] via-[#3a7dc2] to-[#41c3d6] rounded-2xl h-[360px] flex flex-col justify-between text-white p-6">
+              <div className="bg-gradient-to-br from-[#26558e] via-[#3a7dc2] to-[#41c3d6] rounded-2xl h-[380px] flex flex-col justify-between text-white p-6">
                 <div className="flex items-center justify-between text-sm uppercase tracking-wide opacity-80">
                   <span>Live Compliance Snapshot</span>
                   <span>Secure</span>
@@ -91,6 +90,7 @@ export default function HeroSection() {
           </div>
         </div>
       </div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-white" />
     </section>
   );
 }

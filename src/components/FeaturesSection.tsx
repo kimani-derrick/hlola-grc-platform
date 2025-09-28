@@ -33,7 +33,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-gradient-to-br from-[#f8fafc] via-white to-[#f1f5f9]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#41c3d6] mb-4">Why hlola wins</p>

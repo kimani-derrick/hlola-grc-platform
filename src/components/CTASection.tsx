@@ -1,7 +1,8 @@
 export default function CTASection() {
   return (
-    <section id="cta" className="py-20 bg-white">
+    <section id="cta" className="py-20 bg-gradient-to-br from-[#f8fafc] via-white to-[#f1f5f9]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#26558e]/25 to-transparent mb-12" />
         <div className="glass-card rounded-3xl p-8 md:p-12">
           <h2 className="text-4xl font-bold text-[#26558e] mb-6">
             Deploy hlola in days — delight regulators for years
