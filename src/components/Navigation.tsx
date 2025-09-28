@@ -33,10 +33,11 @@ export default function Navigation({ scrollY }: NavigationProps) {
           {/* Desktop Menu */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              <a href="#product" className="text-gray-700 hover:text-[#26558e] transition-colors">Product</a>
-              <a href="#solutions" className="text-gray-700 hover:text-[#26558e] transition-colors">Solutions</a>
-              <a href="#resources" className="text-gray-700 hover:text-[#26558e] transition-colors">Resources</a>
+              <a href="#benefits" className="text-gray-700 hover:text-[#26558e] transition-colors">Benefits</a>
+              <a href="#how-it-works" className="text-gray-700 hover:text-[#26558e] transition-colors">How it works</a>
               <a href="#pricing" className="text-gray-700 hover:text-[#26558e] transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-gray-700 hover:text-[#26558e] transition-colors">Testimonials</a>
+              <a href="#faq" className="text-gray-700 hover:text-[#26558e] transition-colors">FAQ</a>
             </div>
           </div>
 
@@ -66,9 +67,9 @@ export default function Navigation({ scrollY }: NavigationProps) {
                 <Link href="/login" className="text-gray-700 hover:text-[#26558e] transition-colors">
                   Login
                 </Link>
-                <button className="bg-[#26558e] text-white px-6 py-2 rounded-lg hover:bg-[#1e4470] transition-colors">
+                <a href="#cta" className="bg-[#26558e] text-white px-6 py-2 rounded-lg hover:bg-[#1e4470] transition-colors">
                   Get Started
-                </button>
+                </a>
               </>
             )}
           </div>
@@ -90,10 +91,11 @@ export default function Navigation({ scrollY }: NavigationProps) {
         {isMenuOpen && (
           <div className="md:hidden glass-card rounded-lg mt-2 p-4">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#product" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Product</a>
-              <a href="#solutions" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Solutions</a>
-              <a href="#resources" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Resources</a>
+              <a href="#benefits" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Benefits</a>
+              <a href="#how-it-works" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">How it works</a>
               <a href="#pricing" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Pricing</a>
+              <a href="#testimonials" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Testimonials</a>
+              <a href="#faq" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">FAQ</a>
               {user ? (
                 <>
                   <Link href="/dashboard" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Dashboard</Link>
@@ -107,9 +109,7 @@ export default function Navigation({ scrollY }: NavigationProps) {
               ) : (
                 <>
                   <Link href="/login" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Login</Link>
-                  <button className="w-full text-left bg-[#26558e] text-white px-3 py-2 rounded-lg mt-4">
-                    Get Started
-                  </button>
+                  <a href="#cta" className="w-full inline-flex justify-center bg-[#26558e] text-white px-3 py-2 rounded-lg mt-4">Get Started</a>
                 </>
               )}
             </div>

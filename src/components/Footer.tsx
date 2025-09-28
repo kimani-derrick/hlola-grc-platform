@@ -20,7 +20,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#26558e] text-white py-12">
+    <footer className="bg-[#26558e] text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -52,8 +52,14 @@ export default function Footer() {
           ))}
         </div>
         
-        <div className="border-t border-blue-400 mt-8 pt-8 text-center text-blue-100">
-          <p>&copy; 2025 hlola. Making compliance accessible across Africa and beyond.</p>
+        <div className="border-t border-blue-400 mt-8 pt-8 text-center text-blue-100 space-y-2 text-sm">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#terms" className="hover:text-white transition-colors">Terms</a>
+            <a href="#status" className="hover:text-white transition-colors">Status</a>
+            <a href="#security" className="hover:text-white transition-colors">Security</a>
+          </div>
+          <p>&copy; {new Date().getFullYear()} hlola. Building trust across Africa and beyond.</p>
         </div>
       </div>
     </footer>

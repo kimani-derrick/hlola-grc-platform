@@ -1,34 +1,34 @@
 export default function FeaturesSection() {
   const features = [
     {
-      icon: "🎯",
-      title: "Accessible Design",
-      description: "Transform complex compliance into simple, achievable steps everyone can follow"
+      icon: "🕹️",
+      title: "Gamified onboarding",
+      description: "Turn frameworks into streaks, badges, and collaborative missions that teams actually enjoy completing."
     },
     {
-      icon: "🎮",
-      title: "Surprisingly Fun",
-      description: "Gamified compliance with streaks, badges, and rewards that motivate your team"
+      icon: "📊",
+      title: "Single source of truth",
+      description: "All policies, controls, risk registers, and attestation evidence in one glassmorphism hub."
     },
     {
-      icon: "🌍",
-      title: "African-Focused",
-      description: "Regional insights and local expertise for businesses across the continent"
+      icon: "🤝",
+      title: "Vendor risk automation",
+      description: "Proactively chase vendor SOC reports, DPIAs, and questionnaires with automated reminders."
     },
     {
-      icon: "🚀",
-      title: "Scales With You",
-      description: "From Lagos startup to global enterprise - hlola grows with your business"
+      icon: "⚙️",
+      title: "African-first templates",
+      description: "POPIA, NDPA, and GDPR templates tailored to African markets and regulators."
     },
     {
-      icon: "🤖",
-      title: "AI-Powered",
-      description: "Intelligent automation that learns and adapts to new regulations automatically"
+      icon: "💬",
+      title: "Board-ready insights",
+      description: "Executive dashboards translate operational effort into business-friendly language."
     },
     {
-      icon: "🔒",
-      title: "Enterprise Security",
-      description: "Bank-level security with SOC2 compliance and end-to-end encryption"
+      icon: "🔐",
+      title: "Enterprise-grade security",
+      description: "Granular permissions, encryption in transit and at rest, and full audit trails."
     }
   ];
 
@@ -36,12 +36,10 @@ export default function FeaturesSection() {
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-[#26558e] mb-4">
-            Why African Businesses Choose hlola
-          </h2>
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#41c3d6] mb-4">Why hlola wins</p>
+          <h2 className="text-4xl font-bold text-[#26558e] mb-4">Give every compliance champion superpowers</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Built by Africans, for African businesses scaling globally. 
-            Experience compliance that understands your journey.
+            hlola combines behavioural design with automation so your organisation moves from reactive compliance to proactive trust-building.
           </p>
         </div>
 

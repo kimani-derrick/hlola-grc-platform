@@ -7,6 +7,9 @@ import ProblemSolutionSection from "../components/ProblemSolutionSection";
 import ProductShowcaseSection from "../components/ProductShowcaseSection";
 import FeaturesSection from "../components/FeaturesSection";
 import TrustSection from "../components/TrustSection";
+import TestimonialsSection from "../components/TestimonialsSection";
+import PricingSection from "../components/PricingSection";
+import FAQSection from "../components/FAQSection";
 import CTASection from "../components/CTASection";
 import Footer from "../components/Footer";
 
@@ -23,10 +26,13 @@ export default function Home() {
     <div className="min-h-screen font-sans">
       <Navigation scrollY={scrollY} />
       <HeroSection />
-      <ProblemSolutionSection />
-      <ProductShowcaseSection />
-      <FeaturesSection />
       <TrustSection />
+      <ProblemSolutionSection />
+      <FeaturesSection />
+      <ProductShowcaseSection />
+      <PricingSection />
+      <TestimonialsSection />
+      <FAQSection />
       <CTASection />
       <Footer />
     </div>
