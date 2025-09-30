@@ -89,15 +89,15 @@ export default function DashboardContent() {
 
         {/* Overall Compliance Details - Right Side */}
         <div className="lg:col-span-3">
-          <div className="glass-card rounded-2xl p-6 sm:p-8 h-full bg-gradient-to-br from-red-50 to-red-100">
-            <div className="flex items-center justify-between mb-6">
+          <div className="glass-card rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-red-50 to-red-100">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-800">Overall Compliance</h2>
               <span className="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-semibold">
                 Critical Priority
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <div className="text-xs text-blue-600 font-medium mb-1">Current Progress</div>
                 <div className="text-2xl font-bold text-red-500">10.89%</div>
@@ -108,7 +108,7 @@ export default function DashboardContent() {
               </div>
             </div>
 
-            <div className="mb-6">
+            <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs text-blue-600 font-medium">Progress to target</span>
                 <span className="text-xs font-semibold text-gray-800">12%</span>
