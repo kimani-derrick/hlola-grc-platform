@@ -18,21 +18,21 @@ export default function HeroSection() {
                 Rated 4.9/5 by compliance teams
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#26558e] mb-4 text-left leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#26558e] mb-4 text-left leading-tight">
               Transform Compliance Into Your
               <span className="text-[#41c3d6] font-bold"> Competitive Advantage</span>
             </h1>
             <p className="text-base text-gray-600 mb-3 text-left">
               <span className="font-semibold text-[#26558e]">hlola:</span> to see, inspect, examine, investigate
             </p>
-            <p className="text-base sm:text-lg text-gray-700 mb-6 font-medium text-left leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-700 mb-6 font-medium text-left leading-relaxed">
               Tame regulations, automate evidence, and keep your team accountable inside one joyful workspace.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <button className="bg-[#26558e] text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-[#1e4470] transition-all hover-lift">
+              <button className="bg-[#26558e] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-[#1e4470] transition-all hover-lift">
                 Start Your Free Trial
               </button>
-              <button className="glass-button text-[#26558e] px-6 py-3 rounded-xl text-base font-semibold">
+              <button className="glass-button text-[#26558e] px-6 py-3 rounded-xl text-sm font-semibold">
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
@@ -62,23 +62,23 @@ export default function HeroSection() {
                   <span>Secure</span>
                 </div>
                 <div>
-                  <h3 className="text-4xl font-bold mb-4">Overall Score: 89%</h3>
-                  <p className="text-sm text-white/80">AI assistance flags risks, recommends next actions, and keeps your board in the loop in real time.</p>
+                <h3 className="text-3xl font-bold mb-4">Overall Score: 89%</h3>
+                <p className="text-xs text-white/80">AI assistance flags risks, recommends next actions, and keeps your board in the loop in real time.</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-2 gap-4 text-xs">
                   <div className="bg-white/15 rounded-xl p-3">
                     <p className="uppercase text-xs text-white/60">Evidence tasks</p>
-                    <p className="text-2xl font-bold">42</p>
+                    <p className="text-xl font-bold">42</p>
                     <p className="text-xs text-white/70">8 due this week</p>
                   </div>
                   <div className="bg-white/15 rounded-xl p-3">
                     <p className="uppercase text-xs text-white/60">Frameworks</p>
-                    <p className="text-2xl font-bold">GDPR</p>
+                    <p className="text-xl font-bold">GDPR</p>
                     <p className="text-xs text-white/70">POPIA, ISO 27001</p>
                   </div>
                   <div className="bg-white/15 rounded-xl p-3 col-span-2">
                     <p className="uppercase text-xs text-white/60">Automations running</p>
-                    <p className="text-lg font-semibold">Vendor risk reminders, policy attestation, audit trails</p>
+                    <p className="text-sm font-semibold">Vendor risk reminders, policy attestation, audit trails</p>
                   </div>
                 </div>
                 <div className="flex justify-between items-center text-xs uppercase tracking-wide opacity-75">

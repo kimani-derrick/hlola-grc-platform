@@ -45,8 +45,8 @@ export default function PricingSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#41c3d6] mb-4">Pricing · Why it helps</p>
-          <h2 className="text-4xl font-bold text-[#26558e] mb-4">Choose the plan that keeps your auditors smiling</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-[#26558e] mb-4">Choose the plan that keeps your auditors smiling</h2>
+          <p className="text-base text-gray-600 max-w-2xl mx-auto">
             Transparent, flexible pricing designed for African businesses of every size. Cancel any time.
           </p>
         </div>
@@ -64,13 +64,13 @@ export default function PricingSection() {
               <div>
                 <span className="text-sm font-semibold uppercase tracking-wide text-[#41c3d6]">{plan.name}</span>
                 <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-[#26558e]">{plan.price}</span>
-                  <span className="text-gray-500">{plan.cadence}</span>
+                  <span className="text-3xl font-bold text-[#26558e]">{plan.price}</span>
+                  <span className="text-sm text-gray-500">{plan.cadence}</span>
                 </div>
                 <p className="mt-3 text-sm text-gray-600">{plan.description}</p>
               </div>
 
-              <ul className="space-y-3 text-sm text-gray-700 flex-1">
+              <ul className="space-y-3 text-xs text-gray-700 flex-1">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
                     <svg className="w-4 h-4 text-[#41c3d6] mt-0.5" fill="currentColor" viewBox="0 0 20 20">

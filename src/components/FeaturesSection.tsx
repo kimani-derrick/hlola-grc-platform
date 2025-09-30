@@ -37,8 +37,8 @@ export default function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#41c3d6] mb-4">Why hlola wins</p>
-          <h2 className="text-4xl font-bold text-[#26558e] mb-4">Give every compliance champion superpowers</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-[#26558e] mb-4">Give every compliance champion superpowers</h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             hlola combines behavioural design with automation so your organisation moves from reactive compliance to proactive trust-building.
           </p>
         </div>
@@ -47,8 +47,8 @@ export default function FeaturesSection() {
           {features.map((feature, index) => (
             <div key={index} className="glass-card rounded-2xl p-6 hover-lift">
               <div className="text-3xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-[#26558e] mb-3">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
+              <h3 className="text-lg font-semibold text-[#26558e] mb-3">{feature.title}</h3>
+              <p className="text-sm text-gray-600">{feature.description}</p>
             </div>
           ))}
         </div>

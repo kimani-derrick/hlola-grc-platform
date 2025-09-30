@@ -38,16 +38,16 @@ export default function DashboardContent() {
       <div className="glass-card rounded-2xl p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-[#26558e]">
+            <h1 className="text-lg font-bold text-[#26558e]">
               Welcome back, {user?.name.split(' ')[0]}! 👋
             </h1>
-            <p className="text-gray-600 mt-1 text-sm">
+            <p className="text-gray-600 mt-1 text-xs">
               Here&apos;s your compliance overview for today
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">Today</p>
-            <p className="text-lg font-semibold text-[#26558e]">
+            <p className="text-xs text-gray-500">Today</p>
+            <p className="text-sm font-semibold text-[#26558e]">
               {isClient ? new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -67,7 +67,7 @@ export default function DashboardContent() {
             {/* Digital Display Counter - Top Left Inside Card */}
             <div className="absolute top-4 left-4 z-20">
               <div className="bg-black/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-2xl border border-gray-300">
-                <div className="text-2xl font-mono font-bold text-center transition-all duration-1000 ease-out text-red-600">
+                <div className="text-xl font-mono font-bold text-center transition-all duration-1000 ease-out text-red-600">
                   11
                 </div>
                 <div className="text-xs text-gray-300 text-center mt-1 font-semibold tracking-wider">
@@ -91,27 +91,27 @@ export default function DashboardContent() {
         <div className="lg:col-span-3">
           <div className="glass-card rounded-2xl p-6 sm:p-8 h-full bg-gradient-to-br from-red-50 to-red-100">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Overall Compliance</h2>
-              <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+              <h2 className="text-xl font-bold text-gray-800">Overall Compliance</h2>
+              <span className="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-semibold">
                 Critical Priority
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-6 mb-6">
               <div>
-                <div className="text-sm text-blue-600 font-medium mb-1">Current Progress</div>
-                <div className="text-3xl font-bold text-red-500">10.89%</div>
+                <div className="text-xs text-blue-600 font-medium mb-1">Current Progress</div>
+                <div className="text-2xl font-bold text-red-500">10.89%</div>
               </div>
               <div>
-                <div className="text-sm text-blue-600 font-medium mb-1">Next Milestone</div>
-                <div className="text-sm text-gray-600">Target 50%</div>
+                <div className="text-xs text-blue-600 font-medium mb-1">Next Milestone</div>
+                <div className="text-xs text-gray-600">Target 50%</div>
               </div>
             </div>
 
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-blue-600 font-medium">Progress to target</span>
-                <span className="text-sm font-semibold text-gray-800">12%</span>
+                <span className="text-xs text-blue-600 font-medium">Progress to target</span>
+                <span className="text-xs font-semibold text-gray-800">12%</span>
               </div>
               <div className="w-full bg-gray-300 rounded-full h-3">
                 <div 
@@ -126,12 +126,12 @@ export default function DashboardContent() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-800">170</div>
-                <div className="text-sm text-gray-600">Total Controls</div>
+                <div className="text-xl font-bold text-gray-800">170</div>
+                <div className="text-xs text-gray-600">Total Controls</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">99</div>
-                <div className="text-sm text-gray-600">Completed</div>
+                <div className="text-xl font-bold text-green-600">99</div>
+                <div className="text-xs text-gray-600">Completed</div>
               </div>
             </div>
           </div>
