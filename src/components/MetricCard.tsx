@@ -7,6 +7,7 @@ interface MetricCardProps {
   change: string;
   changeType: 'positive' | 'negative' | 'neutral';
   color: 'green' | 'orange' | 'red' | 'cyan';
+  icon?: React.ReactNode;
 }
 
 export default function MetricCard({ 
@@ -15,7 +16,8 @@ export default function MetricCard({
   progress, 
   change, 
   changeType,
-  color 
+  color,
+  icon
 }: MetricCardProps) {
   const colorClasses = {
     green: {
@@ -54,7 +56,9 @@ export default function MetricCard({
                                    colorClasses[color].dot.replace('bg-', '#') === 'bg-red-500' ? '#ef4444' : '#06b6d4' }}>
       
       <div className="flex items-center justify-between mb-4">
-        <div className={`w-4 h-4 rounded-full ${colorClasses[color].dot}`}></div>
+        <div className={`p-2 rounded-lg ${colorClasses[color].bg} ${colorClasses[color].text}`}>
+          {icon || <div className={`w-4 h-4 rounded-full ${colorClasses[color].dot}`}></div>}
+        </div>
         <div className={`text-sm font-medium ${changeColor} flex items-center gap-1`}>
           <span>{changeIcon}</span>
           <span>{change}</span>
