@@ -83,10 +83,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         { name: 'Reports', href: '/dashboard/privacy-hub/reports', icon: ReportsSubIcon }
       ]
     },
-    { name: 'Controls', href: '/dashboard/controls', icon: ControlsIcon, current: false },
-    { name: 'Documents', href: '/dashboard/documents', icon: DocumentsIcon, current: false },
-    { name: 'Audit Centre', href: '/dashboard/audit-centre', icon: AuditCentreIcon, current: false },
-    { name: 'Reports', href: '/dashboard/reports', icon: ReportsIcon, current: false },
     { 
       name: 'Assessments', 
       href: '/dashboard/assessments', 
@@ -145,7 +141,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
         </div>
         
-        <nav className="mt-6 px-3 space-y-2 flex-1 overflow-y-auto sidebar-scroll">
+        <nav className="mt-4 px-3 space-y-1 flex-1 overflow-y-auto sidebar-scroll">
           {navigation.map((item) => {
             const IconComponent = item.icon;
             const isDropdownOpen = openDropdowns.includes(item.name);
@@ -160,7 +156,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       toggleDropdown(item.name);
                     }
                   }}
-                  className={`nav-item group flex items-center justify-between px-4 py-4 text-sm font-medium rounded-lg ${
+                  className={`nav-item group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg ${
                     item.current 
                       ? 'active text-white' 
                       : 'text-white/90 hover:text-white'
@@ -191,7 +187,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <a
                           key={subItem.name}
                           href={subItem.href}
-                          className="sub-menu-item flex items-center px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                          className="sub-menu-item flex items-center px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
                         >
                           {SubItemIcon && (
                             <SubItemIcon className="w-4 h-4 mr-3 text-white/60" />
