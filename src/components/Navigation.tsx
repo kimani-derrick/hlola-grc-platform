@@ -64,10 +64,10 @@ export default function Navigation({ scrollY }: NavigationProps) {
               </>
             ) : (
               <>
-                <Link href="/login" className="text-gray-700 hover:text-[#26558e] transition-colors">
+                <Link href="/login" className="text-gray-700 hover:text-[#26558e] transition-colors text-sm">
                   Login
                 </Link>
-                <a href="#cta" className="bg-[#26558e] text-white px-6 py-2 rounded-lg hover:bg-[#1e4470] transition-colors">
+                <a href="#cta" className="bg-[#26558e] text-white px-4 py-1.5 rounded-lg hover:bg-[#1e4470] transition-colors text-sm">
                   Get Started
                 </a>
               </>

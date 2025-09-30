@@ -139,9 +139,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Image
             src="/brand/Hlola Full White.svg"
             alt="hlola"
-            width={120}
-            height={36}
-            className="h-8 w-auto"
+            width={100}
+            height={30}
+            className="h-6 w-auto"
           />
         </div>
         
@@ -160,7 +160,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       toggleDropdown(item.name);
                     }
                   }}
-                  className={`nav-item group flex items-center justify-between px-4 py-4 text-base font-medium rounded-lg ${
+                  className={`nav-item group flex items-center justify-between px-4 py-4 text-sm font-medium rounded-lg ${
                     item.current 
                       ? 'active text-white' 
                       : 'text-white/90 hover:text-white'
@@ -191,7 +191,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         <a
                           key={subItem.name}
                           href={subItem.href}
-                          className="sub-menu-item flex items-center px-4 py-2.5 text-base text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                          className="sub-menu-item flex items-center px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-md transition-colors"
                         >
                           {SubItemIcon && (
                             <SubItemIcon className="w-4 h-4 mr-3 text-white/60" />
