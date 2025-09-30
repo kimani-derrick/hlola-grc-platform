@@ -274,6 +274,29 @@ export default function SpeedometerGauge({
           </span>
         </div>
       </div>
+
+      {/* Compact Metrics - With Dividers */}
+      <div className="mt-4 flex justify-between items-center text-xs">
+        <div className="text-center flex-1">
+          <div className="font-bold text-red-500">10.89%</div>
+          <div className="text-gray-600">Progress</div>
+        </div>
+        <div className="w-px h-8 bg-gray-300 mx-2"></div>
+        <div className="text-center flex-1">
+          <div className="font-bold text-gray-800">170</div>
+          <div className="text-gray-600">Controls</div>
+        </div>
+        <div className="w-px h-8 bg-gray-300 mx-2"></div>
+        <div className="text-center flex-1">
+          <div className="font-bold text-green-600">99</div>
+          <div className="text-gray-600">Done</div>
+        </div>
+        <div className="w-px h-8 bg-gray-300 mx-2"></div>
+        <div className="text-center flex-1">
+          <div className="font-bold text-gray-600">50%</div>
+          <div className="text-gray-600">Target</div>
+        </div>
+      </div>
     </div>
   );
 }
