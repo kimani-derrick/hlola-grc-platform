@@ -213,17 +213,17 @@ export default function SpeedometerGauge({
           <circle
             cx={center}
             cy={center}
-            r="20"
+            r="10"
             fill="url(#hubGradient)"
             stroke="#374151"
-            strokeWidth="2"
+            strokeWidth="1"
             className="drop-shadow-xl"
           />
           
           <circle
             cx={center}
             cy={center}
-            r="12"
+            r="6"
             fill={config.color}
             className="drop-shadow-lg animate-pulse"
             style={{
@@ -261,14 +261,14 @@ export default function SpeedometerGauge({
       </div>
 
       {/* Status Indicator */}
-      <div className="mt-16 text-center">
-        <div className="text-lg font-bold text-gray-800 mb-1">Overall Compliance Score</div>
-        <div className="flex items-center justify-center gap-2">
+      <div className="mt-8 text-center">
+        <div className="text-sm font-bold text-gray-800 mb-1">Overall Compliance Score</div>
+        <div className="flex items-center justify-center gap-1">
           <div 
-            className="w-3 h-3 rounded-full animate-pulse"
+            className="w-2 h-2 rounded-full animate-pulse"
             style={{ backgroundColor: config.color }}
           />
-          <span className="text-sm font-medium text-gray-600">
+          <span className="text-xs font-medium text-gray-600">
             {status === 'critical' ? 'Below Standards' : 
              status === 'warning' ? 'Needs Attention' : 'Good Standing'}
           </span>

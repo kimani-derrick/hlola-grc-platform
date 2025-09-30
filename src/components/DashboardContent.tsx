@@ -9,7 +9,7 @@ import RiskExposureGauge from './RiskExposureGauge';
 
 export default function DashboardContent() {
   const { user } = useAuth();
-  const [gaugeSize, setGaugeSize] = useState(320);
+  const [gaugeSize, setGaugeSize] = useState(160);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -18,13 +18,13 @@ export default function DashboardContent() {
     const updateGaugeSize = () => {
       const width = window.innerWidth;
       if (width < 480) {
-        setGaugeSize(220);
+        setGaugeSize(110);
       } else if (width < 768) {
-        setGaugeSize(260);
+        setGaugeSize(130);
       } else if (width < 1024) {
-        setGaugeSize(300);
+        setGaugeSize(150);
       } else {
-        setGaugeSize(320);
+        setGaugeSize(160);
       }
     };
 

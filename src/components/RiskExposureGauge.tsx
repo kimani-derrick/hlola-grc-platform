@@ -166,14 +166,14 @@ export default function RiskExposureGauge({
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-lg font-bold text-gray-800">Risk Exposure</h3>
+            <h3 className="text-sm font-bold text-gray-800">Risk Exposure</h3>
             <p className="text-xs text-gray-600">Potential monetary fines</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <div 
-              className="w-3 h-3 rounded-full animate-pulse"
+              className="w-2 h-2 rounded-full animate-pulse"
               style={{ backgroundColor: config.color }}
             />
             <span 
@@ -189,7 +189,7 @@ export default function RiskExposureGauge({
         </div>
 
         {/* Gauge */}
-        <div className="flex justify-center items-center mb-6">
+        <div className="flex justify-center items-center mb-4">
           <div className="relative" style={{ width: size, height: size }}>
             {/* Background circle */}
             <svg
@@ -202,7 +202,7 @@ export default function RiskExposureGauge({
                 cy={size / 2}
                 r={radius}
                 stroke="#e5e7eb"
-                strokeWidth="8"
+                strokeWidth="6"
                 fill="none"
               />
               {/* Progress circle */}
@@ -211,14 +211,14 @@ export default function RiskExposureGauge({
                 cy={size / 2}
                 r={radius}
                 stroke={config.color}
-                strokeWidth="8"
+                strokeWidth="6"
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={strokeDasharray}
                 strokeDashoffset={strokeDashoffset}
                 className="transition-all duration-2000 ease-out"
                 style={{
-                  filter: `drop-shadow(0 0 8px ${config.color}40)`
+                  filter: `drop-shadow(0 0 6px ${config.color}40)`
                 }}
               />
             </svg>
@@ -227,7 +227,7 @@ export default function RiskExposureGauge({
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-center">
                 <div 
-                  className="text-3xl font-bold mb-1"
+                  className="text-xl font-bold mb-1"
                   style={{ color: config.color }}
                 >
                   {formatCurrency(animatedAmount)}
@@ -235,30 +235,30 @@ export default function RiskExposureGauge({
                 <div className="text-xs text-gray-600 mb-2">
                   {config.description}
                 </div>
-                
-                {/* Trend indicator */}
-                <div className="flex items-center justify-center gap-1 text-xs">
-                  {getTrendIcon()}
-                  <span className={trend === 'up' ? 'text-red-500' : trend === 'down' ? 'text-green-500' : 'text-gray-500'}>
-                    {trendPercentage}% vs last month
-                  </span>
-                </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Trend indicator - Below gauge */}
+        <div className="flex items-center justify-center gap-1 text-xs mb-3">
+          {getTrendIcon()}
+          <span className={trend === 'up' ? 'text-red-500' : trend === 'down' ? 'text-green-500' : 'text-gray-500'}>
+            {trendPercentage}% vs last month
+          </span>
+        </div>
+
         {/* Bottom metrics */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div className="text-center">
-            <div className="text-sm font-semibold text-gray-800">
+            <div className="text-xs font-semibold text-gray-800">
               {formatCurrency(industryAverage)}
             </div>
             <div className="text-xs text-gray-600">Industry Average</div>
           </div>
           <div className="text-center">
             <div 
-              className="text-sm font-semibold"
+              className="text-xs font-semibold"
               style={{ color: config.color }}
             >
               {config.percentage}%
