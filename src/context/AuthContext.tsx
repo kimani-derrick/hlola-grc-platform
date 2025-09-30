@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (email === 'admin@hlola.io' && password === 'hlola2025') {
       const mockUser: User = {
         id: '1',
-        name: 'Sarah Okonkwo',
+        name: 'Phillip Kisaka',
         email: email,
         role: 'Compliance Manager'
       };

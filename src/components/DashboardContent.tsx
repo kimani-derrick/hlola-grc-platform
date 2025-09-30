@@ -161,7 +161,7 @@ export default function DashboardContent() {
             <div className="flex items-start space-x-3">
               <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
               <div className="flex-1">
-                <p className="text-sm text-gray-900">New team member Sarah joined Compliance team</p>
+                <p className="text-sm text-gray-900">New team member Phillip joined Compliance team</p>
                 <p className="text-xs text-gray-500">1 day ago</p>
               </div>
             </div>
