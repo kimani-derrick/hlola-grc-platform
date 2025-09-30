@@ -32,7 +32,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-hlola-gradient py-12 px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen flex items-center justify-center bg-hlola-gradient py-4 px-4 sm:px-6 lg:px-8">
       <Link
         href="/"
         className="absolute top-6 left-4 sm:left-6 z-20 inline-flex items-center gap-2 text-sm font-semibold text-[#26558e] bg-white/80 hover:bg-white transition-colors px-3 sm:px-4 py-2 rounded-full shadow-lg backdrop-blur"
@@ -57,22 +57,22 @@ export default function LoginForm() {
         <div className="absolute top-20 left-1/2 w-80 h-80 bg-[#41c3d6] rounded-full mix-blend-normal filter blur-2xl opacity-10 float-animation" style={{animationDelay: '6s'}}></div>
       </div>
 
-      <div className="max-w-md w-full space-y-8 relative z-10 px-2 sm:px-0">
-        <div className="glass-card rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl">
-          <div className="text-center mb-8">
+      <div className="max-w-sm w-full space-y-6 relative z-10 px-2 sm:px-0">
+        <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl">
+          <div className="text-center mb-6">
             <Image
               src="/brand/Hlola Full Color.svg"
               alt="hlola"
-              width={150}
-              height={45}
+              width={120}
+              height={36}
               priority
-              className="h-10 w-auto mx-auto mb-6"
+              className="h-8 w-auto mx-auto mb-4"
             />
-            <h2 className="text-3xl font-bold text-[#26558e]">Welcome Back</h2>
-            <p className="mt-2 text-gray-600">Sign in to your hlola account</p>
+            <h2 className="text-2xl font-bold text-[#26558e]">Welcome Back</h2>
+            <p className="mt-1 text-sm text-gray-600">Sign in to your hlola account</p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {error && (
               <div className="glass-card border-red-200 bg-red-50/50 rounded-lg p-4">
                 <div className="text-red-800 text-sm">{error}</div>
@@ -89,7 +89,7 @@ export default function LoginForm() {
                 type="email"
                 autoComplete="email"
                 required
-                className="glass-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-500"
+                className="glass-input w-full px-3 py-2.5 rounded-lg text-gray-900 placeholder-gray-500"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -108,7 +108,7 @@ export default function LoginForm() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  className="glass-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 pr-12"
+                  className="glass-input w-full px-3 py-2.5 rounded-lg text-gray-900 placeholder-gray-500 pr-12"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -153,7 +153,7 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-[#26558e] hover:bg-[#1e4470] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#41c3d6] font-semibold transition-all hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-white bg-[#26558e] hover:bg-[#1e4470] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#41c3d6] font-semibold transition-all hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <div className="flex items-center">
@@ -178,8 +178,8 @@ export default function LoginForm() {
             </div>
 
             {/* Demo Credentials */}
-            <div className="glass-card bg-blue-50/50 border-blue-200 rounded-lg p-4 mt-6">
-              <h4 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials:</h4>
+            <div className="glass-card bg-blue-50/50 border-blue-200 rounded-lg p-3 mt-4">
+              <h4 className="text-xs font-medium text-blue-800 mb-1">Demo Credentials:</h4>
               <div className="text-xs text-blue-700">
                 <p><strong>Email:</strong> admin@hlola.io</p>
                 <p><strong>Password:</strong> hlola2025</p>
