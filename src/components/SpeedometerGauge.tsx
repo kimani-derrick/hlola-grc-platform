@@ -274,9 +274,6 @@ export default function SpeedometerGauge({
           </span>
         </div>
       </div>
-      
-      {/* Extra spacing for bottom text */}
-      <div className="h-16"></div>
     </div>
   );
 }
