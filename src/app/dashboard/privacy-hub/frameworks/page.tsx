@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import DashboardLayout from '../../../../components/DashboardLayout';
+import { formatDate } from '../../../../utils/dateUtils';
 
 // Framework status types
 type FrameworkStatus = 'active' | 'draft' | 'inactive' | 'pending';
@@ -392,7 +393,7 @@ export default function FrameworksPage() {
 
                   <div className="flex items-center justify-between text-sm text-gray-600">
                     <span>{framework.controls} tasks to complete</span>
-                    <span>Updated {new Date(framework.lastUpdated).toLocaleDateString()}</span>
+                    <span>Updated {formatDate(framework.lastUpdated)}</span>
                   </div>
                 </div>
               </div>

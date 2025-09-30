@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatDate } from '../utils/dateUtils';
 
 // Audit status types
 type AuditStatus = 'planning' | 'in-progress' | 'completed' | 'overdue' | 'cancelled';
@@ -421,7 +422,7 @@ export default function AuditSection() {
                   <div className="text-right">
                     <div className="text-sm text-gray-600">Due</div>
                     <div className="text-sm font-medium text-gray-900">
-                      {new Date(audit.endDate).toLocaleDateString()}
+                      {formatDate(audit.endDate)}
                     </div>
                   </div>
                 </div>
@@ -503,7 +504,7 @@ export default function AuditSection() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(audit.endDate).toLocaleDateString()}
+                      {formatDate(audit.endDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityConfig[audit.priority].bg} ${priorityConfig[audit.priority].color}`}>
@@ -606,13 +607,13 @@ export default function AuditSection() {
                   <div>
                     <div className="text-sm text-gray-600">Start Date</div>
                     <div className="text-lg font-medium text-gray-900">
-                      {new Date(selectedAudit.startDate).toLocaleDateString()}
+                      {formatDate(selectedAudit.startDate)}
                     </div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-600">End Date</div>
                     <div className="text-lg font-medium text-gray-900">
-                      {new Date(selectedAudit.endDate).toLocaleDateString()}
+                      {formatDate(selectedAudit.endDate)}
                     </div>
                   </div>
                   <div>

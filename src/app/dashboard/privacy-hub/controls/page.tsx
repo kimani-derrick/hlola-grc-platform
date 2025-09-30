@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import DashboardLayout from '../../../../components/DashboardLayout';
+import { formatDate } from '../../../../utils/dateUtils';
 
 // Control status types
 type ControlStatus = 'completed' | 'in-progress' | 'not-started' | 'needs-review';
@@ -447,7 +448,7 @@ export default function ControlsPage() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0v1a2 2 0 002 2h4a2 2 0 002-2V7m-6 0h6m-6 0H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2" />
                         </svg>
-                        Due {new Date(control.dueDate).toLocaleDateString()}
+                        Due {formatDate(control.dueDate)}
                       </span>
                     </div>
                   </div>

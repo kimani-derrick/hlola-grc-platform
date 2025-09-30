@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import DashboardLayout from '../../../../components/DashboardLayout';
+import { formatDate } from '../../../../utils/dateUtils';
 
 // Document types
 type DocumentStatus = 'active' | 'draft' | 'review' | 'archived' | 'expired';
@@ -434,7 +435,7 @@ export default function DocumentsPage() {
                     </div>
                     
                     <div className="text-xs text-gray-500">
-                      Updated {new Date(document.lastModified).toLocaleDateString()}
+                      Updated {formatDate(document.lastModified)}
                     </div>
                   </div>
                 </div>
@@ -492,7 +493,7 @@ export default function DocumentsPage() {
                         {document.author}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(document.lastModified).toLocaleDateString()}
+                        {formatDate(document.lastModified)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {document.downloadCount}
@@ -585,7 +586,7 @@ export default function DocumentsPage() {
                           <div>
                             <p className="text-sm font-medium text-green-800">Approved by {selectedDocument.approver}</p>
                             <p className="text-sm text-green-600">
-                              on {selectedDocument.approvalDate && new Date(selectedDocument.approvalDate).toLocaleDateString()}
+                              on {selectedDocument.approvalDate && formatDate(selectedDocument.approvalDate)}
                             </p>
                           </div>
                         </div>
@@ -618,12 +619,12 @@ export default function DocumentsPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Last Modified:</span>
-                        <span className="text-gray-900">{new Date(selectedDocument.lastModified).toLocaleDateString()}</span>
+                        <span className="text-gray-900">{formatDate(selectedDocument.lastModified)}</span>
                       </div>
                       {selectedDocument.expiryDate && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Expires:</span>
-                          <span className="text-gray-900">{new Date(selectedDocument.expiryDate).toLocaleDateString()}</span>
+                          <span className="text-gray-900">{formatDate(selectedDocument.expiryDate)}</span>
                         </div>
                       )}
                     </div>
