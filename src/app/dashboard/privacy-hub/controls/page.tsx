@@ -269,7 +269,7 @@ export default function ControlsPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Compliance Controls</h1>
-              <p className="text-gray-600 mt-2">Track and complete specific tasks required by each country's data protection laws</p>
+              <p className="text-gray-600 mt-2">Track and complete specific tasks required by each country&apos;s data protection laws</p>
               
               {/* What are controls explanation */}
               <div className="mt-4 bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
@@ -281,7 +281,7 @@ export default function ControlsPage() {
                   </div>
                   <div className="ml-3">
                     <p className="text-sm text-green-700">
-                      <strong>What are controls?</strong> These are specific tasks your business must complete to comply with each country's data protection laws. 
+                      <strong>What are controls?</strong> These are specific tasks your business must complete to comply with each country&apos;s data protection laws. 
                       Complete these tasks to protect customer data, avoid fines, and build trust.
                     </p>
                   </div>

@@ -261,7 +261,7 @@ export default function FrameworksPage() {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Laws You're Following</p>
+                  <p className="text-sm font-medium text-gray-600">Laws You&apos;re Following</p>
                   <p className="text-2xl font-bold text-gray-900">7</p>
                 </div>
               </div>
