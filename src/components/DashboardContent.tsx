@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import SpeedometerGauge from './SpeedometerGauge';
 import MetricCard from './MetricCard';
 import AuditOverview from './AuditOverview';
+import RiskExposureGauge from './RiskExposureGauge';
 
 export default function DashboardContent() {
   const { user } = useAuth();
@@ -59,10 +60,10 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* Main Compliance Dashboard */}
-      <div className="grid lg:grid-cols-5 gap-8">
+      {/* Main Compliance Dashboard - Two Dials */}
+      <div className="grid lg:grid-cols-2 gap-8">
         {/* Speedometer Gauge - Left Side */}
-        <div className="lg:col-span-2">
+        <div>
           <div className="glass-card rounded-2xl p-6 sm:p-8 h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 gauge-container relative">
             {/* Digital Display Counter - Top Left Inside Card */}
             <div className="absolute top-4 left-4 z-20">
@@ -87,52 +88,65 @@ export default function DashboardContent() {
           </div>
         </div>
 
-        {/* Overall Compliance Details - Right Side */}
-        <div className="lg:col-span-3">
-          <div className="glass-card rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-red-50 to-red-100">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">Overall Compliance</h2>
-              <span className="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-semibold">
-                Critical Priority
-              </span>
-            </div>
+        {/* Risk Exposure Gauge - Right Side */}
+        <div>
+          <RiskExposureGauge
+            exposureAmount={7000000}
+            riskLevel="critical"
+            industryAverage={5000000}
+            trend="up"
+            trendPercentage={15}
+            size={gaugeSize}
+            currency="KES"
+          />
+        </div>
+      </div>
 
-            <div className="grid grid-cols-2 gap-6 mb-4">
-              <div>
-                <div className="text-xs text-blue-600 font-medium mb-1">Current Progress</div>
-                <div className="text-2xl font-bold text-red-500">10.89%</div>
-              </div>
-              <div>
-                <div className="text-xs text-blue-600 font-medium mb-1">Next Milestone</div>
-                <div className="text-xs text-gray-600">Target 50%</div>
-              </div>
-            </div>
+      {/* Overall Compliance Details - Below Dials */}
+      <div className="max-w-4xl mx-auto">
+        <div className="glass-card rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-red-50 to-red-100">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Overall Compliance</h2>
+            <span className="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-semibold">
+              Critical Priority
+            </span>
+          </div>
 
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-blue-600 font-medium">Progress to target</span>
-                <span className="text-xs font-semibold text-gray-800">12%</span>
-              </div>
-              <div className="w-full bg-gray-300 rounded-full h-3">
-                <div 
-                  className="h-3 bg-red-500 rounded-full transition-all duration-1000 ease-out"
-                  style={{ 
-                    width: '12%',
-                    boxShadow: '0 0 8px #ef444440'
-                  }}
-                ></div>
-              </div>
+          <div className="grid grid-cols-2 gap-6 mb-4">
+            <div>
+              <div className="text-xs text-blue-600 font-medium mb-1">Current Progress</div>
+              <div className="text-2xl font-bold text-red-500">10.89%</div>
             </div>
+            <div>
+              <div className="text-xs text-blue-600 font-medium mb-1">Next Milestone</div>
+              <div className="text-xs text-gray-600">Target 50%</div>
+            </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-xl font-bold text-gray-800">170</div>
-                <div className="text-xs text-gray-600">Total Controls</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-green-600">99</div>
-                <div className="text-xs text-gray-600">Completed</div>
-              </div>
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs text-blue-600 font-medium">Progress to target</span>
+              <span className="text-xs font-semibold text-gray-800">12%</span>
+            </div>
+            <div className="w-full bg-gray-300 rounded-full h-3">
+              <div 
+                className="h-3 bg-red-500 rounded-full transition-all duration-1000 ease-out"
+                style={{ 
+                  width: '12%',
+                  boxShadow: '0 0 8px #ef444440'
+                }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <div className="text-xl font-bold text-gray-800">170</div>
+              <div className="text-xs text-gray-600">Total Controls</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl font-bold text-green-600">99</div>
+              <div className="text-xs text-gray-600">Completed</div>
             </div>
           </div>
         </div>
