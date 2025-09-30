@@ -13,7 +13,7 @@ interface SpeedometerGaugeProps {
 export default function SpeedometerGauge({ 
   value, 
   maxValue = 100, 
-  title, 
+  title: _title, 
   status,
   size = 300 
 }: SpeedometerGaugeProps) {
