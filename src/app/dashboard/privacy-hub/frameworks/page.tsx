@@ -6,6 +6,28 @@ import { formatDate } from '../../../../utils/dateUtils';
 
 // Framework status types
 type FrameworkStatus = 'active' | 'draft' | 'inactive' | 'pending';
+type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'overdue';
+type Priority = 'high' | 'medium' | 'low';
+
+interface ComplianceTask {
+  id: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: Priority;
+  dueDate: string;
+  estimatedHours: number;
+  category: string;
+  completed: boolean;
+}
+
+interface BusinessImpact {
+  penaltyAmount: string;
+  penaltyCurrency: string;
+  businessBenefits: string[];
+  marketAccess: string[];
+  competitiveAdvantages: string[];
+}
 
 interface Framework {
   id: string;
@@ -19,6 +41,11 @@ interface Framework {
   category: 'Privacy' | 'Security' | 'Compliance' | 'Risk';
   icon: string;
   color: string;
+  businessImpact: BusinessImpact;
+  tasks: ComplianceTask[];
+  complianceDeadline: string;
+  priority: Priority;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
 }
 
 const frameworks: Framework[] = [
@@ -33,7 +60,76 @@ const frameworks: Framework[] = [
     region: 'Kenya',
     category: 'Privacy',
     icon: '🇰🇪',
-    color: 'bg-red-600'
+    color: 'bg-red-600',
+    businessImpact: {
+      penaltyAmount: '5,000,000',
+      penaltyCurrency: 'KSh',
+      businessBenefits: [
+        'Build customer trust and confidence',
+        'Access to government contracts',
+        'Enhanced business reputation',
+        'Competitive advantage in local market'
+      ],
+      marketAccess: [
+        'Government procurement opportunities',
+        'Financial services partnerships',
+        'Healthcare sector contracts'
+      ],
+      competitiveAdvantages: [
+        'First-mover advantage in compliance',
+        'Reduced legal risks',
+        'Better customer data handling'
+      ]
+    },
+    tasks: [
+      {
+        id: 'k1',
+        title: 'Appoint Data Protection Officer',
+        description: 'Designate a qualified individual responsible for data protection compliance',
+        status: 'completed',
+        priority: 'high',
+        dueDate: '2024-01-01',
+        estimatedHours: 8,
+        category: 'Governance',
+        completed: true
+      },
+      {
+        id: 'k2',
+        title: 'Conduct Data Protection Impact Assessment',
+        description: 'Assess risks to personal data processing activities',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-02-15',
+        estimatedHours: 16,
+        category: 'Assessment',
+        completed: false
+      },
+      {
+        id: 'k3',
+        title: 'Implement Data Subject Rights Procedures',
+        description: 'Create processes for handling data subject requests',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-03-01',
+        estimatedHours: 12,
+        category: 'Rights Management',
+        completed: false
+      },
+      {
+        id: 'k4',
+        title: 'Update Privacy Policy',
+        description: 'Revise privacy policy to comply with DPA 2019 requirements',
+        status: 'pending',
+        priority: 'high',
+        dueDate: '2024-02-28',
+        estimatedHours: 6,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-06-30',
+    priority: 'high',
+    riskLevel: 'high'
   },
   {
     id: '2',
@@ -46,7 +142,54 @@ const frameworks: Framework[] = [
     region: 'Ghana',
     category: 'Privacy',
     icon: '🇬🇭',
-    color: 'bg-yellow-600'
+    color: 'bg-yellow-600',
+    businessImpact: {
+      penaltyAmount: '500,000',
+      penaltyCurrency: 'GHS',
+      businessBenefits: [
+        'Enhanced business credibility',
+        'Access to regional markets',
+        'Improved customer confidence',
+        'Regulatory compliance advantage'
+      ],
+      marketAccess: [
+        'West African market access',
+        'Financial services licensing',
+        'Government partnerships'
+      ],
+      competitiveAdvantages: [
+        'Early compliance adoption',
+        'Reduced regulatory scrutiny',
+        'Better data governance'
+      ]
+    },
+    tasks: [
+      {
+        id: 'g1',
+        title: 'Register with Data Protection Commission',
+        description: 'Complete registration with Ghana Data Protection Commission',
+        status: 'completed',
+        priority: 'high',
+        dueDate: '2024-01-01',
+        estimatedHours: 4,
+        category: 'Registration',
+        completed: true
+      },
+      {
+        id: 'g2',
+        title: 'Implement Data Security Measures',
+        description: 'Establish technical and organizational security measures',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-02-20',
+        estimatedHours: 20,
+        category: 'Security',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-05-15',
+    priority: 'medium',
+    riskLevel: 'medium'
   },
   {
     id: '3',
@@ -59,7 +202,54 @@ const frameworks: Framework[] = [
     region: 'Nigeria',
     category: 'Privacy',
     icon: '🇳🇬',
-    color: 'bg-green-600'
+    color: 'bg-green-600',
+    businessImpact: {
+      penaltyAmount: '10,000,000,000',
+      penaltyCurrency: '₦',
+      businessBenefits: [
+        'Avoid massive regulatory penalties',
+        'Access to largest African market',
+        'Enhanced business reputation',
+        'Competitive advantage in Nigeria'
+      ],
+      marketAccess: [
+        'Nigerian government contracts',
+        'Financial services sector',
+        'Tech industry partnerships'
+      ],
+      competitiveAdvantages: [
+        'First-mover compliance advantage',
+        'Reduced legal exposure',
+        'Better market positioning'
+      ]
+    },
+    tasks: [
+      {
+        id: 'n1',
+        title: 'Register with NDPC',
+        description: 'Register with Nigeria Data Protection Commission',
+        status: 'completed',
+        priority: 'high',
+        dueDate: '2024-01-01',
+        estimatedHours: 6,
+        category: 'Registration',
+        completed: true
+      },
+      {
+        id: 'n2',
+        title: 'Conduct Privacy Impact Assessment',
+        description: 'Complete comprehensive privacy impact assessment',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-03-01',
+        estimatedHours: 24,
+        category: 'Assessment',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-08-31',
+    priority: 'high',
+    riskLevel: 'critical'
   },
   {
     id: '4',
@@ -72,7 +262,30 @@ const frameworks: Framework[] = [
     region: 'South Africa',
     category: 'Privacy',
     icon: '🇿🇦',
-    color: 'bg-blue-600'
+    color: 'bg-blue-600',
+    businessImpact: {
+      penaltyAmount: '10,000,000',
+      penaltyCurrency: 'R',
+      businessBenefits: ['Avoid regulatory fines', 'Enhanced credibility', 'Market access'],
+      marketAccess: ['Government contracts', 'Financial services'],
+      competitiveAdvantages: ['Compliance advantage', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'sa1',
+        title: 'POPIA Compliance Assessment',
+        description: 'Complete comprehensive POPIA compliance review',
+        status: 'completed',
+        priority: 'high',
+        dueDate: '2024-01-01',
+        estimatedHours: 16,
+        category: 'Assessment',
+        completed: true
+      }
+    ],
+    complianceDeadline: '2024-07-01',
+    priority: 'high',
+    riskLevel: 'high'
   },
   {
     id: '5',
@@ -85,7 +298,30 @@ const frameworks: Framework[] = [
     region: 'Uganda',
     category: 'Privacy',
     icon: '🇺🇬',
-    color: 'bg-purple-600'
+    color: 'bg-purple-600',
+    businessImpact: {
+      penaltyAmount: '2,000,000',
+      penaltyCurrency: 'UGX',
+      businessBenefits: ['Customer trust', 'Market access', 'Compliance advantage'],
+      marketAccess: ['Local partnerships', 'Government contracts'],
+      competitiveAdvantages: ['Early compliance', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'u1',
+        title: 'Data Protection Officer Appointment',
+        description: 'Appoint qualified Data Protection Officer',
+        status: 'pending',
+        priority: 'high',
+        dueDate: '2024-03-15',
+        estimatedHours: 8,
+        category: 'Governance',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-09-30',
+    priority: 'medium',
+    riskLevel: 'medium'
   },
   {
     id: '6',
@@ -98,7 +334,30 @@ const frameworks: Framework[] = [
     region: 'Ethiopia',
     category: 'Privacy',
     icon: '🇪🇹',
-    color: 'bg-orange-600'
+    color: 'bg-orange-600',
+    businessImpact: {
+      penaltyAmount: 'TBD',
+      penaltyCurrency: 'ETB',
+      businessBenefits: ['Early compliance', 'Market preparation', 'Competitive advantage'],
+      marketAccess: ['Future market access', 'Government readiness'],
+      competitiveAdvantages: ['First-mover advantage', 'Regulatory readiness']
+    },
+    tasks: [
+      {
+        id: 'e1',
+        title: 'Monitor Regulatory Updates',
+        description: 'Track Ethiopia data protection law developments',
+        status: 'pending',
+        priority: 'low',
+        dueDate: '2024-12-31',
+        estimatedHours: 4,
+        category: 'Monitoring',
+        completed: false
+      }
+    ],
+    complianceDeadline: 'TBD',
+    priority: 'low',
+    riskLevel: 'low'
   },
   {
     id: '7',
@@ -111,7 +370,30 @@ const frameworks: Framework[] = [
     region: 'Rwanda',
     category: 'Privacy',
     icon: '🇷🇼',
-    color: 'bg-teal-600'
+    color: 'bg-teal-600',
+    businessImpact: {
+      penaltyAmount: '5,000,000',
+      penaltyCurrency: 'RWF',
+      businessBenefits: ['East African market access', 'Government contracts', 'Enhanced credibility'],
+      marketAccess: ['EAC market access', 'Government partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Reduced barriers']
+    },
+    tasks: [
+      {
+        id: 'r1',
+        title: 'Data Protection Impact Assessment',
+        description: 'Complete DPIA for high-risk processing',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-02-28',
+        estimatedHours: 12,
+        category: 'Assessment',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-06-30',
+    priority: 'medium',
+    riskLevel: 'medium'
   },
   {
     id: '8',
@@ -124,7 +406,30 @@ const frameworks: Framework[] = [
     region: 'Tanzania',
     category: 'Privacy',
     icon: '🇹🇿',
-    color: 'bg-indigo-600'
+    color: 'bg-indigo-600',
+    businessImpact: {
+      penaltyAmount: '1,000,000',
+      penaltyCurrency: 'TZS',
+      businessBenefits: ['Customer protection', 'Market access', 'Compliance readiness'],
+      marketAccess: ['Local market access', 'Government contracts'],
+      competitiveAdvantages: ['Early compliance', 'Risk reduction']
+    },
+    tasks: [
+      {
+        id: 't1',
+        title: 'Privacy Policy Update',
+        description: 'Update privacy policy for PDPA compliance',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-04-01',
+        estimatedHours: 8,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-10-31',
+    priority: 'medium',
+    riskLevel: 'medium'
   },
   {
     id: '9',
@@ -137,7 +442,30 @@ const frameworks: Framework[] = [
     region: 'Morocco',
     category: 'Privacy',
     icon: '🇲🇦',
-    color: 'bg-red-700'
+    color: 'bg-red-700',
+    businessImpact: {
+      penaltyAmount: '300,000',
+      penaltyCurrency: 'MAD',
+      businessBenefits: ['North African market access', 'EU adequacy', 'Enhanced credibility'],
+      marketAccess: ['EU market access', 'Government contracts'],
+      competitiveAdvantages: ['EU adequacy advantage', 'Regional compliance']
+    },
+    tasks: [
+      {
+        id: 'm1',
+        title: 'Data Processing Records',
+        description: 'Maintain comprehensive processing records',
+        status: 'completed',
+        priority: 'high',
+        dueDate: '2024-01-01',
+        estimatedHours: 6,
+        category: 'Documentation',
+        completed: true
+      }
+    ],
+    complianceDeadline: '2024-05-31',
+    priority: 'high',
+    riskLevel: 'high'
   },
   {
     id: '10',
@@ -150,7 +478,30 @@ const frameworks: Framework[] = [
     region: 'Egypt',
     category: 'Privacy',
     icon: '🇪🇬',
-    color: 'bg-yellow-700'
+    color: 'bg-yellow-700',
+    businessImpact: {
+      penaltyAmount: '2,000,000',
+      penaltyCurrency: 'EGP',
+      businessBenefits: ['Professional credibility', 'Market access', 'Compliance advantage'],
+      marketAccess: ['Government contracts', 'Financial services'],
+      competitiveAdvantages: ['Professional image', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'eg1',
+        title: 'Data Subject Rights Implementation',
+        description: 'Implement data subject rights procedures',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-03-15',
+        estimatedHours: 16,
+        category: 'Rights Management',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-07-31',
+    priority: 'medium',
+    riskLevel: 'medium'
   },
   {
     id: '11',
@@ -163,7 +514,30 @@ const frameworks: Framework[] = [
     region: 'Mauritius',
     category: 'Privacy',
     icon: '🇲🇺',
-    color: 'bg-cyan-600'
+    color: 'bg-cyan-600',
+    businessImpact: {
+      penaltyAmount: '200,000',
+      penaltyCurrency: 'MUR',
+      businessBenefits: ['Financial hub credibility', 'International trust', 'Market access'],
+      marketAccess: ['Financial services', 'International partnerships'],
+      competitiveAdvantages: ['Financial hub advantage', 'International compliance']
+    },
+    tasks: [
+      {
+        id: 'mu1',
+        title: 'Data Breach Notification Procedures',
+        description: 'Establish data breach notification processes',
+        status: 'completed',
+        priority: 'high',
+        dueDate: '2024-01-01',
+        estimatedHours: 8,
+        category: 'Security',
+        completed: true
+      }
+    ],
+    complianceDeadline: '2024-06-30',
+    priority: 'high',
+    riskLevel: 'high'
   },
   {
     id: '12',
@@ -176,7 +550,30 @@ const frameworks: Framework[] = [
     region: 'Botswana',
     category: 'Privacy',
     icon: '🇧🇼',
-    color: 'bg-gray-600'
+    color: 'bg-gray-600',
+    businessImpact: {
+      penaltyAmount: '500,000',
+      penaltyCurrency: 'BWP',
+      businessBenefits: ['Customer trust', 'Market credibility', 'Compliance advantage'],
+      marketAccess: ['Local market access', 'Government contracts'],
+      competitiveAdvantages: ['Early compliance', 'Risk reduction']
+    },
+    tasks: [
+      {
+        id: 'b1',
+        title: 'Data Protection Officer Training',
+        description: 'Train designated DPO on Botswana requirements',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-04-30',
+        estimatedHours: 12,
+        category: 'Training',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-11-30',
+    priority: 'low',
+    riskLevel: 'low'
   }
 ];
 
@@ -192,6 +589,7 @@ export default function FrameworksPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedFramework, setSelectedFramework] = useState<Framework | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'impact' | 'timeline'>('overview');
 
   const filteredFrameworks = frameworks.filter(framework => {
     const matchesSearch = framework.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -214,6 +612,40 @@ export default function FrameworksPage() {
     if (compliance >= 60) return 'bg-yellow-500';
     if (compliance >= 40) return 'bg-orange-500';
     return 'bg-red-500';
+  };
+
+  const getPriorityColor = (priority: Priority) => {
+    switch (priority) {
+      case 'high': return 'text-red-600 bg-red-100';
+      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'low': return 'text-green-600 bg-green-100';
+      default: return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  const getRiskLevelColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'critical': return 'text-red-700 bg-red-100 border-red-200';
+      case 'high': return 'text-orange-700 bg-orange-100 border-orange-200';
+      case 'medium': return 'text-yellow-700 bg-yellow-100 border-yellow-200';
+      case 'low': return 'text-green-700 bg-green-100 border-green-200';
+      default: return 'text-gray-700 bg-gray-100 border-gray-200';
+    }
+  };
+
+  const getTaskStatusColor = (status: TaskStatus) => {
+    switch (status) {
+      case 'completed': return 'text-green-700 bg-green-100';
+      case 'in-progress': return 'text-blue-700 bg-blue-100';
+      case 'overdue': return 'text-red-700 bg-red-100';
+      case 'pending': return 'text-gray-700 bg-gray-100';
+      default: return 'text-gray-700 bg-gray-100';
+    }
+  };
+
+  const toggleTaskCompletion = (frameworkId: string, taskId: string) => {
+    // This would typically update the backend
+    console.log(`Toggling task ${taskId} for framework ${frameworkId}`);
   };
 
   return (
@@ -350,59 +782,341 @@ export default function FrameworksPage() {
           </div>
         </div>
 
-        {/* Frameworks Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredFrameworks.map((framework) => (
-            <div
-              key={framework.id}
-              className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => setSelectedFramework(framework)}
-            >
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center">
-                    <div className={`w-12 h-12 ${framework.color} rounded-xl flex items-center justify-center text-white text-xl mr-4`}>
-                      {framework.icon}
+        {/* Conditional Content: Grid or Detail View */}
+        {!selectedFramework ? (
+          /* Frameworks Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredFrameworks.map((framework) => (
+              <div
+                key={framework.id}
+                className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => setSelectedFramework(framework)}
+              >
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className={`w-12 h-12 ${framework.color} rounded-xl flex items-center justify-center text-white text-xl mr-4`}>
+                        {framework.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">{framework.name}</h3>
+                        <p className="text-sm text-gray-500">{framework.region}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg text-gray-900">{framework.name}</h3>
-                      <p className="text-sm text-gray-500">{framework.region}</p>
-                    </div>
-                  </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusConfig[framework.status].bg} ${statusConfig[framework.status].color}`}>
-                    <span className={`w-2 h-2 rounded-full mr-1.5 ${statusConfig[framework.status].dot}`}></span>
-                    {framework.status.charAt(0).toUpperCase() + framework.status.slice(1)}
-                  </span>
-                </div>
-
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{framework.description}</p>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Progress</span>
-                    <span className={`text-sm font-semibold ${getComplianceColor(framework.compliance)}`}>
-                      {framework.compliance}% Complete
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusConfig[framework.status].bg} ${statusConfig[framework.status].color}`}>
+                      <span className={`w-2 h-2 rounded-full mr-1.5 ${statusConfig[framework.status].dot}`}></span>
+                      {framework.status.charAt(0).toUpperCase() + framework.status.slice(1)}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all ${getComplianceBg(framework.compliance)}`}
-                      style={{ width: `${framework.compliance}%` }}
-                    ></div>
-                  </div>
 
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>{framework.controls} tasks to complete</span>
-                    <span>Updated {formatDate(framework.lastUpdated)}</span>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{framework.description}</p>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Progress</span>
+                      <span className={`text-sm font-semibold ${getComplianceColor(framework.compliance)}`}>
+                        {framework.compliance}% Complete
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all ${getComplianceBg(framework.compliance)}`}
+                        style={{ width: `${framework.compliance}%` }}
+                      ></div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <span>{framework.controls} tasks to complete</span>
+                      <span>Updated {formatDate(framework.lastUpdated)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          /* Embedded Detail View */
+          <div className="bg-white rounded-xl shadow-sm border">
+            {/* Header with Back Button */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setSelectedFramework(null)}
+                    className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    aria-label="Back to frameworks"
+                  >
+                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <div className={`w-12 h-12 ${selectedFramework.color} rounded-xl flex items-center justify-center text-white text-xl mr-4`}>
+                    {selectedFramework.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">{selectedFramework.name}</h2>
+                    <p className="text-gray-600">{selectedFramework.region}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskLevelColor(selectedFramework.riskLevel)}`}>
+                        {selectedFramework.riskLevel.toUpperCase()} RISK
+                      </span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedFramework.priority)}`}>
+                        {selectedFramework.priority.toUpperCase()} PRIORITY
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Tab Navigation */}
+              <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                {[
+                  { id: 'overview', label: 'Overview', icon: '📊' },
+                  { id: 'tasks', label: 'Tasks', icon: '✅' },
+                  { id: 'impact', label: 'Impact', icon: '💰' },
+                  { id: 'timeline', label: 'Timeline', icon: '📅' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-white text-[#26558e] shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
+
+            {/* Content */}
+            <div className="p-6">
+              {activeTab === 'overview' && (
+                <div className="space-y-6">
+                  {/* Compliance Overview */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Compliance Overview</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className={`text-4xl font-bold ${getComplianceColor(selectedFramework.compliance)} mb-2`}>
+                          {selectedFramework.compliance}%
+                        </div>
+                        <div className="text-sm text-gray-600">Overall Progress</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div
+                            className={`h-2 rounded-full transition-all ${getComplianceBg(selectedFramework.compliance)}`}
+                            style={{ width: `${selectedFramework.compliance}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-gray-900 mb-2">{selectedFramework.controls}</div>
+                        <div className="text-sm text-gray-600">Total Controls</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-gray-900 mb-2">
+                          {selectedFramework.tasks.filter(t => t.completed).length}
+                        </div>
+                        <div className="text-sm text-gray-600">Tasks Completed</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">About This Framework</h3>
+                    <p className="text-gray-700 leading-relaxed">{selectedFramework.description}</p>
+                  </div>
+
+                  {/* Quick Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white border border-gray-200 rounded-xl p-6">
+                      <h4 className="font-semibold text-gray-900 mb-3">Compliance Deadline</h4>
+                      <div className="text-2xl font-bold text-gray-900 mb-2">
+                        {selectedFramework.complianceDeadline === 'TBD' ? 'TBD' : formatDate(selectedFramework.complianceDeadline)}
+                      </div>
+                      <div className="text-sm text-gray-600">Last Updated: {formatDate(selectedFramework.lastUpdated)}</div>
+                    </div>
+                    <div className="bg-white border border-gray-200 rounded-xl p-6">
+                      <h4 className="font-semibold text-gray-900 mb-3">Estimated Effort</h4>
+                      <div className="text-2xl font-bold text-gray-900 mb-2">
+                        {selectedFramework.tasks.reduce((sum, task) => sum + task.estimatedHours, 0)} hours
+                      </div>
+                      <div className="text-sm text-gray-600">Total estimated time to complete</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'tasks' && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold text-gray-900">Compliance Tasks</h3>
+                    <div className="text-sm text-gray-600">
+                      {selectedFramework.tasks.filter(t => t.completed).length} of {selectedFramework.tasks.length} completed
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {selectedFramework.tasks.map((task) => (
+                      <div key={task.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <input
+                                type="checkbox"
+                                checked={task.completed}
+                                onChange={() => toggleTaskCompletion(selectedFramework.id, task.id)}
+                                className="w-5 h-5 text-[#26558e] border-gray-300 rounded focus:ring-[#26558e]"
+                              />
+                              <h4 className={`font-semibold ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                                {task.title}
+                              </h4>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTaskStatusColor(task.status)}`}>
+                                {task.status.replace('-', ' ').toUpperCase()}
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                                {task.priority.toUpperCase()}
+                              </span>
+                            </div>
+                            <p className="text-gray-600 mb-3">{task.description}</p>
+                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                              <span>Due: {formatDate(task.dueDate)}</span>
+                              <span>•</span>
+                              <span>{task.estimatedHours}h estimated</span>
+                              <span>•</span>
+                              <span className="px-2 py-1 bg-gray-100 rounded-md">{task.category}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'impact' && (
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-gray-900">Business Impact Analysis</h3>
+                  
+                  {/* Penalty Information */}
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                      </div>
+                      <h4 className="text-lg font-semibold text-red-900">Non-Compliance Penalties</h4>
+                    </div>
+                    <div className="text-3xl font-bold text-red-900 mb-2">
+                      {selectedFramework.businessImpact.penaltyAmount} {selectedFramework.businessImpact.penaltyCurrency}
+                    </div>
+                    <p className="text-red-700">Maximum penalty for non-compliance with {selectedFramework.name} data protection requirements</p>
+                  </div>
+
+                  {/* Business Benefits */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+                      <h4 className="font-semibold text-green-900 mb-3">Business Benefits</h4>
+                      <ul className="space-y-2">
+                        {selectedFramework.businessImpact.businessBenefits.map((benefit, index) => (
+                          <li key={index} className="flex items-center gap-2 text-green-700">
+                            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            {benefit}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                      <h4 className="font-semibold text-blue-900 mb-3">Market Access</h4>
+                      <ul className="space-y-2">
+                        {selectedFramework.businessImpact.marketAccess.map((access, index) => (
+                          <li key={index} className="flex items-center gap-2 text-blue-700">
+                            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {access}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                      <h4 className="font-semibold text-purple-900 mb-3">Competitive Advantages</h4>
+                      <ul className="space-y-2">
+                        {selectedFramework.businessImpact.competitiveAdvantages.map((advantage, index) => (
+                          <li key={index} className="flex items-center gap-2 text-purple-700">
+                            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            {advantage}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'timeline' && (
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-gray-900">Compliance Timeline</h3>
+                  
+                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                    <div className="space-y-4">
+                      {selectedFramework.tasks
+                        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+                        .map((task, index) => (
+                          <div key={task.id} className="flex items-center gap-4">
+                            <div className={`w-4 h-4 rounded-full ${task.completed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3">
+                                <h4 className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                                  {task.title}
+                                </h4>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTaskStatusColor(task.status)}`}>
+                                  {task.status.replace('-', ' ').toUpperCase()}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                              <div className="text-sm text-gray-500 mt-1">
+                                Due: {formatDate(task.dueDate)} • {task.estimatedHours}h estimated
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Actions */}
+            <div className="p-6 border-t border-gray-200 bg-gray-50">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button className="flex-1 bg-[#26558e] text-white px-6 py-3 rounded-lg hover:bg-[#1e4470] transition-colors font-medium">
+                  Start Compliance Process
+                </button>
+                <button className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                  Generate Report
+                </button>
+                <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                  Get Help
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Empty State */}
-        {filteredFrameworks.length === 0 && (
+        {!selectedFramework && filteredFrameworks.length === 0 && (
           <div className="text-center py-12">
             <svg className="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0h2m-2 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2h2zm8-2V3a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -413,58 +1127,6 @@ export default function FrameworksPage() {
         )}
       </div>
 
-      {/* Framework Details Modal/Drawer - Placeholder */}
-      {selectedFramework && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <div className={`w-16 h-16 ${selectedFramework.color} rounded-xl flex items-center justify-center text-white text-2xl mr-4`}>
-                    {selectedFramework.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{selectedFramework.name}</h2>
-                    <p className="text-gray-600">{selectedFramework.region}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedFramework(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <p className="text-gray-700 mb-6">{selectedFramework.description}</p>
-              
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-600">Compliance Score</div>
-                  <div className={`text-2xl font-bold ${getComplianceColor(selectedFramework.compliance)}`}>
-                    {selectedFramework.compliance}%
-                  </div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-600">Total Controls</div>
-                  <div className="text-2xl font-bold text-gray-900">{selectedFramework.controls}</div>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button className="flex-1 bg-[#26558e] text-white px-4 py-2 rounded-lg hover:bg-[#1e4470] transition-colors">
-                  View Details
-                </button>
-                <button className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                  Generate Report
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </DashboardLayout>
   );
 }

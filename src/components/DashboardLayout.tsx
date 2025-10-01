@@ -52,6 +52,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
 
   const handleLogout = () => {
@@ -129,9 +130,45 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="dashboard-container bg-hlola-gradient">
       {/* Sidebar */}
-      <div className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 sidebar-gradient shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0`}>
+      <div className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 sidebar-gradient shadow-xl transform transition-all duration-300 ease-in-out ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } lg:translate-x-0 ${
+        sidebarCollapsed ? 'collapsed' : ''
+      } rounded-r-2xl m-2`}>
         
-        <div className="flex items-center justify-center h-16 px-4 border-b border-white/10">
+        {/* Collapse Toggle Button - Desktop Only */}
+        <div className={`hidden lg:flex items-center h-16 border-b border-white/10 ${
+          sidebarCollapsed ? 'justify-center px-2' : 'justify-between px-4'
+        }`}>
+          {!sidebarCollapsed && (
+            <Image
+              src="/brand/Hlola Full White.svg"
+              alt="hlola"
+              width={100}
+              height={30}
+              className="h-6 w-auto"
+            />
+          )}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <svg 
+              className={`w-5 h-5 text-white transition-transform duration-300 ${
+                sidebarCollapsed ? 'rotate-180' : ''
+              }`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Mobile Header */}
+        <div className="lg:hidden flex items-center justify-center h-16 px-4 border-b border-white/10">
           <Image
             src="/brand/Hlola Full White.svg"
             alt="hlola"
@@ -156,20 +193,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       toggleDropdown(item.name);
                     }
                   }}
-                  className={`nav-item group flex items-center justify-between px-3 py-2.5 text-xs font-medium rounded-lg ${
+                  className={`nav-item group flex items-center ${
+                    sidebarCollapsed ? 'justify-center px-2' : 'justify-between px-3'
+                  } py-2.5 text-xs font-medium rounded-lg ${
                     item.current 
                       ? 'active text-white' 
                       : 'text-white/90 hover:text-white'
                   }`}
+                  title={sidebarCollapsed ? item.name : undefined}
                 >
                   <div className="flex items-center">
-                    <IconComponent className={`mr-3 w-6 h-6 ${
+                    <IconComponent className={`${
+                      sidebarCollapsed ? 'w-6 h-6' : 'mr-3 w-6 h-6'
+                    } ${
                       item.current ? 'text-white' : 'text-white/80 group-hover:text-white'
                     }`} />
-                    <span>{item.name}</span>
+                    {!sidebarCollapsed && <span>{item.name}</span>}
                   </div>
                   
-                  {item.hasDropdown && (
+                  {item.hasDropdown && !sidebarCollapsed && (
                     <DropdownArrowIcon 
                       className={`dropdown-arrow w-4 h-4 text-white/70 ${
                         isDropdownOpen ? 'open' : ''
@@ -178,8 +220,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   )}
                 </a>
 
-                {/* Dropdown Sub-menu */}
-                {item.hasDropdown && isDropdownOpen && (
+                {/* Dropdown Sub-menu - Only show when not collapsed */}
+                {item.hasDropdown && isDropdownOpen && !sidebarCollapsed && (
                   <div className="mt-2 ml-8 space-y-1 dropdown-enter-active">
                     {item.subItems?.map((subItem) => {
                       const SubItemIcon = subItem.icon;
@@ -205,7 +247,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="dashboard-main">
+      <div className={`dashboard-main transition-all duration-300 ease-in-out ${
+        sidebarCollapsed ? 'collapsed' : ''
+      }`}>
         {/* Top navigation */}
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-2 glass-nav px-2 shadow-sm sm:gap-x-3 sm:px-4 lg:px-6 w-full">
           <button

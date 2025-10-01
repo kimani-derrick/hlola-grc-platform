@@ -271,8 +271,15 @@ p, span, div, li {
 }
 
 .dashboard-sidebar {
-  width: 16rem; /* 64 in rem */
+  width: 16rem; /* 64 in rem - expanded state */
   flex-shrink: 0;
+  height: calc(100vh - 1rem); /* Account for margin */
+  top: 0.5rem; /* Half of margin */
+}
+
+/* Collapsed sidebar state */
+.dashboard-sidebar.collapsed {
+  width: 4rem; /* 16 in rem - collapsed state */
 }
 
 .dashboard-main {
@@ -288,6 +295,11 @@ p, span, div, li {
   .dashboard-main {
     margin-left: 16rem; /* Same as sidebar width */
     max-width: calc(100vw - 16rem); /* Ensure content doesn't exceed viewport */
+  }
+  
+  .dashboard-main.collapsed {
+    margin-left: 4rem; /* Collapsed sidebar width */
+    max-width: calc(100vw - 4rem);
   }
 }
 
@@ -436,6 +448,72 @@ p, span, div, li {
     #26558e 75%,   /* Hlola blue */
     #1e4470 100%   /* Darker blue at bottom */
   );
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Rounded Sidebar */
+.dashboard-sidebar {
+  border-radius: 0 1rem 1rem 0; /* Rounded right corners */
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Collapsible Sidebar Transitions */
+.dashboard-sidebar {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure smooth width transition */
+.dashboard-sidebar.collapsed {
+  width: 4rem !important;
+}
+
+/* Collapsed sidebar specific styles */
+.dashboard-sidebar.collapsed .nav-item {
+  justify-content: center !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+.dashboard-sidebar.collapsed .nav-item span {
+  display: none !important;
+}
+
+.dashboard-sidebar.collapsed .dropdown-arrow {
+  display: none !important;
+}
+
+/* Tooltip for collapsed sidebar items */
+.nav-item[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-left: 0.5rem;
+  pointer-events: none;
+}
+
+.nav-item[title]:hover::before {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: rgba(0, 0, 0, 0.8);
+  margin-left: -0.25rem;
+  z-index: 1000;
+  pointer-events: none;
 }
 
 /* Navigation Items */
