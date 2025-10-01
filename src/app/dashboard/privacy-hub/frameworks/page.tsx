@@ -96,9 +96,9 @@ export default function FrameworksPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 rounded-3xl mx-4 mt-8">
         {/* Header Section with Hlola Gradient */}
-        <div className="bg-hlola-gradient-strong px-6 py-8 rounded-3xl mx-4 mt-4">
+        <div className="bg-hlola-gradient-strong px-6 py-8 rounded-3xl">
           <div className="max-w-7xl mx-auto">
             {/* Top Navigation */}
             <div className="flex items-center justify-between mb-6">

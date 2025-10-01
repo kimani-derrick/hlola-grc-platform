@@ -71,6 +71,8 @@ html {
   background: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid rgba(65, 195, 214, 0.2);
   box-shadow: 0 4px 20px rgba(65, 195, 214, 0.1);
+  border-radius: 1.5rem; /* rounded-3xl equivalent */
+  margin: 1rem; /* mx-4 mt-4 equivalent */
 }
 
 .glass-button {
@@ -307,16 +309,16 @@ p, span, div, li {
   /* Ensure top navigation bar width matches the main content area */
   .dashboard-main .glass-nav {
     position: absolute;
-    top: 0;
-    width: calc(100vw - 16rem);
-    left: 16rem;
+    top: 1rem;
+    width: calc(100vw - 16rem - 2rem); /* Account for sidebar width and margins */
+    left: calc(16rem + 1rem); /* Account for sidebar width and left margin */
   }
   
   .dashboard-main.collapsed .glass-nav {
     position: absolute;
-    top: 0;
-    width: calc(100vw - 4rem);
-    left: 4rem;
+    top: 1rem;
+    width: calc(100vw - 4rem - 2rem); /* Account for collapsed sidebar width and margins */
+    left: calc(4rem + 1rem); /* Account for collapsed sidebar width and left margin */
   }
 }
 
@@ -326,8 +328,8 @@ p, span, div, li {
   overflow-y: auto;
   overflow-x: hidden;
   max-width: 100%;
-  height: calc(100vh - 4rem); /* Subtract header height (4rem = 64px) */
-  padding-top: 4rem; /* Add padding to account for fixed header */
+  height: calc(100vh - 6rem); /* Subtract header height + margins (6rem = 96px) */
+  padding-top: 6rem; /* Add padding to account for fixed header + margins */
 }
 
 /* Prevent wide content from causing horizontal scroll */
@@ -350,9 +352,9 @@ p, span, div, li {
   /* Mobile navigation bar */
   .dashboard-main .glass-nav {
     position: absolute;
-    top: 0;
-    width: 100vw;
-    left: 0;
+    top: 1rem;
+    width: calc(100vw - 2rem); /* Account for margins */
+    left: 1rem;
   }
 }
 
