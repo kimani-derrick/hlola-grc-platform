@@ -268,6 +268,7 @@ p, span, div, li {
 .dashboard-container {
   min-height: 100vh;
   overflow-x: hidden;
+  display: flex;
 }
 
 .dashboard-sidebar {
@@ -288,6 +289,7 @@ p, span, div, li {
   flex-direction: column;
   width: 100%;
   overflow-x: hidden;
+  height: 100vh; /* Fixed height to prevent full page scroll */
 }
 
 /* On large screens, add left margin to main content to account for fixed sidebar */
@@ -301,14 +303,31 @@ p, span, div, li {
     margin-left: 4rem; /* Collapsed sidebar width */
     max-width: calc(100vw - 4rem);
   }
+  
+  /* Ensure top navigation bar width matches the main content area */
+  .dashboard-main .glass-nav {
+    position: absolute;
+    top: 0;
+    width: calc(100vw - 16rem);
+    left: 16rem;
+  }
+  
+  .dashboard-main.collapsed .glass-nav {
+    position: absolute;
+    top: 0;
+    width: calc(100vw - 4rem);
+    left: 4rem;
+  }
 }
 
-/* Ensure proper scrolling */
+/* Ensure proper scrolling - Fixed height for content area */
 .dashboard-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   max-width: 100%;
+  height: calc(100vh - 4rem); /* Subtract header height (4rem = 64px) */
+  padding-top: 4rem; /* Add padding to account for fixed header */
 }
 
 /* Prevent wide content from causing horizontal scroll */
@@ -326,6 +345,14 @@ p, span, div, li {
   
   .dashboard-sidebar {
     width: 16rem; /* Keep fixed width even on mobile for overlay */
+  }
+  
+  /* Mobile navigation bar */
+  .dashboard-main .glass-nav {
+    position: absolute;
+    top: 0;
+    width: 100vw;
+    left: 0;
   }
 }
 
