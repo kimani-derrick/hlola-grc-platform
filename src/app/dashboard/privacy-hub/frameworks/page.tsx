@@ -730,7 +730,7 @@ export default function FrameworksPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedFramework, setSelectedFramework] = useState<Framework | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'impact' | 'timeline'>('overview');
+  const [activeTab, setActiveTab] = useState<'controls'>('controls');
   const [selectedFilter, setSelectedFilter] = useState<'Legal' | 'Other'>('Legal');
   const [selectedEntity, setSelectedEntity] = useState<string>('Entity 2');
   const [activeFrameworkTab, setActiveFrameworkTab] = useState<'active' | 'library'>('library');
@@ -836,6 +836,7 @@ export default function FrameworksPage() {
   const handleViewControls = () => {
     if (popupFramework) {
       setSelectedFramework(popupFramework);
+      setActiveTab('controls');
       setIsPopupOpen(false);
       setPopupFramework(null);
     }
@@ -1150,232 +1151,127 @@ export default function FrameworksPage() {
               
               {/* Tab Navigation */}
               <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-                {[
-                  { id: 'overview', label: 'Overview', icon: '📊' },
-                  { id: 'tasks', label: 'Tasks', icon: '✅' },
-                  { id: 'impact', label: 'Impact', icon: '💰' },
-                  { id: 'timeline', label: 'Timeline', icon: '📅' }
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-white text-[#26558e] shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <span>{tab.icon}</span>
-                    <span className="hidden sm:inline">{tab.label}</span>
-                  </button>
-                ))}
+                <div className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-white text-[#26558e] shadow-sm">
+                  <span>⚙️</span>
+                  <span className="hidden sm:inline">Controls</span>
+                </div>
               </div>
             </div>
 
             {/* Content */}
             <div className="p-6">
-              {activeTab === 'overview' && (
-                <div className="space-y-6">
-                  {/* Compliance Overview */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Compliance Overview</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="text-center">
-                        <div className={`text-4xl font-bold ${getComplianceColor(selectedFramework.compliance)} mb-2`}>
-                          {selectedFramework.compliance}%
-                        </div>
-                        <div className="text-sm text-gray-600">Overall Progress</div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                          <div
-                            className={`h-2 rounded-full transition-all ${getComplianceBg(selectedFramework.compliance)}`}
-                            style={{ width: `${selectedFramework.compliance}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-4xl font-bold text-gray-900 mb-2">{selectedFramework.controls}</div>
-                        <div className="text-sm text-gray-600">Total Controls</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-4xl font-bold text-gray-900 mb-2">
-                          {selectedFramework.tasks.filter(t => t.completed).length}
-                        </div>
-                        <div className="text-sm text-gray-600">Tasks Completed</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Description */}
+              <div className="space-y-6">
+                  {/* Header Section */}
                   <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">About This Framework</h3>
-                    <p className="text-gray-700 leading-relaxed">{selectedFramework.description}</p>
-                  </div>
-
-                  {/* Quick Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white border border-gray-200 rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Compliance Deadline</h4>
-                      <div className="text-2xl font-bold text-gray-900 mb-2">
-                        {selectedFramework.complianceDeadline === 'TBD' ? 'TBD' : formatDate(selectedFramework.complianceDeadline)}
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-2xl font-bold text-gray-900">{selectedFramework.name} Controls</h3>
+                        <p className="text-gray-600">Manage and track compliance requirements</p>
                       </div>
-                      <div className="text-sm text-gray-600">Last Updated: {formatDate(selectedFramework.lastUpdated)}</div>
-                    </div>
-                    <div className="bg-white border border-gray-200 rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Estimated Effort</h4>
-                      <div className="text-2xl font-bold text-gray-900 mb-2">
-                        {selectedFramework.tasks.reduce((sum, task) => sum + task.estimatedHours, 0)} hours
+                      <div className="text-right">
+                        <div className="text-sm text-gray-500">Legal Framework</div>
+                        <div className="text-2xl font-bold text-gray-900">{selectedFramework.requirements} Requirements</div>
                       </div>
-                      <div className="text-sm text-gray-600">Total estimated time to complete</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'tasks' && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-gray-900">Compliance Tasks</h3>
-                    <div className="text-sm text-gray-600">
-                      {selectedFramework.tasks.filter(t => t.completed).length} of {selectedFramework.tasks.length} completed
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    {selectedFramework.tasks.map((task) => (
-                      <div key={task.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                  {/* Framework Overview */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Framework Overview</h4>
+                    <div className="mb-4">
+                      <h5 className="font-medium text-gray-900 mb-2">Description</h5>
+                      <p className="text-gray-600">{selectedFramework.description}</p>
+                    </div>
+                    
+                    {/* Requirements Breakdown */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-blue-50 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-blue-600 mb-1">Controls</div>
+                        <div className="text-3xl font-bold text-gray-900">{selectedFramework.controls}</div>
+                      </div>
+                      <div className="bg-green-50 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-green-600 mb-1">Tasks</div>
+                        <div className="text-3xl font-bold text-gray-900">{selectedFramework.tasks.length}</div>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-600 mb-1">Evidence</div>
+                        <div className="text-3xl font-bold text-gray-900">{Math.floor(selectedFramework.controls * 0.8)}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Framework Controls Section */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h4 className="text-lg font-semibold text-gray-900">Framework Controls</h4>
+                        <p className="text-gray-600">Manage compliance requirements and evidence</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-500">{selectedFramework.controls} Controls</span>
+                        <div className="flex gap-1">
+                          <button className="px-3 py-1 bg-teal-600 text-white rounded text-sm">Table</button>
+                          <button className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm">List</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Controls Cards */}
+                    <div className="space-y-4">
+                      {/* Control 1 */}
+                      <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <input
-                                type="checkbox"
-                                checked={task.completed}
-                                onChange={() => toggleTaskCompletion(selectedFramework.id, task.id)}
-                                className="w-5 h-5 text-[#26558e] border-gray-300 rounded focus:ring-[#26558e]"
-                              />
-                              <h4 className={`font-semibold ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
-                                {task.title}
-                              </h4>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTaskStatusColor(task.status)}`}>
-                                {task.status.replace('-', ' ').toUpperCase()}
-                              </span>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                                {task.priority.toUpperCase()}
-                              </span>
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-001</span>
+                              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 6</span>
                             </div>
-                            <p className="text-gray-600 mb-3">{task.description}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span>Due: {formatDate(task.dueDate)}</span>
-                              <span>•</span>
-                              <span>{task.estimatedHours}h estimated</span>
-                              <span>•</span>
-                              <span className="px-2 py-1 bg-gray-100 rounded-md">{task.category}</span>
-                            </div>
+                            <h5 className="font-semibold text-gray-900 mb-2">Data Protection Principles</h5>
+                            <h6 className="font-medium text-gray-700 mb-2">Lawful Basis for Processing</h6>
+                            <p className="text-gray-600 text-sm mb-3">
+                              Organizations must establish and document lawful basis for all personal data processing activities
+                            </p>
+                            <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
+                              View Details →
+                            </button>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
-              {activeTab === 'impact' && (
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-900">Business Impact Analysis</h3>
-                  
-                  {/* Penalty Information */}
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
-                        </svg>
-                      </div>
-                      <h4 className="text-lg font-semibold text-red-900">Non-Compliance Penalties</h4>
-                    </div>
-                    <div className="text-3xl font-bold text-red-900 mb-2">
-                      {selectedFramework.businessImpact.penaltyAmount} {selectedFramework.businessImpact.penaltyCurrency}
-                    </div>
-                    <p className="text-red-700">Maximum penalty for non-compliance with {selectedFramework.name} data protection requirements</p>
-                  </div>
-
-                  {/* Business Benefits */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-                      <h4 className="font-semibold text-green-900 mb-3">Business Benefits</h4>
-                      <ul className="space-y-2">
-                        {selectedFramework.businessImpact.businessBenefits.map((benefit, index) => (
-                          <li key={index} className="flex items-center gap-2 text-green-700">
-                            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            {benefit}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                      <h4 className="font-semibold text-blue-900 mb-3">Market Access</h4>
-                      <ul className="space-y-2">
-                        {selectedFramework.businessImpact.marketAccess.map((access, index) => (
-                          <li key={index} className="flex items-center gap-2 text-blue-700">
-                            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {access}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-                      <h4 className="font-semibold text-purple-900 mb-3">Competitive Advantages</h4>
-                      <ul className="space-y-2">
-                        {selectedFramework.businessImpact.competitiveAdvantages.map((advantage, index) => (
-                          <li key={index} className="flex items-center gap-2 text-purple-700">
-                            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                            {advantage}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'timeline' && (
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-900">Compliance Timeline</h3>
-                  
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <div className="space-y-4">
-                      {selectedFramework.tasks
-                        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-                        .map((task, index) => (
-                          <div key={task.id} className="flex items-center gap-4">
-                            <div className={`w-4 h-4 rounded-full ${task.completed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3">
-                                <h4 className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
-                                  {task.title}
-                                </h4>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTaskStatusColor(task.status)}`}>
-                                  {task.status.replace('-', ' ').toUpperCase()}
-                                </span>
-                              </div>
-                              <p className="text-sm text-gray-600 mt-1">{task.description}</p>
-                              <div className="text-sm text-gray-500 mt-1">
-                                Due: {formatDate(task.dueDate)} • {task.estimatedHours}h estimated
-                              </div>
+                      {/* Control 2 */}
+                      <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-002</span>
+                              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 15</span>
                             </div>
+                            <h5 className="font-semibold text-gray-900 mb-2">Data Subject Rights</h5>
+                            <h6 className="font-medium text-gray-700 mb-2">Right to Access</h6>
+                            <p className="text-gray-600 text-sm mb-3">
+                              Organizations must provide data subjects with access to their personal data upon request
+                            </p>
+                            <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
+                              View Details →
+                            </button>
                           </div>
-                        ))}
+                        </div>
+                      </div>
+
+                      {/* Additional Controls Placeholder */}
+                      {selectedFramework.controls > 2 && (
+                        <div className="text-center py-8">
+                          <div className="text-gray-400 mb-2">
+                            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                          </div>
+                          <p className="text-gray-500">+{selectedFramework.controls - 2} more controls</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              )}
             </div>
 
             {/* Footer Actions */}
