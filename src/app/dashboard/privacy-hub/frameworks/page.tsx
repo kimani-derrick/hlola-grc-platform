@@ -965,350 +965,343 @@ export default function FrameworksPage() {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Privacy Frameworks Section */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Privacy Frameworks</h2>
-            </div>
-            
-            {/* Framework Tabs */}
-            <div className="flex space-x-1 mb-6">
-              <button
-                onClick={() => setActiveFrameworkTab('active')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeFrameworkTab === 'active'
-                    ? 'bg-teal-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                }`}
-              >
-                Active Frameworks
-              </button>
-              <button
-                onClick={() => setActiveFrameworkTab('library')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeFrameworkTab === 'library'
-                    ? 'bg-teal-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                }`}
-              >
-                Frameworks Library
-              </button>
-            </div>
-
-            {/* Info Banner */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-blue-800 text-center">
-                Browse the frameworks library to find and implement privacy frameworks.
-              </p>
-            </div>
-
-            {/* Framework Category Filters - Only show in Library tab */}
-            {activeFrameworkTab === 'library' && (
-              <div className="flex space-x-2 mb-6">
-                <button
-                  onClick={() => setSelectedFilter('Legal')}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    selectedFilter === 'Legal'
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                  }`}
-                >
-                  African Legal Frameworks
-                </button>
-                <button
-                  onClick={() => setSelectedFilter('Other')}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    selectedFilter === 'Other'
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                  }`}
-                >
-                  Other Frameworks
-                </button>
-              </div>
-            )}
-
-            {/* Conditional Content: Grid or Detail View */}
-            {!selectedFramework ? (
-              /* Frameworks Grid */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredFrameworks.map((framework) => (
-              <div
-                key={framework.id}
-                className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow"
-              >
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="text-2xl">{framework.icon}</div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        framework.type === 'Legal' ? 'text-blue-600 bg-blue-100' :
-                        framework.type === 'Standards' ? 'text-blue-600 bg-blue-100' :
-                        'text-gray-600 bg-gray-100'
-                      }`}>
-                        {framework.type}
-                      </span>
-                      {activeFrameworkTab === 'library' && isFrameworkActive(framework.id) && (
-                        <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                          Active
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <h3 className="font-semibold text-gray-900 mb-3">{framework.name}</h3>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Compliance</span>
-                      <span className="text-sm font-semibold text-red-600">{framework.compliance}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-red-500 h-2 rounded-full"
-                        style={{ width: `${framework.compliance}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Requirements {framework.requirements}
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={() => handleCountryClick(framework)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      View
-                    </button>
-                    {activeFrameworkTab === 'library' && (
-                      isFrameworkActive(framework.id) ? (
-                        <button 
-                          disabled
-                          className="w-10 h-10 bg-green-500 text-white rounded-lg flex items-center justify-center cursor-not-allowed"
-                          title="Already Added to Active Frameworks"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={() => addFrameworkToActive(framework.id)}
-                          className="w-10 h-10 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center"
-                          title="Add to Active Frameworks"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-              </div>
-            ) : (
-          /* Embedded Detail View */
-          <div className="bg-white rounded-xl shadow-sm border">
-            {/* Header with Back Button */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <button
-                    onClick={() => setSelectedFramework(null)}
-                    className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    aria-label="Back to frameworks"
-                  >
-                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <div className={`w-12 h-12 ${selectedFramework.color} rounded-xl flex items-center justify-center text-white text-xl mr-4`}>
-                    {selectedFramework.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{selectedFramework.name}</h2>
-                    <p className="text-gray-600">{selectedFramework.region}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskLevelColor(selectedFramework.riskLevel)}`}>
-                        {selectedFramework.riskLevel.toUpperCase()} RISK
-                      </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedFramework.priority)}`}>
-                        {selectedFramework.priority.toUpperCase()} PRIORITY
-                      </span>
-                    </div>
-                  </div>
-                </div>
+          {/* Conditional Content: Main Frameworks or Country Detail View */}
+          {!selectedFramework ? (
+            /* Main Privacy Frameworks Section */
+            <div className="bg-white rounded-xl p-6 shadow-sm border mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Privacy Frameworks</h2>
               </div>
               
-              {/* Tab Navigation */}
-              <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-                <div className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-white text-[#26558e] shadow-sm">
-                  <span>⚙️</span>
-                  <span className="hidden sm:inline">Controls</span>
+              {/* Framework Tabs */}
+              <div className="flex space-x-1 mb-6">
+                <button
+                  onClick={() => setActiveFrameworkTab('active')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeFrameworkTab === 'active'
+                      ? 'bg-teal-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  }`}
+                >
+                  Active Frameworks
+                </button>
+                <button
+                  onClick={() => setActiveFrameworkTab('library')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeFrameworkTab === 'library'
+                      ? 'bg-teal-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  }`}
+                >
+                  Frameworks Library
+                </button>
+              </div>
+
+              {/* Framework Category Filters - Only show in Library tab */}
+              {activeFrameworkTab === 'library' && (
+                <div className="flex space-x-2 mb-6">
+                  <button
+                    onClick={() => setSelectedFilter('Legal')}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedFilter === 'Legal'
+                        ? 'bg-teal-600 text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    }`}
+                  >
+                    African Legal Frameworks
+                  </button>
+                  <button
+                    onClick={() => setSelectedFilter('Other')}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedFilter === 'Other'
+                        ? 'bg-teal-600 text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    }`}
+                  >
+                    Other Frameworks
+                  </button>
+                </div>
+              )}
+
+              {/* Frameworks Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {filteredFrameworks.map((framework) => (
+                  <div
+                    key={framework.id}
+                    className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow"
+                  >
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="text-2xl">{framework.icon}</div>
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                            framework.type === 'Legal' ? 'text-blue-600 bg-blue-100' :
+                            framework.type === 'Standards' ? 'text-blue-600 bg-blue-100' :
+                            'text-gray-600 bg-gray-100'
+                          }`}>
+                            {framework.type}
+                          </span>
+                          {activeFrameworkTab === 'library' && isFrameworkActive(framework.id) && (
+                            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                              Active
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <h3 className="font-semibold text-gray-900 mb-3">{framework.name}</h3>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Compliance</span>
+                          <span className="text-sm font-semibold text-red-600">{framework.compliance}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-red-500 h-2 rounded-full"
+                            style={{ width: `${framework.compliance}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Requirements {framework.requirements}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => handleCountryClick(framework)}
+                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          View
+                        </button>
+                        {activeFrameworkTab === 'library' && (
+                          isFrameworkActive(framework.id) ? (
+                            <button 
+                              disabled
+                              className="w-10 h-10 bg-green-500 text-white rounded-lg flex items-center justify-center cursor-not-allowed"
+                              title="Already Added to Active Frameworks"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => addFrameworkToActive(framework.id)}
+                              className="w-10 h-10 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center"
+                              title="Add to Active Frameworks"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Empty State */}
+              {filteredFrameworks.length === 0 && (
+                <div className="text-center py-12">
+                  <svg className="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0h2m-2 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2h2zm8-2V3a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {activeFrameworkTab === 'active' ? 'No active frameworks' : 'No frameworks found'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {activeFrameworkTab === 'active' 
+                      ? 'Add frameworks from the library to get started with compliance.' 
+                      : 'Try adjusting your search or filters to find frameworks.'
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Independent Country Detail View */
+            <div className="bg-white rounded-xl shadow-sm border">
+              {/* Header with Back Button */}
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => setSelectedFramework(null)}
+                      className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      aria-label="Back to frameworks"
+                    >
+                      <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <div className={`w-12 h-12 ${selectedFramework.color} rounded-xl flex items-center justify-center text-white text-xl mr-4`}>
+                      {selectedFramework.icon}
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">{selectedFramework.name}</h2>
+                      <p className="text-gray-600">{selectedFramework.region}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskLevelColor(selectedFramework.riskLevel)}`}>
+                          {selectedFramework.riskLevel.toUpperCase()} RISK
+                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(selectedFramework.priority)}`}>
+                          {selectedFramework.priority.toUpperCase()} PRIORITY
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tab Navigation */}
+                <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                  <div className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-white text-[#26558e] shadow-sm">
+                    <span>⚙️</span>
+                    <span className="hidden sm:inline">Controls</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <div className="space-y-6">
+                    {/* Header Section */}
+                    <div className="bg-white border border-gray-200 rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-2xl font-bold text-gray-900">{selectedFramework.name} Controls</h3>
+                          <p className="text-gray-600">Manage and track compliance requirements</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-500">Legal Framework</div>
+                          <div className="text-2xl font-bold text-gray-900">{selectedFramework.requirements} Requirements</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Framework Overview */}
+                    <div className="bg-white border border-gray-200 rounded-xl p-6">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Framework Overview</h4>
+                      <div className="mb-4">
+                        <h5 className="font-medium text-gray-900 mb-2">Description</h5>
+                        <p className="text-gray-600">{selectedFramework.description}</p>
+                      </div>
+                      
+                      {/* Requirements Breakdown */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-blue-50 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold text-blue-600 mb-1">Controls</div>
+                          <div className="text-3xl font-bold text-gray-900">{selectedFramework.controls}</div>
+                        </div>
+                        <div className="bg-green-50 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold text-green-600 mb-1">Tasks</div>
+                          <div className="text-3xl font-bold text-gray-900">{selectedFramework.tasks.length}</div>
+                        </div>
+                        <div className="bg-purple-50 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold text-purple-600 mb-1">Evidence</div>
+                          <div className="text-3xl font-bold text-gray-900">{Math.floor(selectedFramework.controls * 0.8)}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Framework Controls Section */}
+                    <div className="bg-white border border-gray-200 rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-900">Framework Controls</h4>
+                          <p className="text-gray-600">Manage compliance requirements and evidence</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">{selectedFramework.controls} Controls</span>
+                          <div className="flex gap-1">
+                            <button className="px-3 py-1 bg-teal-600 text-white rounded text-sm">Table</button>
+                            <button className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm">List</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Controls Cards */}
+                      <div className="space-y-4">
+                        {/* Control 1 */}
+                        <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-001</span>
+                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 6</span>
+                              </div>
+                              <h5 className="font-semibold text-gray-900 mb-2">Data Protection Principles</h5>
+                              <h6 className="font-medium text-gray-700 mb-2">Lawful Basis for Processing</h6>
+                              <p className="text-gray-600 text-sm mb-3">
+                                Organizations must establish and document lawful basis for all personal data processing activities
+                              </p>
+                              <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
+                                View Details →
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Control 2 */}
+                        <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-002</span>
+                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 15</span>
+                              </div>
+                              <h5 className="font-semibold text-gray-900 mb-2">Data Subject Rights</h5>
+                              <h6 className="font-medium text-gray-700 mb-2">Right to Access</h6>
+                              <p className="text-gray-600 text-sm mb-3">
+                                Organizations must provide data subjects with access to their personal data upon request
+                              </p>
+                              <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
+                                View Details →
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Additional Controls Placeholder */}
+                        {selectedFramework.controls > 2 && (
+                          <div className="text-center py-8">
+                            <div className="text-gray-400 mb-2">
+                              <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                              </svg>
+                            </div>
+                            <p className="text-gray-500">+{selectedFramework.controls - 2} more controls</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+              {/* Footer Actions */}
+              <div className="p-6 border-t border-gray-200 bg-gray-50">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button className="flex-1 bg-[#26558e] text-white px-6 py-3 rounded-lg hover:bg-[#1e4470] transition-colors font-medium">
+                    Start Compliance Process
+                  </button>
+                  <button className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                    Generate Report
+                  </button>
+                  <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                    Get Help
+                  </button>
                 </div>
               </div>
             </div>
-
-            {/* Content */}
-            <div className="p-6">
-              <div className="space-y-6">
-                  {/* Header Section */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-2xl font-bold text-gray-900">{selectedFramework.name} Controls</h3>
-                        <p className="text-gray-600">Manage and track compliance requirements</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-500">Legal Framework</div>
-                        <div className="text-2xl font-bold text-gray-900">{selectedFramework.requirements} Requirements</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Framework Overview */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Framework Overview</h4>
-                    <div className="mb-4">
-                      <h5 className="font-medium text-gray-900 mb-2">Description</h5>
-                      <p className="text-gray-600">{selectedFramework.description}</p>
-                    </div>
-                    
-                    {/* Requirements Breakdown */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-blue-50 rounded-lg p-4 text-center">
-                        <div className="text-2xl font-bold text-blue-600 mb-1">Controls</div>
-                        <div className="text-3xl font-bold text-gray-900">{selectedFramework.controls}</div>
-                      </div>
-                      <div className="bg-green-50 rounded-lg p-4 text-center">
-                        <div className="text-2xl font-bold text-green-600 mb-1">Tasks</div>
-                        <div className="text-3xl font-bold text-gray-900">{selectedFramework.tasks.length}</div>
-                      </div>
-                      <div className="bg-purple-50 rounded-lg p-4 text-center">
-                        <div className="text-2xl font-bold text-purple-600 mb-1">Evidence</div>
-                        <div className="text-3xl font-bold text-gray-900">{Math.floor(selectedFramework.controls * 0.8)}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Framework Controls Section */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-900">Framework Controls</h4>
-                        <p className="text-gray-600">Manage compliance requirements and evidence</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">{selectedFramework.controls} Controls</span>
-                        <div className="flex gap-1">
-                          <button className="px-3 py-1 bg-teal-600 text-white rounded text-sm">Table</button>
-                          <button className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm">List</button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Controls Cards */}
-                    <div className="space-y-4">
-                      {/* Control 1 */}
-                      <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-001</span>
-                              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 6</span>
-                            </div>
-                            <h5 className="font-semibold text-gray-900 mb-2">Data Protection Principles</h5>
-                            <h6 className="font-medium text-gray-700 mb-2">Lawful Basis for Processing</h6>
-                            <p className="text-gray-600 text-sm mb-3">
-                              Organizations must establish and document lawful basis for all personal data processing activities
-                            </p>
-                            <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
-                              View Details →
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Control 2 */}
-                      <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-002</span>
-                              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 15</span>
-                            </div>
-                            <h5 className="font-semibold text-gray-900 mb-2">Data Subject Rights</h5>
-                            <h6 className="font-medium text-gray-700 mb-2">Right to Access</h6>
-                            <p className="text-gray-600 text-sm mb-3">
-                              Organizations must provide data subjects with access to their personal data upon request
-                            </p>
-                            <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
-                              View Details →
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Additional Controls Placeholder */}
-                      {selectedFramework.controls > 2 && (
-                        <div className="text-center py-8">
-                          <div className="text-gray-400 mb-2">
-                            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
-                          </div>
-                          <p className="text-gray-500">+{selectedFramework.controls - 2} more controls</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="p-6 border-t border-gray-200 bg-gray-50">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button className="flex-1 bg-[#26558e] text-white px-6 py-3 rounded-lg hover:bg-[#1e4470] transition-colors font-medium">
-                  Start Compliance Process
-                </button>
-                <button className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                  Generate Report
-                </button>
-                <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                  Get Help
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!selectedFramework && filteredFrameworks.length === 0 && (
-          <div className="text-center py-12">
-            <svg className="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0h2m-2 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2h2zm8-2V3a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {activeFrameworkTab === 'active' ? 'No active frameworks' : 'No frameworks found'}
-            </h3>
-            <p className="text-gray-600">
-              {activeFrameworkTab === 'active' 
-                ? 'Add frameworks from the library to get started with compliance.' 
-                : 'Try adjusting your search or filters to find frameworks.'
-              }
-            </p>
-          </div>
-        )}
-          </div>
+          )}
         </div>
 
         {/* Country Popup Modal */}
