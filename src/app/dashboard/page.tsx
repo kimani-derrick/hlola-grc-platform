@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import DashboardLayout from '../../components/DashboardLayout';
 import DashboardContent from '../../components/DashboardContent';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import { EntityProvider } from '../../context/EntityContext';
 
 export const metadata: Metadata = {
   title: 'Dashboard - hlola GRC Platform',
@@ -11,9 +12,11 @@ export const metadata: Metadata = {
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <DashboardContent />
-      </DashboardLayout>
+      <EntityProvider>
+        <DashboardLayout>
+          <DashboardContent />
+        </DashboardLayout>
+      </EntityProvider>
     </ProtectedRoute>
   );
 }

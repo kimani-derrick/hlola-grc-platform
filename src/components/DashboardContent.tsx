@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useEntity } from '../context/EntityContext';
 import SpeedometerGauge from './SpeedometerGauge';
 import MetricCard from './MetricCard';
 import AuditOverview from './AuditOverview';
@@ -9,6 +10,7 @@ import RiskExposureGauge from './RiskExposureGauge';
 
 export default function DashboardContent() {
   const { user } = useAuth();
+  const { selectedEntity, isLoading: entityLoading } = useEntity();
   const [gaugeSize, setGaugeSize] = useState(160);
   const [isClient, setIsClient] = useState(false);
 
@@ -33,6 +35,72 @@ export default function DashboardContent() {
     return () => window.removeEventListener('resize', updateGaugeSize);
   }, []);
 
+  // Show loading state while entities are loading
+  if (entityLoading) {
+    return (
+      <div className="space-y-6 max-w-full">
+        <div className="glass-card rounded-2xl p-4">
+          <div className="flex items-center justify-between">
+            <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+        <div className="grid lg:grid-cols-2 gap-8">
+          <div className="glass-card rounded-2xl p-6 h-64 bg-gray-100 animate-pulse"></div>
+          <div className="glass-card rounded-2xl p-6 h-64 bg-gray-100 animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message when no entity is selected
+  if (!selectedEntity) {
+    return (
+      <div className="space-y-6 max-w-full">
+        <div className="glass-card rounded-2xl p-8 text-center">
+          <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Entity Selected</h3>
+          <p className="text-gray-500 mb-4">Please select an entity from the dropdown above to view its dashboard.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Get entity-specific data
+  const getEntitySpecificData = () => {
+    const baseData = {
+      criticalIssues: 11,
+      riskExposure: 7000000,
+      controls: 86,
+      policies: 30,
+      risks: 16,
+      tasks: 38,
+    };
+
+    // Adjust data based on entity's compliance score and risk level
+    if (selectedEntity.complianceScore) {
+      const score = selectedEntity.complianceScore;
+      const multiplier = score / 100;
+      
+      return {
+        ...baseData,
+        criticalIssues: Math.max(1, Math.round(baseData.criticalIssues * (1 - multiplier + 0.2))),
+        controls: Math.round(baseData.controls * multiplier),
+        policies: Math.round(baseData.policies * multiplier),
+        risks: Math.round(baseData.risks * (1 - multiplier + 0.3)),
+        tasks: Math.round(baseData.tasks * multiplier),
+      };
+    }
+
+    return baseData;
+  };
+
+  const entityData = getEntitySpecificData();
+
   return (
     <div className="space-y-6 max-w-full">
       {/* Welcome Section */}
@@ -43,7 +111,7 @@ export default function DashboardContent() {
               Welcome back, {user?.name.split(' ')[0]}! 👋
             </h1>
             <p className="text-gray-600 mt-1 text-xs">
-              Here&apos;s your compliance overview for today
+              Here&apos;s your compliance overview for {selectedEntity.name}
             </p>
           </div>
           <div className="text-right">
@@ -69,7 +137,7 @@ export default function DashboardContent() {
             <div className="absolute top-4 left-4 z-20">
               <div className="bg-black/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-2xl border border-gray-300">
                 <div className="text-xl font-mono font-bold text-center transition-all duration-1000 ease-out text-red-600">
-                  11
+                  {entityData.criticalIssues}
                 </div>
                 <div className="text-xs text-gray-300 text-center mt-1 font-semibold tracking-wider">
                   CRITICAL
@@ -78,7 +146,7 @@ export default function DashboardContent() {
             </div>
             <div className="gauge-glow">
               <SpeedometerGauge
-                value={11}
+                value={entityData.criticalIssues}
                 maxValue={100}
                 title="critical"
                 status="critical"
@@ -91,8 +159,8 @@ export default function DashboardContent() {
         {/* Risk Exposure Gauge - Right Side */}
         <div>
           <RiskExposureGauge
-            exposureAmount={7000000}
-            riskLevel="critical"
+            exposureAmount={entityData.riskExposure}
+            riskLevel={selectedEntity.riskLevel || "critical"}
             industryAverage={5000000}
             trend="up"
             trendPercentage={15}
@@ -106,9 +174,9 @@ export default function DashboardContent() {
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-full">
         <MetricCard
-          value={86}
+          value={entityData.controls}
           label="Controls"
-          progress={75}
+          progress={selectedEntity.complianceScore || 75}
           change="+5%"
           changeType="positive"
           color="green"
@@ -119,9 +187,9 @@ export default function DashboardContent() {
           }
         />
         <MetricCard
-          value={30}
+          value={entityData.policies}
           label="Policies"
-          progress={78}
+          progress={selectedEntity.complianceScore || 78}
           change="+5%"
           changeType="positive"
           color="orange"
@@ -132,7 +200,7 @@ export default function DashboardContent() {
           }
         />
         <MetricCard
-          value={16}
+          value={entityData.risks}
           label="Risks"
           progress={75}
           change="-2%"
@@ -145,9 +213,9 @@ export default function DashboardContent() {
           }
         />
         <MetricCard
-          value={38}
+          value={entityData.tasks}
           label="Tasks"
-          progress={70}
+          progress={selectedEntity.complianceScore || 70}
           change="0%"
           changeType="neutral"
           color="cyan"

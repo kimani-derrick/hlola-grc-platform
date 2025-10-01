@@ -80,7 +80,7 @@ export default function AuditOverview({ className = '' }: AuditOverviewProps) {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Total Audits</p>
+              <p className="text-sm font-bold text-gray-600" style={{ fontWeight: 'bold' }}>Total Audits</p>
               <p className="text-2xl font-bold text-gray-900">{auditOverviewData.totalAudits}</p>
             </div>
           </div>
@@ -94,7 +94,7 @@ export default function AuditOverview({ className = '' }: AuditOverviewProps) {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Active</p>
+              <p className="text-sm font-bold text-gray-600" style={{ fontWeight: 'bold' }}>Active</p>
               <p className="text-2xl font-bold text-gray-900">{auditOverviewData.activeAudits}</p>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function AuditOverview({ className = '' }: AuditOverviewProps) {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Overdue</p>
+              <p className="text-sm font-bold text-gray-600" style={{ fontWeight: 'bold' }}>Overdue</p>
               <p className="text-2xl font-bold text-red-600">{auditOverviewData.overdueAudits}</p>
             </div>
           </div>
@@ -122,7 +122,7 @@ export default function AuditOverview({ className = '' }: AuditOverviewProps) {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Critical Findings</p>
+              <p className="text-sm font-bold text-gray-600" style={{ fontWeight: 'bold' }}>Critical Findings</p>
               <p className="text-2xl font-bold text-orange-600">{auditOverviewData.criticalFindings}</p>
             </div>
           </div>
