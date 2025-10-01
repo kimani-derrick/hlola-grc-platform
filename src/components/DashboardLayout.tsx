@@ -28,7 +28,6 @@ import {
   ReportsSubIcon
 } from './icons/ExtendedNavIcons';
 import { ReportsIcon } from './icons/NavIcons';
-import EntityHeader from './EntityHeader';
 
 interface SubMenuItem {
   name: string;
@@ -239,11 +238,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         </a>
                       );
                     })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        </div>
+      )}
+    </div>
+  );
+})}
         </nav>
       </div>
 
@@ -310,7 +309,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Page content */}
         <main className="dashboard-content">
           <div className="px-2 py-6 sm:px-4 lg:px-6 max-w-full">
-            <EntityHeader />
             {children}
           </div>
         </main>

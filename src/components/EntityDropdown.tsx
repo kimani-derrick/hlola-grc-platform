@@ -60,7 +60,7 @@ export default function EntityDropdown() {
   };
 
   return (
-    <div className="relative z-[9998]" ref={dropdownRef}>
+    <div className="relative z-[10001]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#26558e] focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
@@ -88,7 +88,7 @@ export default function EntityDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-[9999] max-h-96 overflow-y-auto">
+        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-[10002] max-h-96 overflow-y-auto">
           <div className="p-3 border-b border-gray-100">
             <h3 className="text-sm font-semibold text-gray-900">Select Entity</h3>
             <p className="text-xs text-gray-500 mt-1">Choose an entity to view its dashboard</p>

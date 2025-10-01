@@ -25,7 +25,7 @@ export default function EntityHeader() {
 
   return (
     <>
-      <div className="glass-card rounded-xl p-4 mb-6 relative z-0">
+      <div className="glass-card rounded-xl p-4 mb-6 relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">

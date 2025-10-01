@@ -7,6 +7,7 @@ import SpeedometerGauge from './SpeedometerGauge';
 import MetricCard from './MetricCard';
 import AuditOverview from './AuditOverview';
 import RiskExposureGauge from './RiskExposureGauge';
+import EntityHeader from './EntityHeader';
 
 export default function DashboardContent() {
   const { user } = useAuth();
@@ -103,6 +104,7 @@ export default function DashboardContent() {
 
   return (
     <div className="space-y-6 max-w-full">
+      <EntityHeader />
       {/* Welcome Section */}
       <div className="glass-card rounded-2xl p-4">
         <div className="flex items-center justify-between">
