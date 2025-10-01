@@ -12,11 +12,9 @@ export default function AddEntityModal({ isOpen, onClose }: AddEntityModalProps)
   const { addEntity } = useEntity();
   const [formData, setFormData] = useState({
     name: '',
-    country: '',
-    type: 'branch' as Entity['type'],
-    status: 'active' as Entity['status'],
-    complianceScore: '',
-    riskLevel: 'medium' as Entity['riskLevel'],
+    frameworkAssignment: '',
+    admins: '',
+    description: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,11 +25,11 @@ export default function AddEntityModal({ isOpen, onClose }: AddEntityModalProps)
     try {
       const entityData = {
         name: formData.name,
-        country: formData.country,
-        type: formData.type,
-        status: formData.status,
-        complianceScore: formData.complianceScore ? parseInt(formData.complianceScore) : undefined,
-        riskLevel: formData.riskLevel,
+        country: 'Default Country', // Default value since it's not in the form
+        type: 'branch' as Entity['type'], // Default value
+        status: 'active' as Entity['status'], // Default value
+        complianceScore: undefined,
+        riskLevel: 'medium' as Entity['riskLevel'], // Default value
       };
 
       addEntity(entityData);
@@ -39,11 +37,9 @@ export default function AddEntityModal({ isOpen, onClose }: AddEntityModalProps)
       // Reset form
       setFormData({
         name: '',
-        country: '',
-        type: 'branch',
-        status: 'active',
-        complianceScore: '',
-        riskLevel: 'medium',
+        frameworkAssignment: '',
+        admins: '',
+        description: '',
       });
       
       onClose();
@@ -65,33 +61,28 @@ export default function AddEntityModal({ isOpen, onClose }: AddEntityModalProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 pointer-events-none">
-      {/* Popup panel */}
-      <div className="relative bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl max-w-md w-full pointer-events-auto border border-gray-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      {/* Dark layered background overlay */}
+      <div 
+        className="absolute inset-0 bg-black/30 transition-opacity"
+        onClick={onClose}
+      ></div>
+
+      {/* Modal panel - positioned on top of dashboard */}
+      <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full z-[10000] border border-gray-200">
           <form onSubmit={handleSubmit}>
             {/* Header */}
             <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-[#26558e]/10">
-                    <svg className="h-4 w-4 text-[#26558e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Add New Entity</h3>
-                    <p className="text-sm text-gray-500">Create a new branch, office, or subsidiary</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-shrink-0 p-1 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-[#26558e]/10">
+                  <svg className="h-4 w-4 text-[#26558e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                </button>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Add New Entity</h3>
+                  <p className="text-sm text-gray-500">Create a new entity workspace by filling out the form below.</p>
+                </div>
               </div>
             </div>
 
@@ -111,98 +102,78 @@ export default function AddEntityModal({ isOpen, onClose }: AddEntityModalProps)
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border"
-                    placeholder="e.g., Nairobi Branch"
+                    className="mt-1 block w-full border-blue-300 bg-blue-50 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border placeholder-gray-600"
+                    placeholder="e.g. Product X"
                   />
                 </div>
 
-                {/* Country */}
+                {/* Framework Assignment */}
                 <div>
-                  <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                    Country *
+                  <label htmlFor="frameworkAssignment" className="block text-sm font-medium text-gray-700">
+                    Framework Assignment *
                   </label>
-                  <input
-                    type="text"
-                    name="country"
-                    id="country"
-                    required
-                    value={formData.country}
+                  <div className="relative">
+                    <select
+                      name="frameworkAssignment"
+                      id="frameworkAssignment"
+                      required
+                      value={formData.frameworkAssignment}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border-blue-300 bg-blue-50 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border appearance-none text-gray-600"
+                    >
+                      <option value="" className="text-gray-600">Select frameworks</option>
+                      <option value="gdpr" className="text-gray-800">GDPR</option>
+                      <option value="ccpa" className="text-gray-800">CCPA</option>
+                      <option value="sox" className="text-gray-800">SOX</option>
+                      <option value="hipaa" className="text-gray-800">HIPAA</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Admins */}
+                <div>
+                  <label htmlFor="admins" className="block text-sm font-medium text-gray-700">
+                    Admins *
+                  </label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      name="admins"
+                      id="admins"
+                      required
+                      value={formData.admins}
+                      onChange={handleChange}
+                      className="mt-1 block flex-1 border-blue-300 bg-blue-50 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border placeholder-gray-600"
+                      placeholder="Select or invite admins..."
+                    />
+                    <button
+                      type="button"
+                      className="mt-1 px-4 py-2 border border-blue-300 bg-white text-blue-600 rounded-md hover:bg-blue-50 focus:ring-[#26558e] focus:border-[#26558e] text-sm font-medium"
+                    >
+                      Invite
+                    </button>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                    Description (optional)
+                  </label>
+                  <textarea
+                    name="description"
+                    id="description"
+                    rows={3}
+                    value={formData.description}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border"
-                    placeholder="e.g., Kenya"
+                    className="mt-1 block w-full border-blue-300 bg-blue-50 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border resize-none placeholder-gray-600"
+                    placeholder="Notes about the entity's purpose"
                   />
-                </div>
-
-                {/* Type */}
-                <div>
-                  <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                    Entity Type *
-                  </label>
-                  <select
-                    name="type"
-                    id="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border"
-                  >
-                    <option value="branch">Branch</option>
-                    <option value="office">Office</option>
-                    <option value="subsidiary">Subsidiary</option>
-                  </select>
-                </div>
-
-                {/* Status */}
-                <div>
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                    Status *
-                  </label>
-                  <select
-                    name="status"
-                    id="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-
-                {/* Compliance Score */}
-                <div>
-                  <label htmlFor="complianceScore" className="block text-sm font-medium text-gray-700">
-                    Compliance Score (Optional)
-                  </label>
-                  <input
-                    type="number"
-                    name="complianceScore"
-                    id="complianceScore"
-                    min="0"
-                    max="100"
-                    value={formData.complianceScore}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border"
-                    placeholder="e.g., 85"
-                  />
-                </div>
-
-                {/* Risk Level */}
-                <div>
-                  <label htmlFor="riskLevel" className="block text-sm font-medium text-gray-700">
-                    Risk Level
-                  </label>
-                  <select
-                    name="riskLevel"
-                    id="riskLevel"
-                    value={formData.riskLevel}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#26558e] focus:border-[#26558e] sm:text-sm px-3 py-2 border"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
-                  </select>
                 </div>
               </div>
             </div>
@@ -230,7 +201,7 @@ export default function AddEntityModal({ isOpen, onClose }: AddEntityModalProps)
                     Adding...
                   </div>
                 ) : (
-                  'Add Entity'
+                  'Create Entity'
                 )}
               </button>
             </div>
