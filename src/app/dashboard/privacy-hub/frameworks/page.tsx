@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import DashboardLayout from '../../../../components/DashboardLayout';
+import CountryPopupModal from '../../../../components/CountryPopupModal';
 import { formatDate } from '../../../../utils/dateUtils';
 
 // Framework status types
@@ -734,6 +735,8 @@ export default function FrameworksPage() {
   const [selectedEntity, setSelectedEntity] = useState<string>('Entity 2');
   const [activeFrameworkTab, setActiveFrameworkTab] = useState<'active' | 'library'>('library');
   const [activeFrameworks, setActiveFrameworks] = useState<string[]>(['1']); // Kenya is default active
+  const [popupFramework, setPopupFramework] = useState<Framework | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const filteredFrameworks = frameworks.filter(framework => {
     const matchesSearch = framework.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -818,6 +821,24 @@ export default function FrameworksPage() {
 
   const isFrameworkActive = (frameworkId: string) => {
     return activeFrameworks.includes(frameworkId);
+  };
+
+  const handleCountryClick = (framework: Framework) => {
+    setPopupFramework(framework);
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setPopupFramework(null);
+  };
+
+  const handleViewControls = () => {
+    if (popupFramework) {
+      setSelectedFramework(popupFramework);
+      setIsPopupOpen(false);
+      setPopupFramework(null);
+    }
   };
 
   // Get frameworks based on current tab
@@ -1056,7 +1077,7 @@ export default function FrameworksPage() {
                   {/* Action Buttons */}
                   <div className="flex items-center space-x-2">
                     <button 
-                      onClick={() => setSelectedFramework(framework)}
+                      onClick={() => handleCountryClick(framework)}
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1393,6 +1414,14 @@ export default function FrameworksPage() {
         )}
           </div>
         </div>
+
+        {/* Country Popup Modal */}
+        <CountryPopupModal
+          framework={popupFramework}
+          isOpen={isPopupOpen}
+          onClose={handleClosePopup}
+          onViewControls={handleViewControls}
+        />
       </div>
     </DashboardLayout>
   );
