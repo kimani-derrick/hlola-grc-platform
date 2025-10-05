@@ -249,7 +249,18 @@ export default function ControlsPage() {
     const matchesCountry = selectedCountry === 'all' || control.country === selectedCountry;
     const matchesStatus = selectedStatus === 'all' || control.status === selectedStatus;
     const matchesPriority = selectedPriority === 'all' || control.priority === selectedPriority;
-    const matchesFramework = selectedFramework === 'all' || control.framework === selectedFramework;
+    
+    // Fix framework matching logic
+    let matchesFramework = true;
+    if (selectedFramework !== 'all') {
+      // Find the framework by name and match by country
+      const framework = frameworks.find(f => f.name === selectedFramework);
+      if (framework) {
+        matchesFramework = control.country === framework.region;
+      } else {
+        matchesFramework = control.framework === selectedFramework;
+      }
+    }
     
     return matchesSearch && matchesCountry && matchesStatus && matchesPriority && matchesFramework;
   });
@@ -378,11 +389,9 @@ export default function ControlsPage() {
               {frameworks
                 .filter(framework => activeFrameworkIds.includes(framework.id))
                 .map(framework => {
-                  // Find controls that match this framework by name or region
+                  // Find controls that match this framework by country/region
                   const frameworkControls = controls.filter(c => 
-                    c.framework === framework.name || 
-                    c.country === framework.region ||
-                    c.framework.includes(framework.name.split(' ')[0]) // Match first word for partial matches
+                    c.country === framework.region
                   );
                   const completedCount = frameworkControls.filter(c => c.status === 'completed').length;
                   const progress = frameworkControls.length > 0 ? Math.round((completedCount / frameworkControls.length) * 100) : 0;
