@@ -1,0 +1,33 @@
+export default function CTASection() {
+  return (
+    <section id="cta" className="py-20 bg-gradient-to-br from-[#f8fafc] via-white to-[#f1f5f9]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#26558e]/25 to-transparent mb-12" />
+        <div className="glass-card rounded-3xl p-8 md:p-12">
+          <h2 className="text-4xl font-bold text-[#26558e] mb-6">
+            Deploy hlola in days — delight regulators for years
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            Start with a guided rollout, automate evidence collection, and give your board real-time assurance.
+            No contracts, cancel any time.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 w-full">
+            <input 
+              type="email" 
+              placeholder="Enter your work email"
+              className="glass-input px-6 py-3 rounded-lg w-full sm:w-auto sm:min-w-[20rem] text-gray-700"
+            />
+            <button className="bg-[#26558e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#1e4470] transition-colors hover-lift whitespace-nowrap">
+              Start Free Trial
+            </button>
+          </div>
+          
+          <div className="text-sm text-gray-500">
+            ✓ Free 14-day trial · ✓ No credit card required · ✓ Setup in 5 minutes · ✓ Concierge onboarding
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
