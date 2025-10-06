@@ -67,9 +67,9 @@ export default function Navigation({ scrollY }: NavigationProps) {
                 <Link href="/login" className="text-gray-700 hover:text-[#26558e] transition-colors text-sm">
                   Login
                 </Link>
-                <a href="#cta" className="bg-[#26558e] text-white px-4 py-1.5 rounded-lg hover:bg-[#1e4470] transition-colors text-sm">
+              <Link href="/onboarding" className="bg-[#26558e] text-white px-4 py-1.5 rounded-lg hover:bg-[#1e4470] transition-colors text-sm">
                   Get Started
-                </a>
+                </Link>
               </>
             )}
           </div>
@@ -109,7 +109,7 @@ export default function Navigation({ scrollY }: NavigationProps) {
               ) : (
                 <>
                   <Link href="/login" className="block px-3 py-2 text-gray-700 hover:text-[#26558e]">Login</Link>
-                  <a href="#cta" className="w-full inline-flex justify-center bg-[#26558e] text-white px-3 py-2 rounded-lg mt-4">Get Started</a>
+                  <Link href="/onboarding" className="w-full inline-flex justify-center bg-[#26558e] text-white px-3 py-2 rounded-lg mt-4">Get Started</Link>
                 </>
               )}
             </div>

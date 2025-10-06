@@ -18,9 +18,9 @@ export default function CTASection() {
               placeholder="Enter your work email"
               className="glass-input px-6 py-3 rounded-lg w-full sm:w-auto sm:min-w-[20rem] text-gray-700"
             />
-            <button className="bg-[#26558e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#1e4470] transition-colors hover-lift whitespace-nowrap">
-              Start Free Trial
-            </button>
+            <a href="/onboarding" className="bg-[#26558e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#1e4470] transition-colors hover-lift whitespace-nowrap">
+              Getting Started
+            </a>
           </div>
           
           <div className="text-sm text-gray-500">

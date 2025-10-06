@@ -91,15 +91,15 @@ const generateTasksForControl = (control: ControlDetailModalProps['control']): T
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'completed':
-      return 'bg-green-100 text-green-800';
+      return 'bg-green-50 text-green-700 border border-green-200';
     case 'in-progress':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
     case 'not-started':
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-50 text-gray-700 border border-gray-200';
     case 'overdue':
-      return 'bg-red-100 text-red-800';
+      return 'bg-red-50 text-red-700 border border-red-200';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-50 text-gray-700 border border-gray-200';
   }
 };
 
@@ -197,22 +197,22 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-xl">
+        <div className="sticky top-0 bg-white/80 backdrop-blur border-b border-gray-200 p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                  <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium border border-indigo-200">
                     {control.country}-{control.id}
                   </span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                  <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium border border-indigo-200">
                     {control.category}
                   </span>
                 </div>
@@ -220,11 +220,11 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
-                <span className="text-sm font-medium text-red-600">{control.completionRate}% At Risk</span>
+                <span className="text-xs font-medium">{control.completionRate}% At Risk</span>
               </div>
               <button
                 onClick={onClose}
@@ -244,7 +244,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
             {/* Description */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <div className="w-1 h-6 bg-purple-500 rounded"></div>
+                <div className="w-1 h-6 bg-indigo-500 rounded"></div>
                 <h3 className="text-lg font-semibold text-gray-900">Description</h3>
               </div>
               <p className="text-gray-700">{control.description}</p>
@@ -253,7 +253,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
             {/* Legal & Implementation */}
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <div className="bg-white border border-gray-200 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9" />
@@ -262,7 +262,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                   </div>
                   <p className="text-sm text-gray-600">Art. 6</p>
                 </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <div className="bg-white border border-gray-200 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -302,13 +302,13 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
             </div>
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
                 <h4 className="font-semibold text-gray-900">Control Evidence</h4>
               </div>
               <p className="text-sm text-gray-600 mb-3">Upload evidence files to demonstrate compliance with this control requirement.</p>
-              <button className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2">
+              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
@@ -423,44 +423,44 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                         onClick={() => setExpandedTaskId(expandedTaskId === task.id ? null : task.id)}
                         className={`text-gray-400 hover:text-gray-600 transition-transform ${expandedTaskId === task.id ? 'rotate-180' : ''}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </button>
                       <div className="relative">
                         <button 
                           onClick={() => setActiveTaskMenu(activeTaskMenu === task.id ? null : task.id)}
-                          className="text-gray-400 hover:text-gray-600 p-1"
+                  className="text-gray-400 hover:text-gray-600 p-1"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                           </svg>
                         </button>
                         
                         {/* Task Action Menu */}
                         {activeTaskMenu === task.id && (
-                          <div className="absolute right-0 top-8 bg-white rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
+                  <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl py-1 z-10 min-w-[160px] border border-gray-200">
                             <button
                               onClick={() => handleTaskAction(task.id, 'view-details')}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
+                      className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
                             >
                               View Details
                             </button>
                             <button
                               onClick={() => handleTaskAction(task.id, 'mark-in-progress')}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
+                      className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
                             >
                               Mark In Progress
                             </button>
                             <button
                               onClick={() => handleTaskAction(task.id, 'mark-complete')}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
+                      className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
                             >
                               Mark Complete
                             </button>
                             <button
                               onClick={() => handleTaskAction(task.id, 'delegate')}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
+                      className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-50"
                             >
                               Delegate Task
                             </button>

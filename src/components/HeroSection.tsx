@@ -29,9 +29,9 @@ export default function HeroSection() {
               Tame regulations, automate evidence, and keep your team accountable inside one joyful workspace.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <button className="bg-[#26558e] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-[#1e4470] transition-all hover-lift">
-                Start Your Free Trial
-              </button>
+              <a href="/onboarding" className="bg-[#26558e] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-[#1e4470] transition-all hover-lift">
+                Getting Started
+              </a>
               <button className="glass-button text-[#26558e] px-6 py-3 rounded-xl text-sm font-semibold">
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
