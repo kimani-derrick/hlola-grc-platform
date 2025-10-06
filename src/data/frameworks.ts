@@ -139,6 +139,17 @@ export const frameworks: Framework[] = [
         estimatedHours: 20,
         category: 'Security',
         completed: false
+      },
+      {
+        id: 'g3',
+        title: 'Data Subject Rights Implementation',
+        description: 'Implement procedures for handling data subject requests',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-03-31',
+        estimatedHours: 12,
+        category: 'Rights Management',
+        completed: false
       }
     ],
     complianceDeadline: '2024-05-15',
@@ -664,6 +675,766 @@ export const frameworks: Framework[] = [
     riskLevel: 'medium',
     type: 'Standards',
     requirements: 187
+  },
+  {
+    id: '16',
+    name: 'Senegal',
+    description: 'Loi sur la Protection des Données Personnelles 2016 - Essential for Senegalese businesses. Build trust in West African markets.',
+    status: 'active',
+    compliance: 58,
+    controls: 28,
+    lastUpdated: '2024-01-20',
+    region: 'Senegal',
+    category: 'Privacy',
+    icon: '🇸🇳',
+    color: 'bg-green-500',
+    businessImpact: {
+      penaltyAmount: '100,000,000',
+      penaltyCurrency: 'XOF',
+      businessBenefits: ['West African market access', 'Enhanced credibility', 'Customer trust'],
+      marketAccess: ['WAEMU market access', 'Government contracts', 'Financial services'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'sn1',
+        title: 'Data Protection Authority Registration',
+        description: 'Register with Commission de Protection des Données Personnelles',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-03-31',
+        estimatedHours: 6,
+        category: 'Registration',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-08-31',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '17',
+    name: 'Ivory Coast',
+    description: 'Loi sur la Protection des Données Personnelles 2013 - Required for Ivorian operations. Access West African markets confidently.',
+    status: 'active',
+    compliance: 45,
+    controls: 26,
+    lastUpdated: '2024-01-18',
+    region: 'Ivory Coast',
+    category: 'Privacy',
+    icon: '🇨🇮',
+    color: 'bg-orange-500',
+    businessImpact: {
+      penaltyAmount: '50,000,000',
+      penaltyCurrency: 'XOF',
+      businessBenefits: ['WAEMU compliance', 'Market credibility', 'Customer protection'],
+      marketAccess: ['West African market', 'Government partnerships', 'Financial sector'],
+      competitiveAdvantages: ['Regional advantage', 'Compliance readiness', 'Risk mitigation']
+    },
+    tasks: [
+      {
+        id: 'ci1',
+        title: 'Data Processing Inventory',
+        description: 'Create comprehensive inventory of data processing activities',
+        status: 'pending',
+        priority: 'high',
+        dueDate: '2024-04-15',
+        estimatedHours: 12,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-09-30',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '18',
+    name: 'Burkina Faso',
+    description: 'Loi sur la Protection des Données Personnelles 2004 - Essential for Burkinabé businesses. Strengthen data governance.',
+    status: 'active',
+    compliance: 38,
+    controls: 24,
+    lastUpdated: '2024-01-16',
+    region: 'Burkina Faso',
+    category: 'Privacy',
+    icon: '🇧🇫',
+    color: 'bg-yellow-600',
+    businessImpact: {
+      penaltyAmount: '25,000,000',
+      penaltyCurrency: 'XOF',
+      businessBenefits: ['Data governance', 'Customer trust', 'Market access'],
+      marketAccess: ['WAEMU market', 'Government contracts', 'Local partnerships'],
+      competitiveAdvantages: ['Early compliance', 'Risk reduction', 'Professional image']
+    },
+    tasks: [
+      {
+        id: 'bf1',
+        title: 'Privacy Policy Development',
+        description: 'Develop comprehensive privacy policy for DPA compliance',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-05-31',
+        estimatedHours: 8,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-10-31',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '19',
+    name: 'Mali',
+    description: 'Loi sur la Protection des Données Personnelles 2013 - Required for Malian businesses. Build trust in Sahel region.',
+    status: 'active',
+    compliance: 42,
+    controls: 25,
+    lastUpdated: '2024-01-14',
+    region: 'Mali',
+    category: 'Privacy',
+    icon: '🇲🇱',
+    color: 'bg-red-500',
+    businessImpact: {
+      penaltyAmount: '30,000,000',
+      penaltyCurrency: 'XOF',
+      businessBenefits: ['Sahel region access', 'Customer confidence', 'Compliance advantage'],
+      marketAccess: ['WAEMU market', 'Government contracts', 'Regional partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Risk mitigation']
+    },
+    tasks: [
+      {
+        id: 'ml1',
+        title: 'Data Security Implementation',
+        description: 'Implement technical and organizational security measures',
+        status: 'pending',
+        priority: 'high',
+        dueDate: '2024-06-30',
+        estimatedHours: 16,
+        category: 'Security',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-11-30',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '20',
+    name: 'Niger',
+    description: 'Loi sur la Protection des Données Personnelles 2017 - Essential for Nigerien operations. Enhance data protection standards.',
+    status: 'active',
+    compliance: 35,
+    controls: 23,
+    lastUpdated: '2024-01-12',
+    region: 'Niger',
+    category: 'Privacy',
+    icon: '🇳🇪',
+    color: 'bg-orange-600',
+    businessImpact: {
+      penaltyAmount: '20,000,000',
+      penaltyCurrency: 'XOF',
+      businessBenefits: ['Data protection standards', 'Customer trust', 'Market access'],
+      marketAccess: ['WAEMU market', 'Government contracts', 'Local partnerships'],
+      competitiveAdvantages: ['Compliance readiness', 'Risk reduction', 'Professional credibility']
+    },
+    tasks: [
+      {
+        id: 'ne1',
+        title: 'Data Protection Officer Appointment',
+        description: 'Appoint qualified Data Protection Officer',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-07-31',
+        estimatedHours: 8,
+        category: 'Governance',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-12-31',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '21',
+    name: 'Chad',
+    description: 'Loi sur la Protection des Données Personnelles 2015 - Required for Chadian businesses. Strengthen data governance framework.',
+    status: 'active',
+    compliance: 28,
+    controls: 22,
+    lastUpdated: '2024-01-10',
+    region: 'Chad',
+    category: 'Privacy',
+    icon: '🇹🇩',
+    color: 'bg-blue-600',
+    businessImpact: {
+      penaltyAmount: '15,000,000',
+      penaltyCurrency: 'XAF',
+      businessBenefits: ['Data governance', 'Customer confidence', 'Compliance advantage'],
+      marketAccess: ['CEMAC market', 'Government contracts', 'Regional partnerships'],
+      competitiveAdvantages: ['Early compliance', 'Risk mitigation', 'Professional image']
+    },
+    tasks: [
+      {
+        id: 'td1',
+        title: 'Privacy Impact Assessment',
+        description: 'Conduct privacy impact assessment for high-risk processing',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-08-31',
+        estimatedHours: 12,
+        category: 'Assessment',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2025-01-31',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '22',
+    name: 'Cameroon',
+    description: 'Loi sur la Protection des Données Personnelles 2010 - Essential for Cameroonian businesses. Access CEMAC markets confidently.',
+    status: 'active',
+    compliance: 52,
+    controls: 29,
+    lastUpdated: '2024-01-08',
+    region: 'Cameroon',
+    category: 'Privacy',
+    icon: '🇨🇲',
+    color: 'bg-green-600',
+    businessImpact: {
+      penaltyAmount: '10,000,000',
+      penaltyCurrency: 'XAF',
+      businessBenefits: ['CEMAC market access', 'Enhanced credibility', 'Customer trust'],
+      marketAccess: ['CEMAC market', 'Government contracts', 'Financial services'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'cm1',
+        title: 'Data Processing Records',
+        description: 'Maintain comprehensive data processing records',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-03-31',
+        estimatedHours: 10,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-09-30',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '23',
+    name: 'Central African Republic',
+    description: 'Loi sur la Protection des Données Personnelles 2013 - Required for CAR operations. Build data protection framework.',
+    status: 'active',
+    compliance: 25,
+    controls: 20,
+    lastUpdated: '2024-01-06',
+    region: 'Central African Republic',
+    category: 'Privacy',
+    icon: '🇨🇫',
+    color: 'bg-blue-500',
+    businessImpact: {
+      penaltyAmount: '5,000,000',
+      penaltyCurrency: 'XAF',
+      businessBenefits: ['Data protection framework', 'Customer confidence', 'Market access'],
+      marketAccess: ['CEMAC market', 'Government contracts', 'Local partnerships'],
+      competitiveAdvantages: ['Compliance readiness', 'Risk reduction', 'Professional credibility']
+    },
+    tasks: [
+      {
+        id: 'cf1',
+        title: 'Privacy Policy Implementation',
+        description: 'Implement comprehensive privacy policy',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-10-31',
+        estimatedHours: 8,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2025-02-28',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '24',
+    name: 'Equatorial Guinea',
+    description: 'Ley de Protección de Datos Personales 2011 - Essential for Equatorial Guinean businesses. Access CEMAC markets.',
+    status: 'active',
+    compliance: 48,
+    controls: 27,
+    lastUpdated: '2024-01-04',
+    region: 'Equatorial Guinea',
+    category: 'Privacy',
+    icon: '🇬🇶',
+    color: 'bg-red-600',
+    businessImpact: {
+      penaltyAmount: '8,000,000',
+      penaltyCurrency: 'XAF',
+      businessBenefits: ['CEMAC market access', 'Enhanced credibility', 'Customer trust'],
+      marketAccess: ['CEMAC market', 'Government contracts', 'Oil sector partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'gq1',
+        title: 'Data Subject Rights Implementation',
+        description: 'Implement data subject rights procedures',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-04-30',
+        estimatedHours: 14,
+        category: 'Rights Management',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-10-31',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '25',
+    name: 'Gabon',
+    description: 'Loi sur la Protection des Données Personnelles 2011 - Required for Gabonese businesses. Strengthen data governance.',
+    status: 'active',
+    compliance: 41,
+    controls: 25,
+    lastUpdated: '2024-01-02',
+    region: 'Gabon',
+    category: 'Privacy',
+    icon: '🇬🇦',
+    color: 'bg-green-500',
+    businessImpact: {
+      penaltyAmount: '12,000,000',
+      penaltyCurrency: 'XAF',
+      businessBenefits: ['Data governance', 'Customer confidence', 'Market access'],
+      marketAccess: ['CEMAC market', 'Government contracts', 'Oil sector partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Risk mitigation']
+    },
+    tasks: [
+      {
+        id: 'ga1',
+        title: 'Data Breach Notification Procedures',
+        description: 'Establish data breach notification processes',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-11-30',
+        estimatedHours: 10,
+        category: 'Security',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2025-01-31',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '26',
+    name: 'Algeria',
+    description: 'Loi sur la Protection des Données Personnelles 2018 - Essential for Algerian businesses. Access North African markets confidently.',
+    status: 'active',
+    compliance: 44,
+    controls: 31,
+    lastUpdated: '2024-01-30',
+    region: 'Algeria',
+    category: 'Privacy',
+    icon: '🇩🇿',
+    color: 'bg-green-700',
+    businessImpact: {
+      penaltyAmount: '1,000,000',
+      penaltyCurrency: 'DZD',
+      businessBenefits: ['North African market access', 'Enhanced credibility', 'Customer trust'],
+      marketAccess: ['Maghreb market', 'Government contracts', 'Energy sector partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'dz1',
+        title: 'Data Protection Authority Notification',
+        description: 'Notify Autorité de Protection des Données Personnelles',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-04-30',
+        estimatedHours: 6,
+        category: 'Registration',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-09-30',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '27',
+    name: 'Tunisia',
+    description: 'Loi sur la Protection des Données Personnelles 2004 - Required for Tunisian businesses. Build trust in North African markets.',
+    status: 'active',
+    compliance: 61,
+    controls: 33,
+    lastUpdated: '2024-01-28',
+    region: 'Tunisia',
+    category: 'Privacy',
+    icon: '🇹🇳',
+    color: 'bg-red-500',
+    businessImpact: {
+      penaltyAmount: '200,000',
+      penaltyCurrency: 'TND',
+      businessBenefits: ['North African market access', 'EU adequacy preparation', 'Enhanced credibility'],
+      marketAccess: ['Maghreb market', 'EU market access', 'Government contracts'],
+      competitiveAdvantages: ['EU adequacy advantage', 'Regional compliance', 'Early adoption']
+    },
+    tasks: [
+      {
+        id: 'tn1',
+        title: 'Data Processing Impact Assessment',
+        description: 'Conduct DPIA for high-risk processing activities',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-05-31',
+        estimatedHours: 16,
+        category: 'Assessment',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-08-31',
+    priority: 'high',
+    riskLevel: 'high',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '28',
+    name: 'Libya',
+    description: 'Draft Data Protection Law - Prepare for Libya\'s emerging data protection framework. Stay ahead of regulations.',
+    status: 'pending',
+    compliance: 15,
+    controls: 18,
+    lastUpdated: '2024-01-26',
+    region: 'Libya',
+    category: 'Privacy',
+    icon: '🇱🇾',
+    color: 'bg-green-600',
+    businessImpact: {
+      penaltyAmount: 'TBD',
+      penaltyCurrency: 'LYD',
+      businessBenefits: ['Early compliance', 'Market preparation', 'Competitive advantage'],
+      marketAccess: ['Future market access', 'Government readiness', 'Oil sector partnerships'],
+      competitiveAdvantages: ['First-mover advantage', 'Regulatory readiness', 'Professional image']
+    },
+    tasks: [
+      {
+        id: 'ly1',
+        title: 'Monitor Regulatory Updates',
+        description: 'Track Libya data protection law developments',
+        status: 'pending',
+        priority: 'low',
+        dueDate: '2024-12-31',
+        estimatedHours: 4,
+        category: 'Monitoring',
+        completed: false
+      }
+    ],
+    complianceDeadline: 'TBD',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '29',
+    name: 'Sudan',
+    description: 'Draft Data Protection Law - Prepare for Sudan\'s emerging data protection framework. Build compliance readiness.',
+    status: 'pending',
+    compliance: 12,
+    controls: 16,
+    lastUpdated: '2024-01-24',
+    region: 'Sudan',
+    category: 'Privacy',
+    icon: '🇸🇩',
+    color: 'bg-red-600',
+    businessImpact: {
+      penaltyAmount: 'TBD',
+      penaltyCurrency: 'SDG',
+      businessBenefits: ['Early compliance', 'Market preparation', 'Competitive advantage'],
+      marketAccess: ['Future market access', 'Government readiness', 'Regional partnerships'],
+      competitiveAdvantages: ['First-mover advantage', 'Regulatory readiness', 'Professional credibility']
+    },
+    tasks: [
+      {
+        id: 'sd1',
+        title: 'Regulatory Monitoring',
+        description: 'Monitor Sudan data protection law developments',
+        status: 'pending',
+        priority: 'low',
+        dueDate: '2024-12-31',
+        estimatedHours: 4,
+        category: 'Monitoring',
+        completed: false
+      }
+    ],
+    complianceDeadline: 'TBD',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '30',
+    name: 'Zambia',
+    description: 'Data Protection Act 2021 - Essential for Zambian businesses. Build trust in Southern African markets.',
+    status: 'active',
+    compliance: 39,
+    controls: 26,
+    lastUpdated: '2024-01-22',
+    region: 'Zambia',
+    category: 'Privacy',
+    icon: '🇿🇲',
+    color: 'bg-green-500',
+    businessImpact: {
+      penaltyAmount: '500,000',
+      penaltyCurrency: 'ZMW',
+      businessBenefits: ['Southern African market access', 'Enhanced credibility', 'Customer trust'],
+      marketAccess: ['SADC market', 'Government contracts', 'Mining sector partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'zm1',
+        title: 'Data Protection Officer Appointment',
+        description: 'Appoint qualified Data Protection Officer',
+        status: 'pending',
+        priority: 'high',
+        dueDate: '2024-06-30',
+        estimatedHours: 8,
+        category: 'Governance',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-10-31',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '31',
+    name: 'Zimbabwe',
+    description: 'Data Protection Act 2021 - Required for Zimbabwean businesses. Strengthen data governance framework.',
+    status: 'active',
+    compliance: 33,
+    controls: 24,
+    lastUpdated: '2024-01-20',
+    region: 'Zimbabwe',
+    category: 'Privacy',
+    icon: '🇿🇼',
+    color: 'bg-yellow-500',
+    businessImpact: {
+      penaltyAmount: '200,000',
+      penaltyCurrency: 'USD',
+      businessBenefits: ['Data governance', 'Customer confidence', 'Market access'],
+      marketAccess: ['SADC market', 'Government contracts', 'Mining sector partnerships'],
+      competitiveAdvantages: ['Compliance readiness', 'Risk reduction', 'Professional image']
+    },
+    tasks: [
+      {
+        id: 'zw1',
+        title: 'Privacy Policy Development',
+        description: 'Develop comprehensive privacy policy for DPA compliance',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-07-31',
+        estimatedHours: 10,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-11-30',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '32',
+    name: 'Malawi',
+    description: 'Data Protection Act 2021 - Essential for Malawian operations. Enhance data protection standards.',
+    status: 'active',
+    compliance: 29,
+    controls: 22,
+    lastUpdated: '2024-01-18',
+    region: 'Malawi',
+    category: 'Privacy',
+    icon: '🇲🇼',
+    color: 'bg-red-500',
+    businessImpact: {
+      penaltyAmount: '100,000',
+      penaltyCurrency: 'MWK',
+      businessBenefits: ['Data protection standards', 'Customer trust', 'Market access'],
+      marketAccess: ['SADC market', 'Government contracts', 'Agricultural partnerships'],
+      competitiveAdvantages: ['Compliance readiness', 'Risk reduction', 'Professional credibility']
+    },
+    tasks: [
+      {
+        id: 'mw1',
+        title: 'Data Security Implementation',
+        description: 'Implement technical and organizational security measures',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-08-31',
+        estimatedHours: 14,
+        category: 'Security',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-12-31',
+    priority: 'low',
+    riskLevel: 'low',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '33',
+    name: 'Mozambique',
+    description: 'Lei de Proteção de Dados Pessoais 2021 - Required for Mozambican businesses. Access SADC markets confidently.',
+    status: 'active',
+    compliance: 36,
+    controls: 25,
+    lastUpdated: '2024-01-16',
+    region: 'Mozambique',
+    category: 'Privacy',
+    icon: '🇲🇿',
+    color: 'bg-green-600',
+    businessImpact: {
+      penaltyAmount: '150,000',
+      penaltyCurrency: 'MZN',
+      businessBenefits: ['SADC market access', 'Enhanced credibility', 'Customer trust'],
+      marketAccess: ['SADC market', 'Government contracts', 'Energy sector partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'mz1',
+        title: 'Data Processing Records',
+        description: 'Maintain comprehensive data processing records',
+        status: 'pending',
+        priority: 'high',
+        dueDate: '2024-05-31',
+        estimatedHours: 12,
+        category: 'Documentation',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-09-30',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '34',
+    name: 'Angola',
+    description: 'Lei de Proteção de Dados Pessoais 2020 - Essential for Angolan businesses. Build trust in Southern African markets.',
+    status: 'active',
+    compliance: 42,
+    controls: 28,
+    lastUpdated: '2024-01-14',
+    region: 'Angola',
+    category: 'Privacy',
+    icon: '🇦🇴',
+    color: 'bg-red-500',
+    businessImpact: {
+      penaltyAmount: '300,000',
+      penaltyCurrency: 'AOA',
+      businessBenefits: ['Southern African market access', 'Enhanced credibility', 'Customer trust'],
+      marketAccess: ['SADC market', 'Government contracts', 'Oil sector partnerships'],
+      competitiveAdvantages: ['Regional compliance', 'Early adoption', 'Reduced risks']
+    },
+    tasks: [
+      {
+        id: 'ao1',
+        title: 'Data Subject Rights Implementation',
+        description: 'Implement data subject rights procedures',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: '2024-04-30',
+        estimatedHours: 16,
+        category: 'Rights Management',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-08-31',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
+  },
+  {
+    id: '35',
+    name: 'Namibia',
+    description: 'Data Protection Act 2019 - Required for Namibian businesses. Strengthen data governance framework.',
+    status: 'active',
+    compliance: 47,
+    controls: 27,
+    lastUpdated: '2024-01-12',
+    region: 'Namibia',
+    category: 'Privacy',
+    icon: '🇳🇦',
+    color: 'bg-blue-600',
+    businessImpact: {
+      penaltyAmount: '200,000',
+      penaltyCurrency: 'NAD',
+      businessBenefits: ['Data governance', 'Customer confidence', 'Market access'],
+      marketAccess: ['SADC market', 'Government contracts', 'Mining sector partnerships'],
+      competitiveAdvantages: ['Compliance readiness', 'Risk reduction', 'Professional image']
+    },
+    tasks: [
+      {
+        id: 'na1',
+        title: 'Data Breach Notification Procedures',
+        description: 'Establish data breach notification processes',
+        status: 'pending',
+        priority: 'medium',
+        dueDate: '2024-07-31',
+        estimatedHours: 10,
+        category: 'Security',
+        completed: false
+      }
+    ],
+    complianceDeadline: '2024-10-31',
+    priority: 'medium',
+    riskLevel: 'medium',
+    type: 'Legal',
+    requirements: 2
   }
 ];
 
