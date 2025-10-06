@@ -131,6 +131,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
   const [activeTaskMenu, setActiveTaskMenu] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   // Update tasks when control changes
   useEffect(() => {
@@ -418,7 +419,10 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button className="text-gray-400 hover:text-gray-600">
+                      <button
+                        onClick={() => setExpandedTaskId(expandedTaskId === task.id ? null : task.id)}
+                        className={`text-gray-400 hover:text-gray-600 transition-transform ${expandedTaskId === task.id ? 'rotate-180' : ''}`}
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
@@ -465,6 +469,21 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                       </div>
                     </div>
                   </div>
+                  {/* Collapsible Upload Evidence for this task */}
+                  {expandedTaskId === task.id && (
+                    <div className="mt-3 border-t border-gray-100 pt-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          <span className="text-sm font-medium text-gray-900">Upload Evidence</span>
+                        </div>
+                        <button className="px-3 py-1.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm">Choose File</button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Attach documents proving completion for this task (PDF, DOCX, images).</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
