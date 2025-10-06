@@ -138,7 +138,7 @@ export default function OnboardingPage() {
               Welcome to Hlola
             </h1>
             <p className="text-lg text-gray-700 font-medium">
-              Let's get you started
+              Let&apos;s get you started
             </p>
           </div>
 
@@ -146,7 +146,7 @@ export default function OnboardingPage() {
             {/* Name */}
             <div>
               <label className="block text-sm font-semibold text-[#26558e] mb-2">
-                What's your name?
+                What&apos;s your name?
               </label>
               <input
                 type="text"
@@ -180,7 +180,7 @@ export default function OnboardingPage() {
             {/* Role */}
             <div>
               <label className="block text-sm font-semibold text-[#26558e] mb-2">
-                💼 What's your role there?
+                💼 What&apos;s your role there?
               </label>
               <p className="text-sm text-gray-500 mb-3">This helps us tailor our communications</p>
               <input
@@ -200,7 +200,7 @@ export default function OnboardingPage() {
               <label className="block text-sm font-semibold text-[#26558e] mb-2">
                 📧 Your work email address
               </label>
-              <p className="text-sm text-gray-500 mb-3">We'll send updates and early access invitations here</p>
+              <p className="text-sm text-gray-500 mb-3">We&apos;ll send updates and early access invitations here</p>
               <input
                 type="email"
                 value={data.email}
@@ -218,7 +218,7 @@ export default function OnboardingPage() {
               <label className="block text-sm font-semibold text-[#26558e] mb-2">
                 Which country(ies) are you based in?
               </label>
-              <p className="text-sm text-gray-500 mb-3">We're building compliance tools globally</p>
+              <p className="text-sm text-gray-500 mb-3">We&apos;re building compliance tools globally</p>
               <div className="max-h-48 overflow-y-auto border-2 border-gray-300 rounded-xl p-4 bg-gradient-to-br from-gray-50 to-white hover:border-[#41c3d6]/50 transition-all duration-200">
                 <div className="grid grid-cols-2 gap-2">
                   {countries.map(country => (

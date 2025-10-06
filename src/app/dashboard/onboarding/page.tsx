@@ -144,8 +144,8 @@ export default function OnboardingPage() {
                       onClick={() => setSelectedFrameworks(prev => prev.includes(fw.id) ? prev.filter(id => id !== fw.id) : [...prev, fw.id])}
                       className={`text-left border rounded-xl p-4 hover:shadow transition ${selectedFrameworks.includes(fw.id) ? 'border-indigo-400 ring-2 ring-indigo-200' : 'border-gray-200'}`}
                     >
-                      <div className="font-semibold text-gray-900">{fw.title}</div>
-                      <div className="text-sm text-gray-600">{fw.country}</div>
+                      <div className="font-semibold text-gray-900">{fw.name}</div>
+                      <div className="text-sm text-gray-600">{fw.region}</div>
                     </button>
                   ))}
                 </div>

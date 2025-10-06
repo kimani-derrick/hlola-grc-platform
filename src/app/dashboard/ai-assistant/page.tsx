@@ -22,11 +22,16 @@ interface QuickAction {
 export default function AIAssistantPage() {
   const [showGuidedTour, setShowGuidedTour] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
-  const [onboardingData, setOnboardingData] = useState<any>(null);
-  const [userProfile, setUserProfile] = useState({
-    experience: '',
-    currentChallenges: []
-  });
+  const [onboardingData, setOnboardingData] = useState<{
+    name?: string;
+    company?: string;
+    role?: string;
+    email?: string;
+    countries?: string[];
+    industry?: string;
+    consent?: boolean;
+  } | null>(null);
+  // Removed unused userProfile state
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -298,99 +303,7 @@ export default function AIAssistantPage() {
     }
   };
 
-  const generatePersonalizedPlan = () => {
-    const plan = createPersonalizedPlan(userProfile);
-    setMessages([{
-      id: '1',
-      type: 'assistant',
-      content: plan.content,
-      timestamp: new Date(),
-      suggestions: plan.suggestions
-    }]);
-  };
-
-  const createPersonalizedPlan = (profile: any) => {
-    let content = `🎯 **Your Personalized Compliance Roadmap**\n\n`;
-    content += `Based on your profile:\n`;
-    content += `• Name: ${onboardingData.name}\n`;
-    content += `• Company: ${onboardingData.company}\n`;
-    content += `• Industry: ${onboardingData.industry}\n`;
-    content += `• Countries: ${onboardingData.countries.join(', ')}\n`;
-    content += `• Role: ${onboardingData.role}\n`;
-    content += `• Experience: ${profile.experience}\n`;
-    content += `• Main Challenges: ${profile.currentChallenges.join(', ')}\n\n`;
-
-    // Smart framework recommendations based on industry and countries
-    const recommendedFrameworks = getRecommendedFrameworks(onboardingData.industry, onboardingData.countries);
-    content += `**🛡️ Recommended Compliance Frameworks for You:**\n`;
-    recommendedFrameworks.forEach(framework => {
-      content += `• **${framework.name}** - ${framework.reason}\n`;
-    });
-    content += `\n`;
-
-    if (profile.experience.includes('Complete beginner')) {
-      content += `**🚀 Getting Started (Week 1-2)**\n`;
-      content += `1. **Understanding Compliance Basics** - Learn fundamental concepts\n`;
-      content += `2. **Platform Navigation** - Get familiar with Hlola's interface\n`;
-      content += `3. **Data Discovery** - Identify what data you collect and process\n`;
-      content += `4. **Regulatory Mapping** - Understand which regulations apply to you\n\n`;
-    }
-
-    // Industry-specific guidance
-    if (onboardingData.industry === 'Technology' || onboardingData.industry === 'Software') {
-      content += `**💻 Technology Industry Focus (Week 3-4)**\n`;
-      content += `1. **Data Privacy by Design** - Build privacy into your products\n`;
-      content += `2. **API Security** - Secure your data interfaces\n`;
-      content += `3. **Cloud Compliance** - Ensure cloud services meet requirements\n`;
-      content += `4. **Third-party Integrations** - Manage vendor compliance\n\n`;
-    } else if (onboardingData.industry === 'Healthcare') {
-      content += `**🏥 Healthcare Industry Focus (Week 3-4)**\n`;
-      content += `1. **HIPAA Compliance** - Protect patient health information\n`;
-      content += `2. **Medical Data Security** - Secure sensitive health data\n`;
-      content += `3. **Consent Management** - Handle patient consent properly\n`;
-      content += `4. **Audit Trails** - Maintain detailed access logs\n\n`;
-    }
-
-    // Country-specific guidance
-    if (onboardingData.countries.some((country: string) => ['United Kingdom', 'Germany', 'France', 'Spain', 'Italy'].includes(country))) {
-      content += `**🇪🇺 EU GDPR Implementation (Week 5-8)**\n`;
-      content += `1. **Data Inventory** - Map all personal data you process\n`;
-      content += `2. **Legal Basis** - Establish lawful basis for processing\n`;
-      content += `3. **Privacy Notices** - Create clear, transparent privacy policies\n`;
-      content += `4. **Data Subject Rights** - Set up processes for access, rectification, erasure\n`;
-      content += `5. **Consent Management** - Implement proper consent mechanisms\n\n`;
-    }
-
-    if (onboardingData.countries.includes('United States')) {
-      content += `**🇺🇸 US Compliance (Week 5-8)**\n`;
-      content += `1. **CCPA Compliance** - California Consumer Privacy Act\n`;
-      content += `2. **State Privacy Laws** - Other state-specific requirements\n`;
-      content += `3. **Data Breach Notification** - US-specific breach procedures\n`;
-      content += `4. **Cross-border Data Transfer** - EU-US data transfers\n\n`;
-    }
-
-    if (profile.currentChallenges.includes('Managing compliance documentation')) {
-      content += `**📄 Document Management (Ongoing)**\n`;
-      content += `1. **Policy Creation** - Develop comprehensive policies\n`;
-      content += `2. **Procedure Documentation** - Document all compliance procedures\n`;
-      content += `3. **Version Control** - Implement document versioning\n`;
-      content += `4. **Training Materials** - Create employee training content\n\n`;
-    }
-
-    content += `**🎯 Next Steps:**\n`;
-    content += `I recommend we start with the first item in your roadmap. Would you like me to guide you through it step-by-step?`;
-
-    return {
-      content,
-      suggestions: [
-        "Start with the first roadmap item",
-        `Set up ${recommendedFrameworks[0]?.name || 'GDPR'} framework`,
-        "Help me with data discovery",
-        "Create a compliance checklist",
-        "Set up compliance monitoring"
-      ]
-    };
-  };
+  // Removed unused functions
 
   const getRecommendedFrameworks = (industry: string, countries: string[]) => {
     const frameworks = [];
@@ -661,7 +574,6 @@ export default function AIAssistantPage() {
               {/* Options */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
                 {guidedTourSteps[currentStep].options.map((option, index) => {
-                  const currentStepData = guidedTourSteps[currentStep];
                   const isSelected = false;
                   const isContinueButton = option.includes('Continue with');
                   
