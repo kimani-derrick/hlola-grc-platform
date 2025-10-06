@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import DashboardLayout from '../../../../components/DashboardLayout';
+import ControlDetailModal from '../../../../components/ControlDetailModal';
 import { formatDate } from '../../../../utils/dateUtils';
 import { useActiveFrameworks } from '../../../../context/ActiveFrameworksContext';
 import { frameworks } from '../../../../data/frameworks';
@@ -948,6 +949,7 @@ export default function ControlsPage() {
   const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [selectedFramework, setSelectedFramework] = useState<string>('all');
   const [selectedControl, setSelectedControl] = useState<Control | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const filteredControls = controls.filter(control => {
     const matchesSearch = control.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -1233,7 +1235,10 @@ export default function ControlsPage() {
             <div
               key={control.id}
               className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => setSelectedControl(control)}
+              onClick={() => {
+                setSelectedControl(control);
+                setIsDetailModalOpen(true);
+              }}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
@@ -1308,62 +1313,16 @@ export default function ControlsPage() {
         )}
       </div>
 
-      {/* Control Details Modal */}
+      {/* Control Detail Modal */}
       {selectedControl && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedControl.title}</h2>
-                  <p className="text-gray-600">{selectedControl.country} - {selectedControl.framework}</p>
-                </div>
-                <button
-                  onClick={() => setSelectedControl(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
-                  <p className="text-gray-700">{selectedControl.description}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600">Progress</div>
-                    <div className="text-2xl font-bold text-gray-900">{selectedControl.completionRate}%</div>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600">Estimated Hours</div>
-                    <div className="text-2xl font-bold text-gray-900">{selectedControl.estimatedHours}h</div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Business Impact</h3>
-                  <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
-                    <p className="text-blue-700">{selectedControl.businessImpact}</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <button className="flex-1 bg-[#26558e] text-white px-4 py-2 rounded-lg hover:bg-[#1e4470] transition-colors">
-                    Update Progress
-                  </button>
-                  <button className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                    View Details
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ControlDetailModal
+          control={selectedControl}
+          isOpen={isDetailModalOpen}
+          onClose={() => {
+            setIsDetailModalOpen(false);
+            setSelectedControl(null);
+          }}
+        />
       )}
     </DashboardLayout>
   );
