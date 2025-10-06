@@ -6,7 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import {
   DashboardIcon,
-  SettingsIcon
+  SettingsIcon,
+  AIAssistantIcon
 } from './icons/NavIcons';
 import {
   PrivacyHubIcon,
@@ -70,6 +71,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: DashboardIcon, current: true },
+    { name: 'AI Assistant', href: '/dashboard/ai-assistant', icon: AIAssistantIcon, current: false },
     { 
       name: 'Privacy Hub', 
       href: '/dashboard/privacy-hub', 
