@@ -43,6 +43,8 @@ export interface AuditGap {
   dueDate?: string;
   assignedTo?: string;
   status: 'open' | 'in-progress' | 'resolved';
+  framework?: string;
+  frameworkIcon?: string;
 }
 
 export interface RegulatoryRequirement {

@@ -12,7 +12,7 @@ interface DocumentDetailsModalProps {
 
 // File type icon mapper
 const getFileIcon = (fileType: string) => {
-  const icons: Record<string, JSX.Element> = {
+  const icons: Record<string, React.ReactElement> = {
     pdf: (
       <svg className="w-12 h-12 text-red-500" fill="currentColor" viewBox="0 0 24 24">
         <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M15.5,15.5C15.5,16.61 14.61,17.5 13.5,17.5H11V19.5H10V14.5H13.5C14.61,14.5 15.5,15.39 15.5,16.5M13.5,16.5H11V15.5H13.5V16.5M10,11.5V9.5H13V11.5H10M8,11.5H5V9.5H8V11.5Z" />

@@ -86,21 +86,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         { name: 'Reports', href: '/dashboard/privacy-hub/reports', icon: ReportsSubIcon }
       ]
     },
-    { 
-      name: 'Assessments', 
-      href: '/dashboard/assessments', 
-      icon: AssessmentsIcon, 
-      current: false,
-      hasDropdown: true,
-      subItems: [
-        { name: 'Risk Assessments', href: '/dashboard/assessments/risk' },
-        { name: 'Compliance Assessments', href: '/dashboard/assessments/compliance' },
-        { name: 'Security Assessments', href: '/dashboard/assessments/security' }
-      ]
-    },
     { name: 'Consent Management', href: '/dashboard/consent-management', icon: ConsentManagementIcon, current: false },
-    { name: 'DSR Management', href: '/dashboard/dsr-management', icon: DSRManagementIcon, current: false },
-    { name: 'Vendor Risk Management', href: '/dashboard/vendor-risk-management', icon: VendorRiskManagementIcon, current: false },
     { 
       name: 'Data Management', 
       href: '/dashboard/data-management', 
@@ -110,10 +96,35 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       subItems: [
         { name: 'Data Discovery', href: '/dashboard/data-management/discovery' },
         { name: 'Data Classification', href: '/dashboard/data-management/classification' },
-        { name: 'Data Lineage', href: '/dashboard/data-management/lineage' }
+        { name: 'Data Lineage', href: '/dashboard/data-management/lineage' },
+        { name: 'DSR Management', href: '/dashboard/data-management/dsr-management', icon: DSRManagementIcon },
+        { name: 'Data Subject Rights Assessments', href: '/dashboard/data-management/dsr-assessments' }
       ]
     },
-    { name: 'Incident Management', href: '/dashboard/incident-management', icon: IncidentManagementIcon, current: false },
+    { 
+      name: 'Risk Management', 
+      href: '/dashboard/risk-management', 
+      icon: VendorRiskManagementIcon, 
+      current: false,
+      hasDropdown: true,
+      subItems: [
+        { name: 'Vendor Risk Management', href: '/dashboard/risk-management/vendor-risk' },
+        { name: 'Vendor Privacy Assessments', href: '/dashboard/risk-management/vendor-assessments' },
+        { name: 'Incident Management', href: '/dashboard/risk-management/incident-management', icon: IncidentManagementIcon },
+        { name: 'Breach Risk Assessments', href: '/dashboard/risk-management/breach-assessments' }
+      ]
+    },
+    { 
+      name: 'Privacy Assessments', 
+      href: '/dashboard/privacy-assessments', 
+      icon: AssessmentsIcon, 
+      current: false,
+      hasDropdown: true,
+      subItems: [
+        { name: 'Privacy Impact Assessments', href: '/dashboard/privacy-assessments/privacy-impact' },
+        { name: 'Privacy Maturity Assessments', href: '/dashboard/privacy-assessments/privacy-maturity' }
+      ]
+    },
     { name: 'Learning Centre', href: '/dashboard/learning-centre', icon: LearningCentreIcon, current: false },
     { 
       name: 'Settings', 

@@ -350,7 +350,7 @@ export default function AuditCenterPage() {
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xl">{(gap as any).frameworkIcon}</span>
+                              <span className="text-xl">{gap.frameworkIcon}</span>
                               <span className={`text-xs px-2 py-1 rounded-full border ${getSeverityColor(gap.severity)}`}>
                                 {gap.severity.toUpperCase()}
                               </span>
