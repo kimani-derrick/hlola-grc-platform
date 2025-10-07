@@ -1,0 +1,745 @@
+import { FrameworkProgress, ControlProgress, TaskProgress, ReportStats, ComplianceTrend, TeamPerformance, Insight } from '../types/reports';
+
+export const frameworksProgress: FrameworkProgress[] = [
+  {
+    id: '1',
+    name: 'Kenya Data Protection Act 2019',
+    region: 'Kenya',
+    icon: '🇰🇪',
+    compliance: 87,
+    totalControls: 34,
+    completedControls: 22,
+    inProgressControls: 8,
+    notStartedControls: 4,
+    totalTasks: 68,
+    completedTasks: 52,
+    inProgressTasks: 12,
+    pendingTasks: 4,
+    totalEvidence: 45,
+    evidenceCollected: 38,
+    evidencePending: 7,
+    riskLevel: 'medium',
+    deadline: '2024-06-30',
+    daysRemaining: 145,
+    assignedTeams: ['Legal Team', 'Tech Team', 'Compliance Team'],
+    lastActivity: '2024-01-15',
+    trend: 'up',
+    priority: 'high'
+  },
+  {
+    id: '2',
+    name: 'Ghana Data Protection Act 2012',
+    region: 'Ghana',
+    icon: '🇬🇭',
+    compliance: 76,
+    totalControls: 29,
+    completedControls: 18,
+    inProgressControls: 7,
+    notStartedControls: 4,
+    totalTasks: 58,
+    completedTasks: 40,
+    inProgressTasks: 14,
+    pendingTasks: 4,
+    totalEvidence: 38,
+    evidenceCollected: 28,
+    evidencePending: 10,
+    riskLevel: 'medium',
+    deadline: '2024-05-31',
+    daysRemaining: 115,
+    assignedTeams: ['Compliance Team', 'Legal Team'],
+    lastActivity: '2024-01-12',
+    trend: 'up',
+    priority: 'high'
+  },
+  {
+    id: '3',
+    name: 'Nigeria Data Protection Act 2023',
+    region: 'Nigeria',
+    icon: '🇳🇬',
+    compliance: 82,
+    totalControls: 42,
+    completedControls: 28,
+    inProgressControls: 10,
+    notStartedControls: 4,
+    totalTasks: 84,
+    completedTasks: 62,
+    inProgressTasks: 18,
+    pendingTasks: 4,
+    totalEvidence: 56,
+    evidenceCollected: 44,
+    evidencePending: 12,
+    riskLevel: 'high',
+    deadline: '2024-07-15',
+    daysRemaining: 160,
+    assignedTeams: ['Legal Team', 'Tech Team', 'Compliance Team', 'Security Team'],
+    lastActivity: '2024-01-14',
+    trend: 'up',
+    priority: 'high'
+  },
+  {
+    id: '4',
+    name: 'South Africa POPIA',
+    region: 'South Africa',
+    icon: '🇿🇦',
+    compliance: 68,
+    totalControls: 36,
+    completedControls: 20,
+    inProgressControls: 10,
+    notStartedControls: 6,
+    totalTasks: 72,
+    completedTasks: 44,
+    inProgressTasks: 20,
+    pendingTasks: 8,
+    totalEvidence: 48,
+    evidenceCollected: 30,
+    evidencePending: 18,
+    riskLevel: 'high',
+    deadline: '2024-04-30',
+    daysRemaining: 84,
+    assignedTeams: ['Compliance Team', 'Legal Team', 'Tech Team'],
+    lastActivity: '2024-01-10',
+    trend: 'stable',
+    priority: 'high'
+  },
+  {
+    id: '5',
+    name: 'EU GDPR',
+    region: 'Europe',
+    icon: '🇪🇺',
+    compliance: 92,
+    totalControls: 48,
+    completedControls: 40,
+    inProgressControls: 6,
+    notStartedControls: 2,
+    totalTasks: 96,
+    completedTasks: 84,
+    inProgressTasks: 10,
+    pendingTasks: 2,
+    totalEvidence: 72,
+    evidenceCollected: 64,
+    evidencePending: 8,
+    riskLevel: 'low',
+    deadline: '2024-08-31',
+    daysRemaining: 207,
+    assignedTeams: ['Legal Team', 'Tech Team', 'Compliance Team', 'Security Team'],
+    lastActivity: '2024-01-16',
+    trend: 'up',
+    priority: 'medium'
+  },
+  {
+    id: '6',
+    name: 'ISO 27001',
+    region: 'International',
+    icon: '🌐',
+    compliance: 58,
+    totalControls: 114,
+    completedControls: 52,
+    inProgressControls: 38,
+    notStartedControls: 24,
+    totalTasks: 228,
+    completedTasks: 120,
+    inProgressTasks: 76,
+    pendingTasks: 32,
+    totalEvidence: 152,
+    evidenceCollected: 88,
+    evidencePending: 64,
+    riskLevel: 'critical',
+    deadline: '2024-09-30',
+    daysRemaining: 238,
+    assignedTeams: ['Security Team', 'Tech Team', 'Compliance Team', 'Audit Team'],
+    lastActivity: '2024-01-13',
+    trend: 'down',
+    priority: 'high'
+  }
+];
+
+export const controlsProgress: ControlProgress[] = [
+  // Kenya Controls
+  {
+    id: '1',
+    title: 'Appoint Data Protection Officer',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'completed',
+    priority: 'high',
+    category: 'Governance',
+    completionRate: 100,
+    totalTasks: 4,
+    completedTasks: 4,
+    assignee: 'Legal Team',
+    dueDate: '2024-02-01',
+    daysOverdue: 0,
+    evidenceCount: 3,
+    lastUpdated: '2024-01-10',
+    estimatedHours: 8,
+    actualHours: 10
+  },
+  {
+    id: '2',
+    title: 'Implement Consent Management',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Data Processing',
+    completionRate: 65,
+    totalTasks: 8,
+    completedTasks: 5,
+    assignee: 'Tech Team',
+    dueDate: '2024-02-15',
+    daysOverdue: 0,
+    evidenceCount: 4,
+    lastUpdated: '2024-01-15',
+    estimatedHours: 24,
+    actualHours: 18
+  },
+  {
+    id: '3',
+    title: 'Create Privacy Policy',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'completed',
+    priority: 'high',
+    category: 'Documentation',
+    completionRate: 100,
+    totalTasks: 5,
+    completedTasks: 5,
+    assignee: 'Legal Team',
+    dueDate: '2024-01-20',
+    daysOverdue: 0,
+    evidenceCount: 2,
+    lastUpdated: '2024-01-12',
+    estimatedHours: 16,
+    actualHours: 14
+  },
+  {
+    id: '4',
+    title: 'Data Breach Response Plan',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'not-started',
+    priority: 'medium',
+    category: 'Security',
+    completionRate: 0,
+    totalTasks: 6,
+    completedTasks: 0,
+    assignee: 'Security Team',
+    dueDate: '2024-03-01',
+    daysOverdue: 0,
+    evidenceCount: 0,
+    lastUpdated: '2024-01-05',
+    estimatedHours: 20,
+    actualHours: 0
+  },
+  // Ghana Controls
+  {
+    id: '5',
+    title: 'Register with Data Protection Commission',
+    framework: 'Ghana Data Protection Act 2012',
+    frameworkIcon: '🇬🇭',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Governance',
+    completionRate: 40,
+    totalTasks: 5,
+    completedTasks: 2,
+    assignee: 'Compliance Team',
+    dueDate: '2024-02-10',
+    daysOverdue: 0,
+    evidenceCount: 1,
+    lastUpdated: '2024-01-12',
+    estimatedHours: 12,
+    actualHours: 8
+  },
+  {
+    id: '6',
+    title: 'Data Processing Impact Assessment',
+    framework: 'Ghana Data Protection Act 2012',
+    frameworkIcon: '🇬🇭',
+    status: 'not-started',
+    priority: 'medium',
+    category: 'Risk Assessment',
+    completionRate: 0,
+    totalTasks: 8,
+    completedTasks: 0,
+    assignee: 'Risk Team',
+    dueDate: '2024-02-25',
+    daysOverdue: 0,
+    evidenceCount: 0,
+    lastUpdated: '2024-01-08',
+    estimatedHours: 32,
+    actualHours: 0
+  },
+  // Nigeria Controls
+  {
+    id: '7',
+    title: 'NDPA Compliance Audit',
+    framework: 'Nigeria Data Protection Act 2023',
+    frameworkIcon: '🇳🇬',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Audit',
+    completionRate: 75,
+    totalTasks: 12,
+    completedTasks: 9,
+    assignee: 'Audit Team',
+    dueDate: '2024-02-20',
+    daysOverdue: 0,
+    evidenceCount: 8,
+    lastUpdated: '2024-01-14',
+    estimatedHours: 40,
+    actualHours: 35
+  },
+  {
+    id: '8',
+    title: 'Cross-Border Data Transfer Agreements',
+    framework: 'Nigeria Data Protection Act 2023',
+    frameworkIcon: '🇳🇬',
+    status: 'not-started',
+    priority: 'medium',
+    category: 'Data Transfer',
+    completionRate: 0,
+    totalTasks: 6,
+    completedTasks: 0,
+    assignee: 'Legal Team',
+    dueDate: '2024-03-15',
+    daysOverdue: 0,
+    evidenceCount: 0,
+    lastUpdated: '2024-01-09',
+    estimatedHours: 24,
+    actualHours: 0
+  },
+  // POPIA Controls
+  {
+    id: '9',
+    title: 'Information Officer Appointment',
+    framework: 'South Africa POPIA',
+    frameworkIcon: '🇿🇦',
+    status: 'completed',
+    priority: 'high',
+    category: 'Governance',
+    completionRate: 100,
+    totalTasks: 3,
+    completedTasks: 3,
+    assignee: 'Legal Team',
+    dueDate: '2024-01-15',
+    daysOverdue: 0,
+    evidenceCount: 2,
+    lastUpdated: '2024-01-10',
+    estimatedHours: 6,
+    actualHours: 8
+  },
+  {
+    id: '10',
+    title: 'Processing Purpose Definition',
+    framework: 'South Africa POPIA',
+    frameworkIcon: '🇿🇦',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Data Processing',
+    completionRate: 55,
+    totalTasks: 10,
+    completedTasks: 6,
+    assignee: 'Compliance Team',
+    dueDate: '2024-02-28',
+    daysOverdue: 0,
+    evidenceCount: 4,
+    lastUpdated: '2024-01-13',
+    estimatedHours: 28,
+    actualHours: 20
+  }
+];
+
+export const tasksProgress: TaskProgress[] = [
+  // Kenya Tasks
+  {
+    id: 'k1',
+    title: 'Appoint Data Protection Officer',
+    description: 'Designate a qualified individual responsible for data protection compliance',
+    control: 'Appoint Data Protection Officer',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'completed',
+    priority: 'high',
+    category: 'Governance',
+    assignee: 'Legal Team',
+    dueDate: '2024-01-01',
+    completedDate: '2023-12-28',
+    daysOverdue: 0,
+    estimatedHours: 8,
+    actualHours: 10,
+    evidenceAttached: true
+  },
+  {
+    id: 'k2',
+    title: 'Conduct Data Protection Impact Assessment',
+    description: 'Assess risks to personal data processing activities',
+    control: 'Implement Consent Management',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Assessment',
+    assignee: 'Compliance Team',
+    dueDate: '2024-02-15',
+    daysOverdue: 0,
+    estimatedHours: 16,
+    actualHours: 12,
+    evidenceAttached: true
+  },
+  {
+    id: 'k3',
+    title: 'Implement Data Subject Rights Procedures',
+    description: 'Create processes for handling data subject requests',
+    control: 'Implement Consent Management',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'pending',
+    priority: 'medium',
+    category: 'Rights Management',
+    assignee: 'Tech Team',
+    dueDate: '2024-03-01',
+    daysOverdue: 0,
+    estimatedHours: 12,
+    actualHours: 0,
+    evidenceAttached: false
+  },
+  {
+    id: 'k4',
+    title: 'Update Privacy Policy',
+    description: 'Revise privacy policy to comply with DPA 2019 requirements',
+    control: 'Create Privacy Policy',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'completed',
+    priority: 'high',
+    category: 'Documentation',
+    assignee: 'Legal Team',
+    dueDate: '2024-02-28',
+    completedDate: '2024-01-12',
+    daysOverdue: 0,
+    estimatedHours: 6,
+    actualHours: 5,
+    evidenceAttached: true
+  },
+  {
+    id: 'k5',
+    title: 'Establish Breach Notification Procedure',
+    description: 'Create process for 72-hour breach notification',
+    control: 'Data Breach Response Plan',
+    framework: 'Kenya Data Protection Act 2019',
+    frameworkIcon: '🇰🇪',
+    status: 'pending',
+    priority: 'high',
+    category: 'Security',
+    assignee: 'Security Team',
+    dueDate: '2024-03-01',
+    daysOverdue: 0,
+    estimatedHours: 10,
+    actualHours: 0,
+    evidenceAttached: false
+  },
+  // Ghana Tasks
+  {
+    id: 'g1',
+    title: 'Submit Registration Application',
+    description: 'Complete and submit registration to Ghana DPC',
+    control: 'Register with Data Protection Commission',
+    framework: 'Ghana Data Protection Act 2012',
+    frameworkIcon: '🇬🇭',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Governance',
+    assignee: 'Compliance Team',
+    dueDate: '2024-02-10',
+    daysOverdue: 0,
+    estimatedHours: 8,
+    actualHours: 6,
+    evidenceAttached: true
+  },
+  {
+    id: 'g2',
+    title: 'Prepare DPIA Documentation',
+    description: 'Document high-risk processing activities',
+    control: 'Data Processing Impact Assessment',
+    framework: 'Ghana Data Protection Act 2012',
+    frameworkIcon: '🇬🇭',
+    status: 'pending',
+    priority: 'medium',
+    category: 'Risk Assessment',
+    assignee: 'Risk Team',
+    dueDate: '2024-02-25',
+    daysOverdue: 0,
+    estimatedHours: 16,
+    actualHours: 0,
+    evidenceAttached: false
+  },
+  // Nigeria Tasks
+  {
+    id: 'n1',
+    title: 'Review Data Processing Activities',
+    description: 'Audit all data processing under NDPA 2023',
+    control: 'NDPA Compliance Audit',
+    framework: 'Nigeria Data Protection Act 2023',
+    frameworkIcon: '🇳🇬',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Audit',
+    assignee: 'Audit Team',
+    dueDate: '2024-02-20',
+    daysOverdue: 0,
+    estimatedHours: 20,
+    actualHours: 18,
+    evidenceAttached: true
+  },
+  {
+    id: 'n2',
+    title: 'Draft Data Transfer Agreements',
+    description: 'Create templates for international transfers',
+    control: 'Cross-Border Data Transfer Agreements',
+    framework: 'Nigeria Data Protection Act 2023',
+    frameworkIcon: '🇳🇬',
+    status: 'pending',
+    priority: 'medium',
+    category: 'Data Transfer',
+    assignee: 'Legal Team',
+    dueDate: '2024-03-15',
+    daysOverdue: 0,
+    estimatedHours: 12,
+    actualHours: 0,
+    evidenceAttached: false
+  },
+  // POPIA Tasks
+  {
+    id: 'p1',
+    title: 'Appoint Information Officer',
+    description: 'Designate officer responsible for POPIA compliance',
+    control: 'Information Officer Appointment',
+    framework: 'South Africa POPIA',
+    frameworkIcon: '🇿🇦',
+    status: 'completed',
+    priority: 'high',
+    category: 'Governance',
+    assignee: 'Legal Team',
+    dueDate: '2024-01-15',
+    completedDate: '2024-01-10',
+    daysOverdue: 0,
+    estimatedHours: 4,
+    actualHours: 6,
+    evidenceAttached: true
+  },
+  {
+    id: 'p2',
+    title: 'Define Processing Purposes',
+    description: 'Document legitimate purposes for data processing',
+    control: 'Processing Purpose Definition',
+    framework: 'South Africa POPIA',
+    frameworkIcon: '🇿🇦',
+    status: 'in-progress',
+    priority: 'high',
+    category: 'Data Processing',
+    assignee: 'Compliance Team',
+    dueDate: '2024-02-28',
+    daysOverdue: 0,
+    estimatedHours: 14,
+    actualHours: 10,
+    evidenceAttached: true
+  },
+  // Overdue task example
+  {
+    id: 'o1',
+    title: 'Security Training Completion',
+    description: 'Complete mandatory security awareness training',
+    control: 'Staff Training and Awareness',
+    framework: 'ISO 27001',
+    frameworkIcon: '🌐',
+    status: 'blocked',
+    priority: 'high',
+    category: 'Training',
+    assignee: 'All Teams',
+    dueDate: '2024-01-10',
+    daysOverdue: 7,
+    estimatedHours: 40,
+    actualHours: 20,
+    evidenceAttached: false,
+    blockers: ['Training platform access issues', 'Awaiting content approval']
+  }
+];
+
+export const complianceTrends: ComplianceTrend[] = [
+  { date: '2023-11-01', compliance: 45, controlsCompleted: 82, tasksCompleted: 164 },
+  { date: '2023-11-15', compliance: 52, controlsCompleted: 95, tasksCompleted: 190 },
+  { date: '2023-12-01', compliance: 58, controlsCompleted: 108, tasksCompleted: 216 },
+  { date: '2023-12-15', compliance: 65, controlsCompleted: 122, tasksCompleted: 244 },
+  { date: '2024-01-01', compliance: 72, controlsCompleted: 140, tasksCompleted: 280 },
+  { date: '2024-01-15', compliance: 78, controlsCompleted: 160, tasksCompleted: 320 }
+];
+
+export const teamPerformance: TeamPerformance[] = [
+  {
+    teamName: 'Legal Team',
+    assignedTasks: 45,
+    completedTasks: 38,
+    completionRate: 84,
+    averageCompletionTime: 12,
+    overdueItems: 2
+  },
+  {
+    teamName: 'Tech Team',
+    assignedTasks: 68,
+    completedTasks: 52,
+    completionRate: 76,
+    averageCompletionTime: 18,
+    overdueItems: 4
+  },
+  {
+    teamName: 'Compliance Team',
+    assignedTasks: 52,
+    completedTasks: 44,
+    completionRate: 85,
+    averageCompletionTime: 10,
+    overdueItems: 1
+  },
+  {
+    teamName: 'Security Team',
+    assignedTasks: 38,
+    completedTasks: 28,
+    completionRate: 74,
+    averageCompletionTime: 22,
+    overdueItems: 3
+  },
+  {
+    teamName: 'Audit Team',
+    assignedTasks: 28,
+    completedTasks: 24,
+    completionRate: 86,
+    averageCompletionTime: 16,
+    overdueItems: 1
+  },
+  {
+    teamName: 'Risk Team',
+    assignedTasks: 24,
+    completedTasks: 18,
+    completionRate: 75,
+    averageCompletionTime: 20,
+    overdueItems: 2
+  }
+];
+
+export const insights: Insight[] = [
+  {
+    id: 'i1',
+    type: 'critical',
+    title: 'ISO 27001 Falling Behind Schedule',
+    description: 'ISO 27001 compliance has decreased from 62% to 58% in the last month. 24 controls remain not started with only 238 days until deadline.',
+    recommendation: 'Increase resource allocation to ISO 27001 implementation. Consider hiring external consultants or reassigning team members from lower-priority frameworks.',
+    affectedItems: ['ISO 27001', '24 controls', '32 pending tasks'],
+    priority: 'high'
+  },
+  {
+    id: 'i2',
+    type: 'warning',
+    title: 'POPIA Deadline Approaching',
+    description: 'South Africa POPIA compliance is at 68% with only 84 days remaining. 6 controls are not yet started and 8 tasks are pending.',
+    recommendation: 'Prioritize POPIA controls in Q1 2024. Schedule weekly progress reviews and remove blockers for pending tasks.',
+    affectedItems: ['South Africa POPIA', '16 controls', '28 tasks'],
+    priority: 'high'
+  },
+  {
+    id: 'i3',
+    type: 'warning',
+    title: 'High Number of Overdue Tasks',
+    description: 'Currently 13 tasks are overdue across multiple frameworks, affecting overall compliance progress.',
+    recommendation: 'Conduct task review meeting to identify bottlenecks. Redistribute overdue tasks or adjust deadlines based on priority.',
+    affectedItems: ['13 tasks', '5 frameworks'],
+    priority: 'medium'
+  },
+  {
+    id: 'i4',
+    type: 'success',
+    title: 'EU GDPR Compliance Exceeds Target',
+    description: 'GDPR compliance has reached 92%, exceeding the 85% target for this quarter. Strong progress across all control categories.',
+    recommendation: 'Document successful practices from GDPR implementation to apply to other frameworks. Focus remaining effort on final 8% completion.',
+    affectedItems: ['EU GDPR', '40 completed controls'],
+    priority: 'low'
+  },
+  {
+    id: 'i5',
+    type: 'info',
+    title: 'Evidence Collection Gap',
+    description: '164 pieces of evidence remain pending across all frameworks. This may impact audit readiness.',
+    recommendation: 'Establish monthly evidence collection sprints. Create templates and checklists to streamline evidence gathering process.',
+    affectedItems: ['All frameworks', '164 pending evidence items'],
+    priority: 'medium'
+  },
+  {
+    id: 'i6',
+    type: 'success',
+    title: 'Kenya DPA Strong Performance',
+    description: 'Kenya Data Protection Act compliance at 87% with positive trend. Only 4 controls not started.',
+    recommendation: 'Maintain current pace. Complete remaining controls to achieve 95%+ compliance before deadline.',
+    affectedItems: ['Kenya DPA', '22 completed controls'],
+    priority: 'low'
+  },
+  {
+    id: 'i7',
+    type: 'warning',
+    title: 'Security Team Resource Constraint',
+    description: 'Security Team has the lowest completion rate (74%) and highest average completion time (22 days). Currently 3 overdue items.',
+    recommendation: 'Review Security Team workload and capacity. Consider cross-training or temporary resource allocation from other teams.',
+    affectedItems: ['Security Team', '10 pending tasks', '3 overdue items'],
+    priority: 'high'
+  },
+  {
+    id: 'i8',
+    type: 'info',
+    title: 'Positive Compliance Trend',
+    description: 'Overall compliance has increased from 45% to 78% over the last 2.5 months, showing strong organizational commitment.',
+    recommendation: 'Continue current momentum. Share progress reports with stakeholders to maintain engagement and support.',
+    affectedItems: ['All frameworks', '33% improvement'],
+    priority: 'low'
+  }
+];
+
+export function calculateReportStats(): ReportStats {
+  const totalFrameworks = frameworksProgress.length;
+  const activeFrameworks = frameworksProgress.filter(f => f.compliance < 100).length;
+  
+  const totalCompliance = frameworksProgress.reduce((sum, f) => sum + f.compliance, 0);
+  const overallCompliance = Math.round(totalCompliance / totalFrameworks);
+  
+  const totalControls = frameworksProgress.reduce((sum, f) => sum + f.totalControls, 0);
+  const completedControls = frameworksProgress.reduce((sum, f) => sum + f.completedControls, 0);
+  const inProgressControls = frameworksProgress.reduce((sum, f) => sum + f.inProgressControls, 0);
+  
+  const totalTasks = frameworksProgress.reduce((sum, f) => sum + f.totalTasks, 0);
+  const completedTasks = frameworksProgress.reduce((sum, f) => sum + f.completedTasks, 0);
+  const inProgressTasks = frameworksProgress.reduce((sum, f) => sum + f.inProgressTasks, 0);
+  
+  const overdueTasksCount = tasksProgress.filter(t => t.daysOverdue > 0).length;
+  
+  const totalEvidence = frameworksProgress.reduce((sum, f) => sum + f.totalEvidence, 0);
+  const evidenceCollected = frameworksProgress.reduce((sum, f) => sum + f.evidenceCollected, 0);
+  
+  const highRiskItems = frameworksProgress.filter(f => f.riskLevel === 'high' || f.riskLevel === 'critical').length;
+  
+  const upcomingDeadlines = frameworksProgress.filter(f => f.daysRemaining <= 90).length;
+  
+  return {
+    totalFrameworks,
+    activeFrameworks,
+    overallCompliance,
+    totalControls,
+    completedControls,
+    inProgressControls,
+    totalTasks,
+    completedTasks,
+    inProgressTasks,
+    overdueTasksCount,
+    totalEvidence,
+    evidenceCollected,
+    highRiskItems,
+    upcomingDeadlines
+  };
+}
+
