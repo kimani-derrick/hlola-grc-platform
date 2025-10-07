@@ -24,7 +24,6 @@ export default function DocumentsPage() {
     showEvidenceOnly: true
   });
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [showUploadModal, setShowUploadModal] = useState(false);
 
   const filteredDocuments = filterDocuments(allDocuments, filters);
   const stats = calculateStats(allDocuments);
@@ -71,23 +70,6 @@ export default function DocumentsPage() {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="flex gap-3">
-              <button className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export All
-              </button>
-              <button 
-                onClick={() => setShowUploadModal(true)}
-                className="bg-[#26558e] text-white px-6 py-2 rounded-lg hover:bg-[#1e4470] transition-colors flex items-center gap-2 shadow-md"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                Upload Evidence
-              </button>
             </div>
           </div>
 
@@ -380,15 +362,7 @@ export default function DocumentsPage() {
             </svg>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No documents found</h3>
             <p className="text-gray-600 mb-4">Try adjusting your search or filters to find documents.</p>
-            <button 
-              onClick={() => setShowUploadModal(true)}
-              className="inline-flex items-center gap-2 bg-[#26558e] text-white px-6 py-2 rounded-lg hover:bg-[#1e4470] transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              Upload Your First Evidence
-            </button>
+            <p className="text-gray-500">No evidence documents found. Evidence will appear here when uploaded.</p>
           </div>
         )}
       </div>
@@ -397,26 +371,6 @@ export default function DocumentsPage() {
         document={selectedDocument}
         onClose={() => setSelectedDocument(null)}
       />
-
-      {/* Upload Modal Placeholder */}
-      {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">Upload Evidence</h2>
-              <button onClick={() => setShowUploadModal(false)} className="text-gray-400 hover:text-gray-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="text-center py-12">
-              <p className="text-gray-600">Evidence upload functionality coming soon...</p>
-              <p className="text-sm text-gray-500 mt-2">You'll be able to upload evidence and link it to frameworks, controls, and tasks.</p>
-            </div>
-          </div>
-        </div>
-      )}
     </DashboardLayout>
   );
 }
