@@ -34,12 +34,12 @@ export const authOptions = {
             return {
               id: data.user.id,
               email: data.user.email,
-              name: `${data.user.first_name} ${data.user.last_name}`,
+              name: `${data.user.firstName} ${data.user.lastName}`,
               role: data.user.role,
-              organizationId: data.user.organization_id,
-              entityId: data.user.entity_id,
+              organizationId: data.user.organizationId,
+              entityId: data.user.entityId,
               department: data.user.department,
-              jobTitle: data.user.job_title,
+              jobTitle: data.user.jobTitle,
               token: data.token, // Store JWT token for API calls
             }
           }
