@@ -1,5 +1,18 @@
+const logger = require('../config/logger');
+
 const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
+  // Log error with structured logging
+  logger.error('Application Error', {
+    error: err.message,
+    stack: err.stack,
+    requestId: req.id,
+    method: req.method,
+    url: req.url,
+    userAgent: req.get('User-Agent'),
+    ip: req.ip,
+    userId: req.user?.userId,
+    statusCode: err.status || 500
+  });
 
   // Default error
   let error = {
@@ -49,9 +62,18 @@ const errorHandler = (err, req, res, next) => {
     error.status = 400;
   }
 
+  // Log the response being sent
+  logger.info('Error Response Sent', {
+    requestId: req.id,
+    statusCode: error.status,
+    errorMessage: error.message,
+    userId: req.user?.userId
+  });
+
   res.status(error.status).json({
     success: false,
     error: error.message,
+    requestId: req.id,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };

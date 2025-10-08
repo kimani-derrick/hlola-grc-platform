@@ -96,4 +96,4 @@ docker-compose.override.yml
 
 # Temporary files
 *.tmp
-*.temp
+*.tempkeycloak-25.0.5.zip

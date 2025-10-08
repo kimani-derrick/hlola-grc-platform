@@ -7,6 +7,11 @@ require('dotenv').config();
 // Import database connection
 const { testConnection } = require('./config/database');
 
+// Import logging
+const logger = require('./config/logger');
+const { requestLogger, addRequestId, addResponseTime } = require('./middleware/requestLogger');
+const bodyLogger = require('./middleware/bodyLogger');
+
 // Import routes
 const authRoutes = require('./routes/auth');
 
@@ -15,6 +20,10 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Request ID and response time middleware (must be first)
+app.use(addRequestId);
+app.use(addResponseTime);
 
 // Security middleware
 app.use(helmet());
@@ -38,12 +47,24 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Body parsing middleware
+// Body parsing middleware (must be before requestLogger)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Request logging middleware (after body parsing)
+app.use(requestLogger);
+
+// Body logging middleware (after body parsing)
+app.use(bodyLogger);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
+  logger.info('Health check requested', {
+    requestId: req.id,
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
+  });
+  
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
@@ -88,6 +109,14 @@ const startServer = async () => {
     
     // Start the server
     app.listen(PORT, () => {
+      logger.info('GRC Platform API Server Started', {
+        port: PORT,
+        environment: process.env.NODE_ENV || 'development',
+        database: `${process.env.DB_NAME}@${process.env.DB_HOST}:${process.env.DB_PORT}`,
+        healthCheck: `http://localhost:${PORT}/health`,
+        authEndpoints: `http://localhost:${PORT}/api/auth`
+      });
+      
       console.log('🚀 GRC Platform API Server Started');
       console.log(`📊 Port: ${PORT}`);
       console.log(`🌐 Environment: ${process.env.NODE_ENV}`);

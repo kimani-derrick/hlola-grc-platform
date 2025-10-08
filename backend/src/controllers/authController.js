@@ -1,13 +1,26 @@
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
+const logger = require('../config/logger');
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    logger.info('Login attempt', {
+      requestId: req.id,
+      email: email,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    });
 
     // Find user by email
     const user = await User.findByEmail(email);
     if (!user) {
+      logger.warn('Login failed - user not found', {
+        requestId: req.id,
+        email: email,
+        ip: req.ip
+      });
       return res.status(401).json({ 
         error: 'Invalid credentials',
         message: 'Email or password is incorrect'
