@@ -1,12 +1,17 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 
 interface User {
   id: string;
   name: string;
   email: string;
   role: string;
+  organizationId?: string;
+  entityId?: string;
+  department?: string;
+  jobTitle?: string;
 }
 
 interface AuthContextType {
@@ -19,45 +24,38 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const isLoading = status === 'loading';
 
-  useEffect(() => {
-    // Check for existing session on mount
-    const savedUser = localStorage.getItem('hlola_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
-  }, []);
+  // Extract user from NextAuth session
+  const user: User | null = session?.user ? {
+    id: session.user.id,
+    name: session.user.name || '',
+    email: session.user.email || '',
+    role: session.user.role || '',
+    organizationId: session.user.organizationId,
+    entityId: session.user.entityId,
+    department: session.user.department,
+    jobTitle: session.user.jobTitle,
+  } : null;
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    
-    // Mock authentication - replace with real API call
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-    
-    if (email === 'admin@hlola.io' && password === 'hlola2025') {
-      const mockUser: User = {
-        id: '1',
-        name: 'Phillip Kisaka',
-        email: email,
-        role: 'Compliance Manager'
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('hlola_user', JSON.stringify(mockUser));
-      setIsLoading(false);
-      return true;
-    } else {
-      setIsLoading(false);
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      return result?.ok || false;
+    } catch (error) {
+      console.error('Login error:', error);
       return false;
     }
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('hlola_user');
+    signOut({ redirect: false });
   };
 
   return (

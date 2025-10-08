@@ -14,6 +14,7 @@ const bodyLogger = require('./middleware/bodyLogger');
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const organizationRoutes = require('./routes/organizations');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -30,7 +31,7 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: 'http://localhost:3003',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -76,6 +77,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/organizations', organizationRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -85,6 +87,7 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       auth: '/api/auth',
+      organizations: '/api/organizations',
       documentation: '/api/docs'
     }
   });

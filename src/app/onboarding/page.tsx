@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 interface OnboardingData {
-  name: string;
+  firstName: string;
+  lastName: string;
   company: string;
   role: string;
   email: string;
+  password: string;
+  confirmPassword: string;
   countries: string[];
   industry: string;
   consent: boolean;
@@ -43,13 +46,24 @@ const industries = [
   'Engineering', 'Research', 'Development', 'Other'
 ];
 
+const roles = [
+  { value: 'admin', label: 'Administrator' },
+  { value: 'compliance_manager', label: 'Compliance Manager' },
+  { value: 'team_member', label: 'Team Member' },
+  { value: 'auditor', label: 'Auditor' },
+  { value: 'entity_manager', label: 'Entity Manager' }
+];
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [data, setData] = useState<OnboardingData>({
-    name: '',
+    firstName: '',
+    lastName: '',
     company: '',
     role: '',
     email: '',
+    password: '',
+    confirmPassword: '',
     countries: [],
     industry: '',
     consent: false
@@ -60,11 +74,16 @@ export default function OnboardingPage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!data.name.trim()) newErrors.name = 'Name is required';
+    if (!data.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!data.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!data.company.trim()) newErrors.company = 'Company is required';
     if (!data.role.trim()) newErrors.role = 'Role is required';
     if (!data.email.trim()) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(data.email)) newErrors.email = 'Email is invalid';
+    if (!data.password.trim()) newErrors.password = 'Password is required';
+    else if (data.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!data.confirmPassword.trim()) newErrors.confirmPassword = 'Please confirm your password';
+    else if (data.password !== data.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     if (data.countries.length === 0) newErrors.countries = 'Please select at least one country';
     if (!data.industry) newErrors.industry = 'Industry is required';
     if (!data.consent) newErrors.consent = 'Consent is required';
@@ -73,13 +92,70 @@ export default function OnboardingPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Save onboarding data
-      localStorage.setItem('onboardingData', JSON.stringify(data));
-      // Redirect to dashboard
-      router.push('/dashboard');
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setSubmitError('');
+
+    try {
+      // Use the separate first and last name fields
+      const firstName = data.firstName.trim();
+      const lastName = data.lastName.trim();
+
+      // First, create the organization
+      const orgResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/organizations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.company,
+          industry: data.industry,
+          country: data.countries[0] || 'Kenya', // Use first selected country
+        }),
+      });
+
+      if (!orgResponse.ok) {
+        throw new Error('Failed to create organization');
+      }
+
+      const orgData = await orgResponse.json();
+
+      // Then, create the user
+      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
+          email: data.email,
+          password: data.password,
+          organizationId: orgData.organization.id,
+          role: data.role,
+          department: roles.find(r => r.value === data.role)?.label || data.role,
+          jobTitle: roles.find(r => r.value === data.role)?.label || data.role,
+        }),
+      });
+
+      if (!userResponse.ok) {
+        const errorData = await userResponse.json();
+        throw new Error(errorData.message || 'Failed to create user account');
+      }
+
+      // Success! Redirect to login page
+      router.push('/login?message=Account created successfully! Please sign in.');
+    } catch (error) {
+      console.error('Onboarding error:', error);
+      setSubmitError(error instanceof Error ? error.message : 'An error occurred during registration');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,21 +219,38 @@ export default function OnboardingPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name */}
+            {/* First Name */}
             <div>
               <label className="block text-sm font-semibold text-[#26558e] mb-2">
-                What&apos;s your name?
+                What&apos;s your first name?
               </label>
               <input
                 type="text"
-                value={data.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                value={data.firstName}
+                onChange={(e) => handleInputChange('firstName', e.target.value)}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-[#41c3d6]/30 focus:border-[#41c3d6] transition-all duration-200 ${
-                  errors.name ? 'border-red-500' : 'border-gray-300 hover:border-[#41c3d6]/50'
+                  errors.firstName ? 'border-red-500' : 'border-gray-300 hover:border-[#41c3d6]/50'
                 }`}
-                placeholder="Enter your full name"
+                placeholder="Enter your first name"
               />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+            </div>
+
+            {/* Last Name */}
+            <div>
+              <label className="block text-sm font-semibold text-[#26558e] mb-2">
+                What&apos;s your last name?
+              </label>
+              <input
+                type="text"
+                value={data.lastName}
+                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-[#41c3d6]/30 focus:border-[#41c3d6] transition-all duration-200 ${
+                  errors.lastName ? 'border-red-500' : 'border-gray-300 hover:border-[#41c3d6]/50'
+                }`}
+                placeholder="Enter your last name"
+              />
+              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
             </div>
 
             {/* Company */}
@@ -183,15 +276,18 @@ export default function OnboardingPage() {
                 💼 What&apos;s your role there?
               </label>
               <p className="text-sm text-gray-500 mb-3">This helps us tailor our communications</p>
-              <input
-                type="text"
+              <select
                 value={data.role}
                 onChange={(e) => handleInputChange('role', e.target.value)}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-[#41c3d6]/30 focus:border-[#41c3d6] transition-all duration-200 ${
                   errors.role ? 'border-red-500' : 'border-gray-300 hover:border-[#41c3d6]/50'
                 }`}
-                placeholder="e.g., Data Protection Officer, Compliance Manager, CEO"
-              />
+              >
+                <option value="">Select your role</option>
+                {roles.map(role => (
+                  <option key={role.value} value={role.value}>{role.label}</option>
+                ))}
+              </select>
               {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role}</p>}
             </div>
 
@@ -211,6 +307,41 @@ export default function OnboardingPage() {
                 placeholder="Enter your work email"
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-semibold text-[#26558e] mb-2">
+                🔐 Create a password
+              </label>
+              <p className="text-sm text-gray-500 mb-3">Choose a strong password for your account</p>
+              <input
+                type="password"
+                value={data.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-[#41c3d6]/30 focus:border-[#41c3d6] transition-all duration-200 ${
+                  errors.password ? 'border-red-500' : 'border-gray-300 hover:border-[#41c3d6]/50'
+                }`}
+                placeholder="Enter your password"
+              />
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-semibold text-[#26558e] mb-2">
+                🔐 Confirm your password
+              </label>
+              <input
+                type="password"
+                value={data.confirmPassword}
+                onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-[#41c3d6]/30 focus:border-[#41c3d6] transition-all duration-200 ${
+                  errors.confirmPassword ? 'border-red-500' : 'border-gray-300 hover:border-[#41c3d6]/50'
+                }`}
+                placeholder="Confirm your password"
+              />
+              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
 
             {/* Countries */}
@@ -275,13 +406,31 @@ export default function OnboardingPage() {
               {errors.consent && <p className="text-red-500 text-sm mt-1">{errors.consent}</p>}
             </div>
 
+            {/* Error Message */}
+            {submitError && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-red-800 text-sm">{submitError}</p>
+              </div>
+            )}
+
             {/* Submit Button */}
             <div className="pt-6">
               <button
                 type="submit"
-                className="w-full px-6 py-4 bg-gradient-to-r from-[#26558e] to-[#41c3d6] text-white rounded-xl font-semibold text-lg hover:from-[#1e4470] hover:to-[#2dd4da] hover:shadow-2xl hover:shadow-[#41c3d6]/25 transform hover:-translate-y-1 transition-all duration-300"
+                disabled={isLoading}
+                className="w-full px-6 py-4 bg-gradient-to-r from-[#26558e] to-[#41c3d6] text-white rounded-xl font-semibold text-lg hover:from-[#1e4470] hover:to-[#2dd4da] hover:shadow-2xl hover:shadow-[#41c3d6]/25 transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Get Started
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating Account...
+                  </div>
+                ) : (
+                  'Get Started'
+                )}
               </button>
             </div>
           </form>

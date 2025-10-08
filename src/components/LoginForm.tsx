@@ -23,11 +23,16 @@ export default function LoginForm() {
       return;
     }
 
-    const success = await login(email, password);
-    if (success) {
-      router.push('/dashboard');
-    } else {
-      setError('Invalid email or password. Try admin@hlola.io / hlola2025');
+    try {
+      const success = await login(email, password);
+      if (success) {
+        router.push('/dashboard');
+      } else {
+        setError('Invalid email or password. Please check your credentials and try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred during login. Please try again.');
     }
   };
 
@@ -179,10 +184,11 @@ export default function LoginForm() {
 
             {/* Demo Credentials */}
             <div className="glass-card bg-blue-50/50 border-blue-200 rounded-lg p-3 mt-4">
-              <h4 className="text-xs font-medium text-blue-800 mb-1">Demo Credentials:</h4>
+              <h4 className="text-xs font-medium text-blue-800 mb-1">Test Credentials:</h4>
               <div className="text-xs text-blue-700">
                 <p><strong>Email:</strong> admin@hlola.io</p>
                 <p><strong>Password:</strong> hlola2025</p>
+                <p className="text-xs text-blue-600 mt-1">* Create a user via API first</p>
               </div>
             </div>
           </form>
