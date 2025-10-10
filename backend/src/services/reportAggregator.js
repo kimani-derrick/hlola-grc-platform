@@ -265,7 +265,6 @@ class ReportAggregator {
           c.description,
           c.category,
           c.priority,
-          c.evidence_type,
           f.name as framework_name,
           f.region as framework_region,
           COUNT(DISTINCT e.id) as assigned_entities,
@@ -287,7 +286,7 @@ class ReportAggregator {
         LEFT JOIN documents d ON c.id = d.control_id
         LEFT JOIN audit_gaps ag ON e.id = ag.entity_id AND c.id = ag.control_id
         ${whereClause}
-        GROUP BY c.id, c.control_id, c.title, c.description, c.category, c.priority, c.evidence_type, f.name, f.region
+        GROUP BY c.id, c.control_id, c.title, c.description, c.category, c.priority, f.name, f.region
         ORDER BY f.name, c.control_id
       `;
 
@@ -300,7 +299,6 @@ class ReportAggregator {
         description: row.description,
         category: row.category,
         priority: row.priority,
-        evidenceType: row.evidence_type,
         frameworkName: row.framework_name,
         frameworkRegion: row.framework_region,
         assignedEntities: parseInt(row.assigned_entities) || 0,
