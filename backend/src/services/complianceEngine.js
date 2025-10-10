@@ -32,7 +32,7 @@ class ComplianceEngine {
       });
 
       // 3. Compare required vs actual
-      const gaps = await this.detectGaps(requiredControls, entityEvidence);
+      const gaps = await this.detectGaps(requiredControls, entityEvidence, frameworkId);
       logger.info('Detected gaps', { 
         entityId, 
         frameworkId, 
@@ -47,21 +47,15 @@ class ComplianceEngine {
         score 
       });
 
-      // 5. Generate tasks for gaps
-      const TaskGenerator = require('./taskGenerator');
-      const Entity = require('../models/Entity');
-      const entity = await Entity.findById(entityId);
-      logger.info('About to generate tasks', { 
+      // 5. Analyze existing tasks for gaps
+      const taskAnalysis = await this.analyzeExistingTasks(gaps, entityId, frameworkId);
+      logger.info('Analyzed existing tasks', { 
         entityId, 
-        organizationId: entity.organization_id,
-        gapCount: gaps.length,
-        gaps: gaps.map(g => ({ controlId: g.controlId, title: g.title }))
-      });
-      const createdTasks = await TaskGenerator.createTasksFromGaps(gaps, entityId, entity.organization_id);
-      logger.info('Generated tasks from gaps', { 
-        entityId, 
-        taskCount: createdTasks.length,
-        createdTasks: createdTasks.map(t => ({ id: t.id, title: t.title }))
+        frameworkId,
+        totalTasks: taskAnalysis.totalTasks,
+        completedTasks: taskAnalysis.completedTasks,
+        completionRate: taskAnalysis.completionRate,
+        tasksForGaps: taskAnalysis.tasksForGaps.length
       });
 
       // 6. Create/update audit gaps
@@ -84,7 +78,7 @@ class ComplianceEngine {
         score, 
         gaps, 
         requiredControls: requiredControls.length,
-        tasksGenerated: createdTasks.length
+        taskAnalysis
       };
     } catch (error) {
       logger.error('Error in compliance check', {
@@ -101,9 +95,10 @@ class ComplianceEngine {
    * Detect what's missing by comparing required controls with existing evidence
    * @param {Array} requiredControls - Array of required controls
    * @param {Object} entityEvidence - Object containing documents and tasks
+   * @param {string} frameworkId - Framework ID for gap tracking
    * @returns {Array} Array of detected gaps
    */
-  static async detectGaps(requiredControls, entityEvidence) {
+  static async detectGaps(requiredControls, entityEvidence, frameworkId) {
     const gaps = [];
     
     for (const control of requiredControls) {
@@ -175,14 +170,16 @@ class ComplianceEngine {
       return false;
     }
     
-    // Check if document is related to this control (if control_id is set)
-    if (document.control_id && document.control_id !== control.id) {
-      return false;
+    // Check if document is related to this control
+    // If document has a specific control_id, it must match
+    if (document.control_id) {
+      return document.control_id === control.id;
     }
     
-    // Additional matching logic can be added here
-    // For now, we'll consider it a match if document type matches
-    return true;
+    // If document has no control_id, it's a general document
+    // Only count it as evidence if it's specifically marked as general evidence
+    // For now, we'll be strict: only documents linked to specific controls count
+    return false;
   }
 
   /**
@@ -236,8 +233,16 @@ class ComplianceEngine {
    */
   static async getEntityEvidence(entityId) {
     try {
+      // Get organization ID from entity
+      const Entity = require('../models/Entity');
+      const entity = await Entity.findById(entityId);
+      if (!entity) {
+        logger.warn('Entity not found for evidence retrieval', { entityId });
+        return { documents: [], tasks: [] };
+      }
+      
       const [documents, tasks] = await Promise.all([
-        Document.findByEntity(entityId),
+        Document.findByEntity(entityId, entity.organization_id),
         Task.findByEntity(entityId)
       ]);
       
@@ -248,6 +253,100 @@ class ComplianceEngine {
         entityId
       });
       return { documents: [], tasks: [] };
+    }
+  }
+
+  /**
+   * Analyze existing tasks for gaps and return task status
+   * @param {Array} gaps - Array of detected gaps
+   * @param {string} entityId - Entity ID
+   * @param {string} frameworkId - Framework ID to filter tasks
+   * @returns {Object} Task analysis object
+   */
+  static async analyzeExistingTasks(gaps, entityId, frameworkId) {
+    try {
+      logger.info('Starting task analysis', { entityId, frameworkId, gapCount: gaps.length });
+      
+      // Get all tasks for this entity
+      const allTasks = await Task.findByEntity(entityId);
+      logger.info('Retrieved tasks from database', { entityId, totalTasks: allTasks.length });
+      
+      // Filter tasks by framework
+      const frameworkTasks = allTasks.filter(task => task.framework_id === frameworkId);
+      logger.info('Filtered tasks by framework', { entityId, frameworkId, frameworkTasks: frameworkTasks.length });
+      
+      // Calculate overall task statistics
+      const taskStats = {
+        totalTasks: frameworkTasks.length,
+        pendingTasks: frameworkTasks.filter(t => t.status === 'pending').length,
+        inProgressTasks: frameworkTasks.filter(t => t.status === 'in-progress').length,
+        completedTasks: frameworkTasks.filter(t => t.status === 'completed').length,
+        blockedTasks: frameworkTasks.filter(t => t.status === 'blocked').length,
+        cancelledTasks: frameworkTasks.filter(t => t.status === 'cancelled').length,
+        highPriorityTasks: frameworkTasks.filter(t => t.priority === 'high').length,
+        mediumPriorityTasks: frameworkTasks.filter(t => t.priority === 'medium').length,
+        lowPriorityTasks: frameworkTasks.filter(t => t.priority === 'low').length
+      };
+
+      // Find tasks related to gaps
+      const tasksForGaps = [];
+      for (const gap of gaps) {
+        const relatedTasks = frameworkTasks.filter(task => task.control_id === gap.controlId);
+        
+        for (const task of relatedTasks) {
+          tasksForGaps.push({
+            controlId: gap.controlId,
+            taskId: task.id,
+            title: task.title,
+            status: task.status,
+            priority: task.priority,
+            dueDate: task.due_date,
+            progress: task.progress || 0,
+            assigneeId: task.assignee_id,
+            assigneeName: task.assignee_first_name && task.assignee_last_name 
+              ? `${task.assignee_first_name} ${task.assignee_last_name}` 
+              : null
+          });
+        }
+      }
+
+      // Calculate completion rate
+      const completionRate = taskStats.totalTasks > 0 
+        ? Math.round((taskStats.completedTasks / taskStats.totalTasks) * 100)
+        : 0;
+
+      logger.info('Task analysis completed', {
+        entityId,
+        totalTasks: taskStats.totalTasks,
+        completedTasks: taskStats.completedTasks,
+        completionRate,
+        tasksForGaps: tasksForGaps.length
+      });
+
+      return {
+        ...taskStats,
+        completionRate,
+        tasksForGaps
+      };
+    } catch (error) {
+      logger.error('Error analyzing existing tasks', {
+        error: error.message,
+        entityId,
+        gapCount: gaps.length
+      });
+      return {
+        totalTasks: 0,
+        pendingTasks: 0,
+        inProgressTasks: 0,
+        completedTasks: 0,
+        blockedTasks: 0,
+        cancelledTasks: 0,
+        highPriorityTasks: 0,
+        mediumPriorityTasks: 0,
+        lowPriorityTasks: 0,
+        completionRate: 0,
+        tasksForGaps: []
+      };
     }
   }
 

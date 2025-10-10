@@ -147,6 +147,23 @@ class Task {
     return result.rows;
   }
 
+  static async findByEntity(entityId) {
+    const result = await query(
+      `SELECT t.*, 
+              c.title as control_title, c.description as control_description,
+              c.framework_id,
+              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
+       FROM tasks t
+       JOIN controls c ON t.control_id = c.id
+       JOIN control_assignments ca ON c.id = ca.control_id
+       LEFT JOIN users u1 ON t.assignee_id = u1.id
+       WHERE ca.entity_id = $1
+       ORDER BY t.due_date ASC, t.priority DESC`,
+      [entityId]
+    );
+    return result.rows;
+  }
+
   static async update(id, { title, description, priority, category, assigneeId, dueDate, estimatedHours, actualHours, progress, evidenceAttached, blockers }) {
     const updates = [];
     const values = [];

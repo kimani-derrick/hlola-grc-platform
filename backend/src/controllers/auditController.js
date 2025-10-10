@@ -637,7 +637,8 @@ const createSmartAudit = async (req, res, next) => {
       frameworkId,
       score: complianceResult.score,
       gaps: complianceResult.gaps.length,
-      tasksGenerated: complianceResult.tasksGenerated
+      totalTasks: complianceResult.taskAnalysis.totalTasks,
+      completedTasks: complianceResult.taskAnalysis.completedTasks
     });
     
     // 2. Create audit record
@@ -705,7 +706,8 @@ const createSmartAudit = async (req, res, next) => {
       complianceScore: complianceResult.score,
       gaps: complianceResult.gaps.length,
       findings: findings.length,
-      tasksGenerated: complianceResult.tasksGenerated,
+      totalTasks: complianceResult.taskAnalysis.totalTasks,
+      completedTasks: complianceResult.taskAnalysis.completedTasks,
       userId: req.user.id
     });
     
@@ -727,7 +729,7 @@ const createSmartAudit = async (req, res, next) => {
         complianceScore: complianceResult.score,
         gapsDetected: complianceResult.gaps.length,
         findingsCreated: findings.length,
-        tasksGenerated: complianceResult.tasksGenerated,
+        taskAnalysis: complianceResult.taskAnalysis,
         requiredControls: complianceResult.requiredControls,
         gaps: complianceResult.gaps.map(gap => ({
           controlId: gap.controlId,
