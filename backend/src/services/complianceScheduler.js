@@ -299,7 +299,7 @@ class ComplianceScheduler {
       const { pool } = require('../config/database');
       
       const result = await pool.query(`
-        SELECT DISTINCT ef.entity_id, ef.framework_id, e.name as entity_name, f.name as framework_name
+        SELECT DISTINCT ef.entity_id, ef.framework_id, ef.created_at, e.name as entity_name, f.name as framework_name
         FROM entity_frameworks ef
         JOIN entities e ON ef.entity_id = e.id
         JOIN frameworks f ON ef.framework_id = f.id
@@ -325,7 +325,7 @@ class ComplianceScheduler {
       const { pool } = require('../config/database');
       
       const result = await pool.query(`
-        SELECT DISTINCT ef.entity_id, ef.framework_id, e.name as entity_name, f.name as framework_name
+        SELECT DISTINCT ef.entity_id, ef.framework_id, ef.created_at, e.name as entity_name, f.name as framework_name
         FROM entity_frameworks ef
         JOIN entities e ON ef.entity_id = e.id
         JOIN frameworks f ON ef.framework_id = f.id
@@ -352,7 +352,7 @@ class ComplianceScheduler {
       const { pool } = require('../config/database');
       
       const result = await pool.query(`
-        SELECT DISTINCT ef.entity_id, ef.framework_id, e.name as entity_name, f.name as framework_name
+        SELECT DISTINCT ef.entity_id, ef.framework_id, ef.created_at, e.name as entity_name, f.name as framework_name
         FROM entity_frameworks ef
         JOIN entities e ON ef.entity_id = e.id
         JOIN frameworks f ON ef.framework_id = f.id
