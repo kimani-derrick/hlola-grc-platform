@@ -336,7 +336,7 @@ class ComplianceEventListener {
     try {
       const { pool } = require('../config/database');
       const result = await pool.query(`
-        SELECT id, title, description, framework_id, risk_level
+        SELECT id, title, description, framework_id, priority, category
         FROM controls
         WHERE id = $1
       `, [controlId]);
