@@ -37,6 +37,14 @@ const getComplianceDashboard = async (req, res, next) => {
       completedTasks: 0,
       totalAudits: 0,
       activeAudits: 0,
+      riskExposure: {
+        totalExposure: 0,
+        currentExposure: 0,
+        exposurePercentage: 0,
+        currency: 'EUR',
+        controlsAtRisk: 0,
+        totalControls: 0
+      },
       lastUpdated: new Date().toISOString()
     };
     
@@ -63,6 +71,14 @@ const getComplianceDashboard = async (req, res, next) => {
           gaps: result.gaps.length,
           requiredControls: result.requiredControls,
           tasksGenerated: result.tasksGenerated,
+          riskExposure: result.riskExposure || {
+            totalExposure: 0,
+            currentExposure: 0,
+            exposurePercentage: 0,
+            currency: 'EUR',
+            controlsAtRisk: 0,
+            totalControls: 0
+          },
           lastChecked: new Date().toISOString()
         };
         
@@ -72,6 +88,14 @@ const getComplianceDashboard = async (req, res, next) => {
         totalScore += result.score;
         validAssignments++;
         dashboardData.totalGaps += result.gaps.length;
+        
+        // Aggregate risk exposure
+        if (result.riskExposure) {
+          dashboardData.riskExposure.totalExposure += parseFloat(result.riskExposure.totalExposure) || 0;
+          dashboardData.riskExposure.currentExposure += parseFloat(result.riskExposure.currentExposure) || 0;
+          dashboardData.riskExposure.controlsAtRisk += result.riskExposure.controlsAtRisk;
+          dashboardData.riskExposure.totalControls += result.riskExposure.totalControls;
+        }
         
         // Count gaps by severity
         result.gaps.forEach(gap => {
@@ -109,6 +133,13 @@ const getComplianceDashboard = async (req, res, next) => {
     // Calculate average score
     if (validAssignments > 0) {
       dashboardData.overallScore = Math.round(totalScore / validAssignments);
+    }
+    
+    // Calculate overall risk exposure percentage
+    if (dashboardData.riskExposure.totalExposure > 0) {
+      dashboardData.riskExposure.exposurePercentage = Math.round(
+        (dashboardData.riskExposure.currentExposure / dashboardData.riskExposure.totalExposure) * 100
+      );
     }
     
     // Get task statistics

@@ -3,12 +3,12 @@ const { pool } = require('../config/database');
 const query = (text, params) => pool.query(text, params);
 
 class Control {
-  static async create({ frameworkId, controlId, title, description, category, subcategory, priority, implementationLevel, businessImpact, technicalRequirements, legalRequirements, implementationGuidance, testingProcedures, evidenceRequirements }) {
+  static async create({ frameworkId, controlId, title, description, category, subcategory, priority, implementationLevel, businessImpact, technicalRequirements, legalRequirements, implementationGuidance, testingProcedures, evidenceRequirements, fineAmount, fineCurrency = 'EUR' }) {
     const result = await query(
-      `INSERT INTO controls (framework_id, control_id, title, description, category, subcategory, priority, implementation_level, business_impact, technical_requirements, legal_requirements, implementation_guidance, testing_procedures, evidence_requirements)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      `INSERT INTO controls (framework_id, control_id, title, description, category, subcategory, priority, implementation_level, business_impact, technical_requirements, legal_requirements, implementation_guidance, testing_procedures, evidence_requirements, fine_amount, fine_currency)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
        RETURNING *`,
-      [frameworkId, controlId, title, description, category, subcategory, priority, implementationLevel, businessImpact, technicalRequirements, legalRequirements, implementationGuidance, testingProcedures, evidenceRequirements]
+      [frameworkId, controlId, title, description, category, subcategory, priority, implementationLevel, businessImpact, technicalRequirements, legalRequirements, implementationGuidance, testingProcedures, evidenceRequirements, fineAmount, fineCurrency]
     );
     return result.rows[0];
   }

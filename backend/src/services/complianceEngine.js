@@ -47,6 +47,17 @@ class ComplianceEngine {
         score 
       });
 
+      // 4.5. Calculate risk exposure based on fine amounts
+      const riskExposure = this.calculateRiskExposure(requiredControls, gaps);
+      logger.info('Calculated risk exposure', { 
+        entityId, 
+        frameworkId, 
+        totalExposure: riskExposure.totalExposure,
+        currentExposure: riskExposure.currentExposure,
+        exposurePercentage: riskExposure.exposurePercentage,
+        currency: riskExposure.currency
+      });
+
       // 5. Analyze existing tasks for gaps
       const taskAnalysis = await this.analyzeExistingTasks(gaps, entityId, frameworkId);
       logger.info('Analyzed existing tasks', { 
@@ -78,7 +89,8 @@ class ComplianceEngine {
         score, 
         gaps, 
         requiredControls: requiredControls.length,
-        taskAnalysis
+        taskAnalysis,
+        riskExposure
       };
     } catch (error) {
       logger.error('Error in compliance check', {
@@ -224,6 +236,36 @@ class ComplianceEngine {
     
     const score = Math.round((compliant / totalRequired) * 100);
     return Math.max(0, Math.min(100, score)); // Ensure score is between 0-100
+  }
+
+  /**
+   * Calculate risk exposure based on uncompleted controls and their fine amounts
+   * @param {Array} requiredControls - Array of required controls
+   * @param {Array} gaps - Array of detected gaps
+   * @returns {Object} Risk exposure data
+   */
+  static calculateRiskExposure(requiredControls, gaps) {
+    const totalExposure = requiredControls.reduce((sum, control) => {
+      return sum + (control.fine_amount || 0);
+    }, 0);
+
+    const currentExposure = gaps.reduce((sum, gap) => {
+      const control = requiredControls.find(c => c.id === gap.controlId);
+      return sum + (control?.fine_amount || 0);
+    }, 0);
+
+    const exposurePercentage = totalExposure > 0 
+      ? Math.round((currentExposure / totalExposure) * 100)
+      : 0;
+
+    return {
+      totalExposure,
+      currentExposure,
+      exposurePercentage,
+      currency: requiredControls[0]?.fine_currency || 'EUR',
+      controlsAtRisk: gaps.length,
+      totalControls: requiredControls.length
+    };
   }
 
   /**
