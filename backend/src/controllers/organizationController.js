@@ -1,4 +1,5 @@
 const Organization = require('../models/Organization');
+const Entity = require('../models/Entity');
 const logger = require('../config/logger');
 
 const createOrganization = async (req, res, next) => {
@@ -14,16 +15,32 @@ const createOrganization = async (req, res, next) => {
 
     const organization = await Organization.create({ name, industry, country });
 
-    logger.info('Organization created successfully', {
+    // Auto-create default entity for the organization
+    const defaultEntity = await Entity.create({
+      organizationId: organization.id,
+      name: 'Main Operations',
+      description: 'Default entity for main operations',
+      entityType: 'division',
+      country: country,
+      region: null,
+      industry: industry,
+      size: null,
+      riskLevel: 'medium',
+      complianceOfficer: null
+    });
+
+    logger.info('Organization and default entity created successfully', {
       requestId: req.id,
       organizationId: organization.id,
+      entityId: defaultEntity.id,
       name: organization.name
     });
 
     res.status(201).json({
       success: true,
       message: 'Organization created successfully',
-      organization
+      organization,
+      defaultEntity
     });
   } catch (error) {
     logger.error('Error creating organization', {

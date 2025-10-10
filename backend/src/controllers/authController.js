@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Entity = require('../models/Entity');
 const { generateToken } = require('../utils/jwt');
 const logger = require('../config/logger');
 
@@ -105,10 +106,25 @@ const register = async (req, res) => {
       });
     }
 
+    // If no entityId provided, try to find default entity for organization
+    let finalEntityId = entityId;
+    if (!entityId) {
+      const defaultEntity = await Entity.findDefaultEntityByOrganizationId(organizationId);
+      if (defaultEntity) {
+        finalEntityId = defaultEntity.id;
+        logger.info('Auto-assigning user to default entity', {
+          requestId: req.id,
+          userId: 'pending',
+          organizationId: organizationId,
+          entityId: finalEntityId
+        });
+      }
+    }
+
     // Create new user
     const userData = {
       organization_id: organizationId,
-      entity_id: entityId,
+      entity_id: finalEntityId,
       email,
       first_name: firstName,
       last_name: lastName,

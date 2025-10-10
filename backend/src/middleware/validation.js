@@ -61,8 +61,154 @@ const registerSchema = Joi.object({
   jobTitle: Joi.string().max(100).optional()
 });
 
+// Entity validation schemas
+const createEntitySchema = Joi.object({
+  name: Joi.string().min(2).max(255).required().messages({
+    'string.min': 'Entity name must be at least 2 characters long',
+    'string.max': 'Entity name must not exceed 255 characters',
+    'any.required': 'Entity name is required'
+  }),
+  description: Joi.string().max(1000).optional().allow(''),
+  entityType: Joi.string().valid('subsidiary', 'division', 'department', 'project').required().messages({
+    'any.only': 'Entity type must be one of: subsidiary, division, department, project',
+    'any.required': 'Entity type is required'
+  }),
+  country: Joi.string().max(100).optional().allow(''),
+  region: Joi.string().max(100).optional().allow(''),
+  industry: Joi.string().max(100).optional().allow(''),
+  size: Joi.string().max(50).optional().allow(''),
+  riskLevel: Joi.string().valid('low', 'medium', 'high', 'critical').optional().default('medium').messages({
+    'any.only': 'Risk level must be one of: low, medium, high, critical'
+  }),
+  complianceOfficer: Joi.string().max(255).optional().allow('')
+});
+
+const updateEntitySchema = Joi.object({
+  name: Joi.string().min(2).max(255).optional(),
+  description: Joi.string().max(1000).optional().allow(''),
+  entityType: Joi.string().valid('subsidiary', 'division', 'department', 'project').optional().messages({
+    'any.only': 'Entity type must be one of: subsidiary, division, department, project'
+  }),
+  country: Joi.string().max(100).optional().allow(''),
+  region: Joi.string().max(100).optional().allow(''),
+  industry: Joi.string().max(100).optional().allow(''),
+  size: Joi.string().max(50).optional().allow(''),
+  riskLevel: Joi.string().valid('low', 'medium', 'high', 'critical').optional().messages({
+    'any.only': 'Risk level must be one of: low, medium, high, critical'
+  }),
+  complianceOfficer: Joi.string().max(255).optional().allow('')
+});
+
+const assignUserSchema = Joi.object({
+  userId: Joi.string().uuid().required().messages({
+    'string.guid': 'User ID must be a valid UUID',
+    'any.required': 'User ID is required'
+  })
+});
+
+// Framework validation schemas
+const createFrameworkSchema = Joi.object({
+  name: Joi.string().min(2).max(255).required().messages({
+    'string.min': 'Framework name must be at least 2 characters long',
+    'string.max': 'Framework name must not exceed 255 characters',
+    'any.required': 'Framework name is required'
+  }),
+  description: Joi.string().max(1000).optional().allow(''),
+  region: Joi.string().valid('Africa', 'Europe', 'Asia', 'Americas', 'International', 'Global').required().messages({
+    'any.only': 'Region must be one of: Africa, Europe, Asia, Americas, International, Global',
+    'any.required': 'Region is required'
+  }),
+  country: Joi.string().max(100).optional().allow(''),
+  category: Joi.string().valid('Privacy', 'Security', 'Compliance', 'Risk', 'Financial', 'Healthcare').required().messages({
+    'any.only': 'Category must be one of: Privacy, Security, Compliance, Risk, Financial, Healthcare',
+    'any.required': 'Category is required'
+  }),
+  type: Joi.string().valid('Legal', 'Standards', 'Industry', 'International').required().messages({
+    'any.only': 'Type must be one of: Legal, Standards, Industry, International',
+    'any.required': 'Type is required'
+  }),
+  icon: Joi.string().max(50).optional().allow(''),
+  color: Joi.string().max(20).optional().allow(''),
+  complianceDeadline: Joi.date().optional().allow(null),
+  priority: Joi.string().valid('high', 'medium', 'low').required().messages({
+    'any.only': 'Priority must be one of: high, medium, low',
+    'any.required': 'Priority is required'
+  }),
+  riskLevel: Joi.string().valid('low', 'medium', 'high', 'critical').required().messages({
+    'any.only': 'Risk level must be one of: low, medium, high, critical',
+    'any.required': 'Risk level is required'
+  }),
+  status: Joi.string().valid('active', 'draft', 'inactive', 'pending').optional().default('active').messages({
+    'any.only': 'Status must be one of: active, draft, inactive, pending'
+  }),
+  requirementsCount: Joi.number().integer().min(0).optional().default(0),
+  applicableCountries: Joi.array().items(Joi.string()).optional().default([]),
+  industryScope: Joi.string().max(100).optional().allow('')
+});
+
+const updateFrameworkSchema = Joi.object({
+  name: Joi.string().min(2).max(255).optional(),
+  description: Joi.string().max(1000).optional().allow(''),
+  region: Joi.string().valid('Africa', 'Europe', 'Asia', 'Americas', 'International', 'Global').optional().messages({
+    'any.only': 'Region must be one of: Africa, Europe, Asia, Americas, International, Global'
+  }),
+  country: Joi.string().max(100).optional().allow(''),
+  category: Joi.string().valid('Privacy', 'Security', 'Compliance', 'Risk', 'Financial', 'Healthcare').optional().messages({
+    'any.only': 'Category must be one of: Privacy, Security, Compliance, Risk, Financial, Healthcare'
+  }),
+  type: Joi.string().valid('Legal', 'Standards', 'Industry', 'International').optional().messages({
+    'any.only': 'Type must be one of: Legal, Standards, Industry, International'
+  }),
+  icon: Joi.string().max(50).optional().allow(''),
+  color: Joi.string().max(20).optional().allow(''),
+  complianceDeadline: Joi.date().optional().allow(null),
+  priority: Joi.string().valid('high', 'medium', 'low').optional().messages({
+    'any.only': 'Priority must be one of: high, medium, low'
+  }),
+  riskLevel: Joi.string().valid('low', 'medium', 'high', 'critical').optional().messages({
+    'any.only': 'Risk level must be one of: low, medium, high, critical'
+  }),
+  status: Joi.string().valid('active', 'draft', 'inactive', 'pending').optional().messages({
+    'any.only': 'Status must be one of: active, draft, inactive, pending'
+  }),
+  requirementsCount: Joi.number().integer().min(0).optional(),
+  applicableCountries: Joi.array().items(Joi.string()).optional(),
+  industryScope: Joi.string().max(100).optional().allow('')
+});
+
+const assignFrameworkSchema = Joi.object({
+  complianceScore: Joi.number().integer().min(0).max(100).optional().default(0),
+  auditReadinessScore: Joi.number().integer().min(0).max(100).optional().default(0),
+  lastAuditDate: Joi.date().optional().allow(null),
+  nextAuditDate: Joi.date().optional().allow(null),
+  certificationStatus: Joi.string().valid('certified', 'pending', 'expired', 'not-applicable').optional().default('not-applicable').messages({
+    'any.only': 'Certification status must be one of: certified, pending, expired, not-applicable'
+  }),
+  certificationExpiry: Joi.date().optional().allow(null),
+  complianceDeadline: Joi.date().optional().allow(null)
+});
+
+const updateComplianceSchema = Joi.object({
+  complianceScore: Joi.number().integer().min(0).max(100).optional(),
+  auditReadinessScore: Joi.number().integer().min(0).max(100).optional(),
+  lastAuditDate: Joi.date().optional().allow(null),
+  nextAuditDate: Joi.date().optional().allow(null),
+  certificationStatus: Joi.string().valid('certified', 'pending', 'expired', 'not-applicable').optional().messages({
+    'any.only': 'Certification status must be one of: certified, pending, expired, not-applicable'
+  }),
+  certificationExpiry: Joi.date().optional().allow(null),
+  complianceDeadline: Joi.date().optional().allow(null)
+});
+
 module.exports = {
   validateRequest,
   loginSchema,
-  registerSchema
+  registerSchema,
+  createEntitySchema,
+  updateEntitySchema,
+  assignUserSchema,
+  createFrameworkSchema,
+  updateFrameworkSchema,
+  assignFrameworkSchema,
+  updateComplianceSchema
 };

@@ -15,6 +15,9 @@ const bodyLogger = require('./middleware/bodyLogger');
 // Import routes
 const authRoutes = require('./routes/auth');
 const organizationRoutes = require('./routes/organizations');
+const entityRoutes = require('./routes/entities');
+const frameworkRoutes = require('./routes/frameworks');
+const entityFrameworkRoutes = require('./routes/entityFrameworks');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -78,6 +81,9 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/organizations', organizationRoutes);
+app.use('/api/entities', entityRoutes);
+app.use('/api/frameworks', frameworkRoutes);
+app.use('/api', entityFrameworkRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -88,6 +94,9 @@ app.get('/', (req, res) => {
       health: '/health',
       auth: '/api/auth',
       organizations: '/api/organizations',
+      entities: '/api/entities',
+      frameworks: '/api/frameworks',
+      entityFrameworks: '/api/entities/:entityId/frameworks',
       documentation: '/api/docs'
     }
   });
