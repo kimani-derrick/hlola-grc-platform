@@ -156,10 +156,16 @@ class ComplianceEventListener {
         frameworkId
       });
 
-      // Immediately run compliance check for the new framework
+      // Step 1: Create control assignments for all framework controls
+      await this.createControlAssignments(entityId, frameworkId);
+      
+      // Step 2: Copy framework tasks to entity-specific tasks
+      await this.copyFrameworkTasks(entityId, frameworkId);
+      
+      // Step 3: Run compliance check for the new framework
       await ComplianceEngine.checkEntityCompliance(entityId, frameworkId);
       
-      logger.info('Initial compliance check completed after framework assignment', {
+      logger.info('Framework assignment processing completed', {
         entityId,
         frameworkId
       });
@@ -366,6 +372,207 @@ class ComplianceEventListener {
         entityId
       });
       return null;
+    }
+  }
+
+  /**
+   * Create control assignments for all framework controls
+   * @param {string} entityId - Entity ID
+   * @param {string} frameworkId - Framework ID
+   */
+  static async createControlAssignments(entityId, frameworkId) {
+    try {
+      const { pool } = require('../config/database');
+      
+      // Get all controls for the framework
+      const controlsResult = await pool.query(`
+        SELECT id, control_id, title, priority
+        FROM controls 
+        WHERE framework_id = $1
+      `, [frameworkId]);
+      
+      if (controlsResult.rows.length === 0) {
+        logger.info('No controls found for framework', { frameworkId });
+        return;
+      }
+      
+      logger.info('Creating control assignments', {
+        entityId,
+        frameworkId,
+        controlCount: controlsResult.rows.length
+      });
+      
+      // Create control assignments for each control
+      let assignmentsCreated = 0;
+      for (const control of controlsResult.rows) {
+        try {
+          // Check if assignment already exists
+          const existingAssignment = await pool.query(`
+            SELECT id FROM control_assignments 
+            WHERE entity_id = $1 AND control_id = $2
+          `, [entityId, control.id]);
+          
+          if (existingAssignment.rows.length > 0) {
+            logger.debug('Control assignment already exists', {
+              entityId,
+              controlId: control.id,
+              controlTitle: control.title
+            });
+            continue;
+          }
+          
+          // Create new control assignment
+          await pool.query(`
+            INSERT INTO control_assignments (
+              entity_id, 
+              control_id, 
+              status, 
+              priority, 
+              completion_rate,
+              created_at, 
+              updated_at
+            ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+          `, [
+            entityId,
+            control.id,
+            'not-started',
+            control.priority || 'medium',
+            0
+          ]);
+          
+          assignmentsCreated++;
+          logger.debug('Control assignment created', {
+            entityId,
+            controlId: control.id,
+            controlTitle: control.title
+          });
+        } catch (error) {
+          logger.error('Error creating control assignment', {
+            error: error.message,
+            entityId,
+            controlId: control.id,
+            controlTitle: control.title
+          });
+        }
+      }
+      
+      logger.info('Control assignments creation completed', {
+        entityId,
+        frameworkId,
+        assignmentsCreated,
+        totalControls: controlsResult.rows.length
+      });
+      
+    } catch (error) {
+      logger.error('Error creating control assignments', {
+        error: error.message,
+        entityId,
+        frameworkId
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Copy framework tasks to entity-specific tasks
+   * @param {string} entityId - Entity ID
+   * @param {string} frameworkId - Framework ID
+   */
+  static async copyFrameworkTasks(entityId, frameworkId) {
+    try {
+      const { pool } = require('../config/database');
+      
+      // Get all tasks for the framework controls
+      const tasksResult = await pool.query(`
+        SELECT t.id, t.control_id, t.title, t.description, t.priority, t.category, t.estimated_hours
+        FROM tasks t
+        JOIN controls c ON t.control_id = c.id
+        WHERE c.framework_id = $1
+      `, [frameworkId]);
+      
+      if (tasksResult.rows.length === 0) {
+        logger.info('No tasks found for framework', { frameworkId });
+        return;
+      }
+      
+      logger.info('Copying framework tasks', {
+        entityId,
+        frameworkId,
+        taskCount: tasksResult.rows.length
+      });
+      
+      // Copy tasks for each control
+      let tasksCopied = 0;
+      for (const task of tasksResult.rows) {
+        try {
+          // Check if task already exists for this control
+          const existingTask = await pool.query(`
+            SELECT id FROM tasks 
+            WHERE control_id = $1 AND title = $2
+          `, [task.control_id, task.title]);
+          
+          if (existingTask.rows.length > 0) {
+            logger.debug('Task already exists for entity', {
+              entityId,
+              controlId: task.control_id,
+              taskTitle: task.title
+            });
+            continue;
+          }
+          
+          // Create new task for the entity
+          await pool.query(`
+            INSERT INTO tasks (
+              control_id, 
+              title, 
+              description, 
+              status, 
+              priority, 
+              category, 
+              estimated_hours,
+              created_at, 
+              updated_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+          `, [
+            task.control_id,
+            task.title,
+            task.description,
+            'pending',
+            task.priority,
+            task.category,
+            task.estimated_hours
+          ]);
+          
+          tasksCopied++;
+          logger.debug('Task copied to entity', {
+            entityId,
+            controlId: task.control_id,
+            taskTitle: task.title
+          });
+        } catch (error) {
+          logger.error('Error copying task', {
+            error: error.message,
+            entityId,
+            controlId: task.control_id,
+            taskTitle: task.title
+          });
+        }
+      }
+      
+      logger.info('Framework tasks copying completed', {
+        entityId,
+        frameworkId,
+        tasksCopied,
+        totalTasks: tasksResult.rows.length
+      });
+      
+    } catch (error) {
+      logger.error('Error copying framework tasks', {
+        error: error.message,
+        entityId,
+        frameworkId
+      });
+      throw error;
     }
   }
 }

@@ -112,6 +112,7 @@ class ComplianceEngine {
       if (!hasEvidence) {
         const gap = {
           controlId: control.id,
+          frameworkId: frameworkId,
           title: `Missing: ${control.title}`,
           description: control.description,
           category: this.determineCategory(control),

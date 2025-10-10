@@ -50,3 +50,4 @@ router.put('/:id', authenticateToken, validateRequest(updateOrganizationSchema),
 router.delete('/:id', authenticateToken, deleteOrganization);
 
 module.exports = router;
+
