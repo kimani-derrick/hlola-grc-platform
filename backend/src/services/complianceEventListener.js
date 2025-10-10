@@ -524,8 +524,10 @@ class ComplianceEventListener {
           const existingTask = await pool.query(`
             SELECT t.id FROM tasks t
             JOIN control_assignments ca ON t.control_id = ca.control_id
-            WHERE t.control_id = $1 AND ca.entity_id = $2 AND t.title LIKE $3
-          `, [control.id, entityId, `%${framework.name}%`]);
+            WHERE t.control_id = $1 AND ca.entity_id = $2 AND t.created_at >= (
+              SELECT created_at FROM entities WHERE id = $2
+            )
+          `, [control.id, entityId]);
           
           if (existingTask.rows.length > 0) {
             logger.debug('Task already exists for control', {
