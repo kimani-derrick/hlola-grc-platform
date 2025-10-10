@@ -200,6 +200,86 @@ const updateComplianceSchema = Joi.object({
   complianceDeadline: Joi.date().optional().allow(null)
 });
 
+// Control validation schemas
+const createControlSchema = Joi.object({
+  frameworkId: Joi.string().uuid().required().messages({
+    'string.guid': 'Framework ID must be a valid UUID',
+    'any.required': 'Framework ID is required'
+  }),
+  controlId: Joi.string().max(100).required().messages({
+    'string.max': 'Control ID must not exceed 100 characters',
+    'any.required': 'Control ID is required'
+  }),
+  title: Joi.string().min(2).max(500).required().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters',
+    'any.required': 'Title is required'
+  }),
+  description: Joi.string().optional().allow(''),
+  category: Joi.string().max(100).optional().allow(''),
+  subcategory: Joi.string().max(100).optional().allow(''),
+  priority: Joi.string().valid('high', 'medium', 'low').required().messages({
+    'any.only': 'Priority must be one of: high, medium, low',
+    'any.required': 'Priority is required'
+  }),
+  implementationLevel: Joi.string().valid('basic', 'intermediate', 'advanced').optional().messages({
+    'any.only': 'Implementation level must be one of: basic, intermediate, advanced'
+  }),
+  businessImpact: Joi.string().optional().allow(''),
+  technicalRequirements: Joi.string().optional().allow(''),
+  legalRequirements: Joi.string().optional().allow(''),
+  implementationGuidance: Joi.string().optional().allow(''),
+  testingProcedures: Joi.string().optional().allow(''),
+  evidenceRequirements: Joi.array().items(Joi.string()).optional().default([])
+});
+
+const updateControlSchema = Joi.object({
+  controlId: Joi.string().max(100).optional().messages({
+    'string.max': 'Control ID must not exceed 100 characters'
+  }),
+  title: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters'
+  }),
+  description: Joi.string().optional().allow(''),
+  category: Joi.string().max(100).optional().allow(''),
+  subcategory: Joi.string().max(100).optional().allow(''),
+  priority: Joi.string().valid('high', 'medium', 'low').optional().messages({
+    'any.only': 'Priority must be one of: high, medium, low'
+  }),
+  implementationLevel: Joi.string().valid('basic', 'intermediate', 'advanced').optional().messages({
+    'any.only': 'Implementation level must be one of: basic, intermediate, advanced'
+  }),
+  businessImpact: Joi.string().optional().allow(''),
+  technicalRequirements: Joi.string().optional().allow(''),
+  legalRequirements: Joi.string().optional().allow(''),
+  implementationGuidance: Joi.string().optional().allow(''),
+  testingProcedures: Joi.string().optional().allow(''),
+  evidenceRequirements: Joi.array().items(Joi.string()).optional()
+});
+
+const assignControlSchema = Joi.object({
+  assignedTo: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Assigned user ID must be a valid UUID'
+  }),
+  assignedTeam: Joi.string().max(100).optional().allow(''),
+  priority: Joi.string().valid('high', 'medium', 'low').optional().default('medium').messages({
+    'any.only': 'Priority must be one of: high, medium, low'
+  }),
+  dueDate: Joi.date().optional().allow(null)
+});
+
+const updateControlStatusSchema = Joi.object({
+  status: Joi.string().valid('not-started', 'in-progress', 'completed', 'needs-review').optional().messages({
+    'any.only': 'Status must be one of: not-started, in-progress, completed, needs-review'
+  }),
+  completionRate: Joi.number().integer().min(0).max(100).optional().messages({
+    'number.min': 'Completion rate must be between 0 and 100',
+    'number.max': 'Completion rate must be between 0 and 100'
+  }),
+  reviewNotes: Joi.string().optional().allow('')
+});
+
 module.exports = {
   validateRequest,
   loginSchema,
@@ -210,5 +290,9 @@ module.exports = {
   createFrameworkSchema,
   updateFrameworkSchema,
   assignFrameworkSchema,
-  updateComplianceSchema
+  updateComplianceSchema,
+  createControlSchema,
+  updateControlSchema,
+  assignControlSchema,
+  updateControlStatusSchema
 };

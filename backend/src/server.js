@@ -18,6 +18,8 @@ const organizationRoutes = require('./routes/organizations');
 const entityRoutes = require('./routes/entities');
 const frameworkRoutes = require('./routes/frameworks');
 const entityFrameworkRoutes = require('./routes/entityFrameworks');
+const controlRoutes = require('./routes/controls');
+const controlAssignmentRoutes = require('./routes/controlAssignments');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -84,6 +86,8 @@ app.use('/api/organizations', organizationRoutes);
 app.use('/api/entities', entityRoutes);
 app.use('/api/frameworks', frameworkRoutes);
 app.use('/api', entityFrameworkRoutes);
+app.use('/api/controls', controlRoutes);
+app.use('/api', controlAssignmentRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -97,6 +101,8 @@ app.get('/', (req, res) => {
       entities: '/api/entities',
       frameworks: '/api/frameworks',
       entityFrameworks: '/api/entities/:entityId/frameworks',
+      controls: '/api/controls',
+      controlAssignments: '/api/entities/:entityId/controls',
       documentation: '/api/docs'
     }
   });
