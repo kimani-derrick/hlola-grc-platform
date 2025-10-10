@@ -436,10 +436,10 @@ class ReportAggregator {
         JOIN frameworks f ON c.framework_id = f.id
         JOIN control_assignments ca ON c.id = ca.control_id
         JOIN entities e ON ca.entity_id = e.id
-        WHERE e.organization_id = $1
-        AND t.created_at >= e.created_at
         LEFT JOIN users u ON t.assignee_id = u.id
         LEFT JOIN documents d ON c.id = d.control_id
+        WHERE e.organization_id = $1
+        AND t.created_at >= e.created_at
         ${whereClause}
         GROUP BY t.id, t.title, t.description, t.status, t.priority, t.category, t.estimated_hours, t.due_date, t.created_at, t.updated_at, c.title, c.control_id, f.name, e.name, u.first_name, u.last_name
         ORDER BY t.due_date ASC, t.priority DESC
