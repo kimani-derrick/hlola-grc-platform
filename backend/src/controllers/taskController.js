@@ -330,6 +330,18 @@ const updateTaskStatus = async (req, res, next) => {
       status: updatedTask.status
     });
 
+    // Trigger compliance event listener
+    try {
+      const ComplianceEventListener = require('../services/complianceEventListener');
+      await ComplianceEventListener.onTaskStatusUpdated(updatedTask, existingTask.status, updatedTask.status);
+    } catch (error) {
+      logger.error('Error triggering compliance event for task status update', {
+        error: error.message,
+        taskId: updatedTask.id,
+        entityId: updatedTask.entity_id
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: 'Task status updated successfully',

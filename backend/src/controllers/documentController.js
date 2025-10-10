@@ -123,6 +123,18 @@ const uploadDocument = async (req, res, next) => {
       filePath: uploadResult.path
     });
 
+    // Trigger compliance event listener
+    try {
+      const ComplianceEventListener = require('../services/complianceEventListener');
+      await ComplianceEventListener.onDocumentUploaded(document);
+    } catch (error) {
+      logger.error('Error triggering compliance event for document upload', {
+        error: error.message,
+        documentId: document.id,
+        entityId: document.entity_id
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: 'Document uploaded successfully',
@@ -575,6 +587,18 @@ const deleteDocument = async (req, res, next) => {
       requestId: req.id,
       documentId: id
     });
+
+    // Trigger compliance event listener
+    try {
+      const ComplianceEventListener = require('../services/complianceEventListener');
+      await ComplianceEventListener.onDocumentDeleted(document);
+    } catch (error) {
+      logger.error('Error triggering compliance event for document deletion', {
+        error: error.message,
+        documentId: id,
+        entityId: document.entity_id
+      });
+    }
 
     res.status(200).json({
       success: true,

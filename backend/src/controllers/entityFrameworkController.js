@@ -54,6 +54,18 @@ const assignFrameworkToEntity = async (req, res, next) => {
       frameworkId: frameworkId
     });
 
+    // Trigger compliance event listener
+    try {
+      const ComplianceEventListener = require('../services/complianceEventListener');
+      await ComplianceEventListener.onFrameworkAssigned(entityId, frameworkId);
+    } catch (error) {
+      logger.error('Error triggering compliance event for framework assignment', {
+        error: error.message,
+        entityId,
+        frameworkId
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: 'Framework assigned to entity successfully',

@@ -808,6 +808,71 @@ const updateEventSchema = Joi.object({
   })
 });
 
+// Smart Compliance Engine Schemas
+const createSmartAuditSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  frameworkId: Joi.string().uuid().required().messages({
+    'string.guid': 'Framework ID must be a valid UUID',
+    'any.required': 'Framework ID is required'
+  }),
+  title: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters'
+  }),
+  auditType: Joi.string().valid('regulatory', 'certification', 'internal').required().messages({
+    'any.only': 'Audit type must be one of: regulatory, certification, internal',
+    'any.required': 'Audit type is required'
+  }),
+  priority: Joi.string().valid('critical', 'high', 'medium', 'low').required().messages({
+    'any.only': 'Priority must be one of: critical, high, medium, low',
+    'any.required': 'Priority is required'
+  }),
+  startDate: Joi.date().required().messages({
+    'date.base': 'Start date must be a valid date',
+    'any.required': 'Start date is required'
+  }),
+  endDate: Joi.date().min(Joi.ref('startDate')).required().messages({
+    'date.base': 'End date must be a valid date',
+    'date.min': 'End date must be after start date',
+    'any.required': 'End date is required'
+  })
+});
+
+const triggerComplianceCheckSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  frameworkId: Joi.string().uuid().required().messages({
+    'string.guid': 'Framework ID must be a valid UUID',
+    'any.required': 'Framework ID is required'
+  })
+});
+
+const complianceDashboardSchema = Joi.object({
+  entityId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Entity ID must be a valid UUID'
+  }),
+  frameworkId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  includeHistory: Joi.boolean().optional().messages({
+    'boolean.base': 'Include history must be a boolean value'
+  }),
+  dateRange: Joi.object({
+    startDate: Joi.date().optional().messages({
+      'date.base': 'Start date must be a valid date'
+    }),
+    endDate: Joi.date().min(Joi.ref('startDate')).optional().messages({
+      'date.base': 'End date must be a valid date',
+      'date.min': 'End date must be after start date'
+    })
+  }).optional()
+});
+
 module.exports = {
   validateRequest,
   loginSchema,
@@ -842,5 +907,9 @@ module.exports = {
   updateGapStatusSchema,
   recordEventSchema,
   createEventSchema,
-  updateEventSchema
+  updateEventSchema,
+  // Smart Compliance Engine Schemas
+  createSmartAuditSchema,
+  triggerComplianceCheckSchema,
+  complianceDashboardSchema
 };

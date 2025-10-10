@@ -26,6 +26,7 @@ const auditRoutes = require('./routes/audits');
 const auditGapRoutes = require('./routes/auditGaps');
 const complianceHistoryRoutes = require('./routes/complianceHistory');
 const auditTimelineRoutes = require('./routes/auditTimeline');
+const complianceRoutes = require('./routes/compliance');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -100,6 +101,7 @@ app.use('/api/audits', auditRoutes);
 app.use('/api/audit-gaps', auditGapRoutes);
 app.use('/api/compliance/history', complianceHistoryRoutes);
 app.use('/api/audit/timeline', auditTimelineRoutes);
+app.use('/api/compliance', complianceRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -121,6 +123,7 @@ app.get('/', (req, res) => {
       auditGaps: '/api/audit-gaps',
       complianceHistory: '/api/compliance/history',
       auditTimeline: '/api/audit/timeline',
+      compliance: '/api/compliance',
       documentation: '/api/docs'
     }
   });
@@ -143,6 +146,11 @@ const startServer = async () => {
     // Test database connection
     await testConnection();
     
+    // Start compliance scheduler
+    const ComplianceScheduler = require('./services/complianceScheduler');
+    ComplianceScheduler.start();
+    logger.info('Compliance scheduler initialized');
+    
     // Start the server
     app.listen(PORT, () => {
       logger.info('GRC Platform API Server Started', {
@@ -159,6 +167,7 @@ const startServer = async () => {
       console.log(`🗄️  Database: ${process.env.DB_NAME}@${process.env.DB_HOST}:${process.env.DB_PORT}`);
       console.log(`🔗 Health Check: http://localhost:${PORT}/health`);
       console.log(`🔐 Auth Endpoints: http://localhost:${PORT}/api/auth`);
+      console.log(`🤖 Compliance Engine: Active`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
