@@ -49,10 +49,19 @@ class ComplianceEngine {
 
       // 5. Generate tasks for gaps
       const TaskGenerator = require('./taskGenerator');
-      const createdTasks = await TaskGenerator.createTasksFromGaps(gaps, entityId);
+      const Entity = require('../models/Entity');
+      const entity = await Entity.findById(entityId);
+      logger.info('About to generate tasks', { 
+        entityId, 
+        organizationId: entity.organization_id,
+        gapCount: gaps.length,
+        gaps: gaps.map(g => ({ controlId: g.controlId, title: g.title }))
+      });
+      const createdTasks = await TaskGenerator.createTasksFromGaps(gaps, entityId, entity.organization_id);
       logger.info('Generated tasks from gaps', { 
         entityId, 
-        taskCount: createdTasks.length 
+        taskCount: createdTasks.length,
+        createdTasks: createdTasks.map(t => ({ id: t.id, title: t.title }))
       });
 
       // 6. Create/update audit gaps
