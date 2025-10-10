@@ -467,6 +467,347 @@ const searchDocumentsSchema = Joi.object({
   })
 });
 
+// Audit Management Validation Schemas
+const createAuditSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  frameworkId: Joi.string().uuid().required().messages({
+    'string.guid': 'Framework ID must be a valid UUID',
+    'any.required': 'Framework ID is required'
+  }),
+  auditPackageId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Audit Package ID must be a valid UUID'
+  }),
+  title: Joi.string().min(2).max(500).required().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters',
+    'any.required': 'Title is required'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  auditType: Joi.string().valid('regulatory', 'certification', 'internal').required().messages({
+    'any.only': 'Audit type must be one of: regulatory, certification, internal',
+    'any.required': 'Audit type is required'
+  }),
+  priority: Joi.string().valid('critical', 'high', 'medium', 'low').required().messages({
+    'any.only': 'Priority must be one of: critical, high, medium, low',
+    'any.required': 'Priority is required'
+  }),
+  auditor: Joi.string().max(255).optional().allow('').messages({
+    'string.max': 'Auditor must not exceed 255 characters'
+  }),
+  startDate: Joi.date().required().messages({
+    'date.base': 'Start date must be a valid date',
+    'any.required': 'Start date is required'
+  }),
+  endDate: Joi.date().min(Joi.ref('startDate')).required().messages({
+    'date.base': 'End date must be a valid date',
+    'date.min': 'End date must be after start date',
+    'any.required': 'End date is required'
+  }),
+  progress: Joi.number().integer().min(0).max(100).optional().default(0).messages({
+    'number.min': 'Progress must be at least 0',
+    'number.max': 'Progress must not exceed 100'
+  }),
+  nextMilestone: Joi.string().max(500).optional().allow('').messages({
+    'string.max': 'Next milestone must not exceed 500 characters'
+  }),
+  estimatedCompletion: Joi.date().optional().messages({
+    'date.base': 'Estimated completion must be a valid date'
+  })
+});
+
+const updateAuditSchema = Joi.object({
+  title: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  auditType: Joi.string().valid('regulatory', 'certification', 'internal').optional().messages({
+    'any.only': 'Audit type must be one of: regulatory, certification, internal'
+  }),
+  priority: Joi.string().valid('critical', 'high', 'medium', 'low').optional().messages({
+    'any.only': 'Priority must be one of: critical, high, medium, low'
+  }),
+  auditor: Joi.string().max(255).optional().allow('').messages({
+    'string.max': 'Auditor must not exceed 255 characters'
+  }),
+  startDate: Joi.date().optional().messages({
+    'date.base': 'Start date must be a valid date'
+  }),
+  endDate: Joi.date().optional().messages({
+    'date.base': 'End date must be a valid date'
+  }),
+  nextMilestone: Joi.string().max(500).optional().allow('').messages({
+    'string.max': 'Next milestone must not exceed 500 characters'
+  }),
+  estimatedCompletion: Joi.date().optional().messages({
+    'date.base': 'Estimated completion must be a valid date'
+  })
+});
+
+const updateAuditProgressSchema = Joi.object({
+  progress: Joi.number().integer().min(0).max(100).required().messages({
+    'number.min': 'Progress must be at least 0',
+    'number.max': 'Progress must not exceed 100',
+    'any.required': 'Progress is required'
+  }),
+  nextMilestone: Joi.string().max(500).optional().allow('').messages({
+    'string.max': 'Next milestone must not exceed 500 characters'
+  })
+});
+
+const updateAuditStatusSchema = Joi.object({
+  status: Joi.string().valid('planning', 'in-progress', 'completed', 'overdue', 'cancelled').required().messages({
+    'any.only': 'Status must be one of: planning, in-progress, completed, overdue, cancelled',
+    'any.required': 'Status is required'
+  })
+});
+
+const createFindingSchema = Joi.object({
+  controlId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Control ID must be a valid UUID'
+  }),
+  findingType: Joi.string().valid('observation', 'non-conformity', 'opportunity').required().messages({
+    'any.only': 'Finding type must be one of: observation, non-conformity, opportunity',
+    'any.required': 'Finding type is required'
+  }),
+  severity: Joi.string().valid('critical', 'high', 'medium', 'low', 'info').required().messages({
+    'any.only': 'Severity must be one of: critical, high, medium, low, info',
+    'any.required': 'Severity is required'
+  }),
+  title: Joi.string().min(2).max(500).required().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters',
+    'any.required': 'Title is required'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  evidence: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Evidence must not exceed 2000 characters'
+  }),
+  recommendation: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Recommendation must not exceed 2000 characters'
+  }),
+  assignedTo: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Assigned to must be a valid UUID'
+  }),
+  dueDate: Joi.date().optional().messages({
+    'date.base': 'Due date must be a valid date'
+  })
+});
+
+const updateFindingSchema = Joi.object({
+  controlId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Control ID must be a valid UUID'
+  }),
+  findingType: Joi.string().valid('observation', 'non-conformity', 'opportunity').optional().messages({
+    'any.only': 'Finding type must be one of: observation, non-conformity, opportunity'
+  }),
+  severity: Joi.string().valid('critical', 'high', 'medium', 'low', 'info').optional().messages({
+    'any.only': 'Severity must be one of: critical, high, medium, low, info'
+  }),
+  title: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  evidence: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Evidence must not exceed 2000 characters'
+  }),
+  recommendation: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Recommendation must not exceed 2000 characters'
+  }),
+  assignedTo: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Assigned to must be a valid UUID'
+  }),
+  dueDate: Joi.date().optional().messages({
+    'date.base': 'Due date must be a valid date'
+  })
+});
+
+const createGapSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  frameworkId: Joi.string().uuid().required().messages({
+    'string.guid': 'Framework ID must be a valid UUID',
+    'any.required': 'Framework ID is required'
+  }),
+  controlId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Control ID must be a valid UUID'
+  }),
+  title: Joi.string().min(2).max(500).required().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters',
+    'any.required': 'Title is required'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  category: Joi.string().valid('documentation', 'technical', 'procedural', 'evidence').required().messages({
+    'any.only': 'Category must be one of: documentation, technical, procedural, evidence',
+    'any.required': 'Category is required'
+  }),
+  severity: Joi.string().valid('critical', 'high', 'medium', 'low').required().messages({
+    'any.only': 'Severity must be one of: critical, high, medium, low',
+    'any.required': 'Severity is required'
+  }),
+  impactDescription: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Impact description must not exceed 2000 characters'
+  }),
+  remediationPlan: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Remediation plan must not exceed 2000 characters'
+  }),
+  estimatedEffort: Joi.string().max(100).optional().allow('').messages({
+    'string.max': 'Estimated effort must not exceed 100 characters'
+  }),
+  assignedTo: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Assigned to must be a valid UUID'
+  }),
+  assignedTeam: Joi.string().max(100).optional().allow('').messages({
+    'string.max': 'Assigned team must not exceed 100 characters'
+  }),
+  dueDate: Joi.date().optional().messages({
+    'date.base': 'Due date must be a valid date'
+  })
+});
+
+const updateGapSchema = Joi.object({
+  title: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  category: Joi.string().valid('documentation', 'technical', 'procedural', 'evidence').optional().messages({
+    'any.only': 'Category must be one of: documentation, technical, procedural, evidence'
+  }),
+  severity: Joi.string().valid('critical', 'high', 'medium', 'low').optional().messages({
+    'any.only': 'Severity must be one of: critical, high, medium, low'
+  }),
+  impactDescription: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Impact description must not exceed 2000 characters'
+  }),
+  remediationPlan: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Remediation plan must not exceed 2000 characters'
+  }),
+  estimatedEffort: Joi.string().max(100).optional().allow('').messages({
+    'string.max': 'Estimated effort must not exceed 100 characters'
+  }),
+  assignedTo: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Assigned to must be a valid UUID'
+  }),
+  assignedTeam: Joi.string().max(100).optional().allow('').messages({
+    'string.max': 'Assigned team must not exceed 100 characters'
+  }),
+  dueDate: Joi.date().optional().messages({
+    'date.base': 'Due date must be a valid date'
+  })
+});
+
+const updateGapStatusSchema = Joi.object({
+  status: Joi.string().valid('open', 'in-progress', 'resolved', 'closed').required().messages({
+    'any.only': 'Status must be one of: open, in-progress, resolved, closed',
+    'any.required': 'Status is required'
+  })
+});
+
+const recordEventSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  frameworkId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  complianceScore: Joi.number().integer().min(0).max(100).required().messages({
+    'number.min': 'Compliance score must be at least 0',
+    'number.max': 'Compliance score must not exceed 100',
+    'any.required': 'Compliance score is required'
+  }),
+  milestone: Joi.string().min(2).max(255).required().messages({
+    'string.min': 'Milestone must be at least 2 characters long',
+    'string.max': 'Milestone must not exceed 255 characters',
+    'any.required': 'Milestone is required'
+  }),
+  eventType: Joi.string().valid('achievement', 'audit', 'update', 'gap-closed').required().messages({
+    'any.only': 'Event type must be one of: achievement, audit, update, gap-closed',
+    'any.required': 'Event type is required'
+  }),
+  eventDate: Joi.date().required().messages({
+    'date.base': 'Event date must be a valid date',
+    'any.required': 'Event date is required'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  })
+});
+
+const createEventSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  frameworkId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  eventType: Joi.string().valid('audit', 'certification', 'milestone', 'gap-identified', 'gap-resolved').required().messages({
+    'any.only': 'Event type must be one of: audit, certification, milestone, gap-identified, gap-resolved',
+    'any.required': 'Event type is required'
+  }),
+  eventDate: Joi.date().required().messages({
+    'date.base': 'Event date must be a valid date',
+    'any.required': 'Event date is required'
+  }),
+  eventTitle: Joi.string().min(2).max(500).required().messages({
+    'string.min': 'Event title must be at least 2 characters long',
+    'string.max': 'Event title must not exceed 500 characters',
+    'any.required': 'Event title is required'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  status: Joi.string().valid('completed', 'in-progress', 'scheduled').optional().default('completed').messages({
+    'any.only': 'Status must be one of: completed, in-progress, scheduled'
+  }),
+  relatedDocuments: Joi.array().items(Joi.string().uuid()).optional().default([]).messages({
+    'array.base': 'Related documents must be an array of UUIDs'
+  })
+});
+
+const updateEventSchema = Joi.object({
+  eventType: Joi.string().valid('audit', 'certification', 'milestone', 'gap-identified', 'gap-resolved').optional().messages({
+    'any.only': 'Event type must be one of: audit, certification, milestone, gap-identified, gap-resolved'
+  }),
+  eventDate: Joi.date().optional().messages({
+    'date.base': 'Event date must be a valid date'
+  }),
+  eventTitle: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Event title must be at least 2 characters long',
+    'string.max': 'Event title must not exceed 500 characters'
+  }),
+  description: Joi.string().max(2000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 2000 characters'
+  }),
+  status: Joi.string().valid('completed', 'in-progress', 'scheduled').optional().messages({
+    'any.only': 'Status must be one of: completed, in-progress, scheduled'
+  }),
+  relatedDocuments: Joi.array().items(Joi.string().uuid()).optional().messages({
+    'array.base': 'Related documents must be an array of UUIDs'
+  })
+});
+
 module.exports = {
   validateRequest,
   loginSchema,
@@ -488,5 +829,18 @@ module.exports = {
   uploadDocumentSchema,
   updateDocumentSchema,
   createDocumentVersionSchema,
-  searchDocumentsSchema
+  searchDocumentsSchema,
+  // Audit Management Schemas
+  createAuditSchema,
+  updateAuditSchema,
+  updateAuditProgressSchema,
+  updateAuditStatusSchema,
+  createFindingSchema,
+  updateFindingSchema,
+  createGapSchema,
+  updateGapSchema,
+  updateGapStatusSchema,
+  recordEventSchema,
+  createEventSchema,
+  updateEventSchema
 };

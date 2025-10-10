@@ -22,6 +22,10 @@ const controlRoutes = require('./routes/controls');
 const controlAssignmentRoutes = require('./routes/controlAssignments');
 const taskRoutes = require('./routes/tasks');
 const documentRoutes = require('./routes/documents');
+const auditRoutes = require('./routes/audits');
+const auditGapRoutes = require('./routes/auditGaps');
+const complianceHistoryRoutes = require('./routes/complianceHistory');
+const auditTimelineRoutes = require('./routes/auditTimeline');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -92,6 +96,10 @@ app.use('/api/controls', controlRoutes);
 app.use('/api', controlAssignmentRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/audits', auditRoutes);
+app.use('/api/audit-gaps', auditGapRoutes);
+app.use('/api/compliance/history', complianceHistoryRoutes);
+app.use('/api/audit/timeline', auditTimelineRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -109,6 +117,10 @@ app.get('/', (req, res) => {
       controlAssignments: '/api/entities/:entityId/controls',
       tasks: '/api/tasks',
       documents: '/api/documents',
+      audits: '/api/audits',
+      auditGaps: '/api/audit-gaps',
+      complianceHistory: '/api/compliance/history',
+      auditTimeline: '/api/audit/timeline',
       documentation: '/api/docs'
     }
   });
