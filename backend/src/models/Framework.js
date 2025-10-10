@@ -3,12 +3,12 @@ const { pool } = require('../config/database');
 const query = (text, params) => pool.query(text, params);
 
 class Framework {
-  static async create({ name, description, region, country, category, type, icon, color, complianceDeadline, priority, riskLevel, status, requirementsCount, applicableCountries, industryScope }) {
+  static async create({ name, description, region, country, category, type, icon, color, complianceDeadline, priority, riskLevel, status, requirementsCount, applicableCountries, industryScope, maxFineAmount, maxFineCurrency = 'EUR' }) {
     const result = await query(
-      `INSERT INTO frameworks (name, description, region, country, category, type, icon, color, compliance_deadline, priority, risk_level, status, requirements_count, applicable_countries, industry_scope)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-       RETURNING id, name, description, region, country, category, type, icon, color, compliance_deadline, priority, risk_level, status, requirements_count, applicable_countries, industry_scope, created_at`,
-      [name, description, region, country, category, type, icon, color, complianceDeadline, priority, riskLevel, status, requirementsCount, applicableCountries, industryScope]
+      `INSERT INTO frameworks (name, description, region, country, category, type, icon, color, compliance_deadline, priority, risk_level, status, requirements_count, applicable_countries, industry_scope, max_fine_amount, max_fine_currency)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+       RETURNING id, name, description, region, country, category, type, icon, color, compliance_deadline, priority, risk_level, status, requirements_count, applicable_countries, industry_scope, max_fine_amount, max_fine_currency, created_at`,
+      [name, description, region, country, category, type, icon, color, complianceDeadline, priority, riskLevel, status, requirementsCount, applicableCountries, industryScope, maxFineAmount, maxFineCurrency]
     );
     return result.rows[0];
   }

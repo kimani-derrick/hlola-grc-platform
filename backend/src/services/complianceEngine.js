@@ -23,6 +23,16 @@ class ComplianceEngine {
         controlCount: requiredControls.length 
       });
 
+      // 1.5. Get framework details for fine calculation
+      const Framework = require('../models/Framework');
+      const framework = await Framework.findById(frameworkId);
+      logger.info('Retrieved framework details', { 
+        frameworkId, 
+        frameworkName: framework?.name,
+        maxFineAmount: framework?.max_fine_amount,
+        maxFineCurrency: framework?.max_fine_currency
+      });
+
       // 2. Get existing evidence (documents, completed tasks)
       const entityEvidence = await this.getEntityEvidence(entityId);
       logger.info('Retrieved entity evidence', { 
@@ -47,15 +57,16 @@ class ComplianceEngine {
         score 
       });
 
-      // 4.5. Calculate risk exposure based on fine amounts
-      const riskExposure = this.calculateRiskExposure(requiredControls, gaps);
+      // 4.5. Calculate risk exposure based on framework-level fines
+      const riskExposure = this.calculateRiskExposure(requiredControls, gaps, framework);
       logger.info('Calculated risk exposure', { 
         entityId, 
         frameworkId, 
         totalExposure: riskExposure.totalExposure,
         currentExposure: riskExposure.currentExposure,
         exposurePercentage: riskExposure.exposurePercentage,
-        currency: riskExposure.currency
+        currency: riskExposure.currency,
+        compliancePercentage: riskExposure.compliancePercentage
       });
 
       // 5. Analyze existing tasks for gaps
@@ -239,32 +250,38 @@ class ComplianceEngine {
   }
 
   /**
-   * Calculate risk exposure based on uncompleted controls and their fine amounts
+   * Calculate risk exposure based on framework-level fines and compliance percentage
    * @param {Array} requiredControls - Array of required controls
    * @param {Array} gaps - Array of detected gaps
+   * @param {Object} framework - Framework object with max_fine_amount
    * @returns {Object} Risk exposure data
    */
-  static calculateRiskExposure(requiredControls, gaps) {
-    const totalExposure = requiredControls.reduce((sum, control) => {
-      return sum + (control.fine_amount || 0);
-    }, 0);
-
-    const currentExposure = gaps.reduce((sum, gap) => {
-      const control = requiredControls.find(c => c.id === gap.controlId);
-      return sum + (control?.fine_amount || 0);
-    }, 0);
-
-    const exposurePercentage = totalExposure > 0 
-      ? Math.round((currentExposure / totalExposure) * 100)
-      : 0;
-
+  static calculateRiskExposure(requiredControls, gaps, framework) {
+    // Framework-level maximum fine amount
+    const maxFineAmount = framework?.max_fine_amount || 0;
+    const fineCurrency = framework?.max_fine_currency || 'EUR';
+    
+    // Calculate compliance percentage
+    const totalControls = requiredControls.length;
+    const compliantControls = totalControls - gaps.length;
+    const compliancePercentage = totalControls > 0 
+      ? Math.round((compliantControls / totalControls) * 100)
+      : 100;
+    
+    // Risk exposure is proportional to non-compliance
+    // If 100% compliant = 0% exposure, if 0% compliant = 100% exposure
+    const nonCompliancePercentage = 100 - compliancePercentage;
+    const currentExposure = Math.round((maxFineAmount * nonCompliancePercentage) / 100);
+    
     return {
-      totalExposure,
-      currentExposure,
-      exposurePercentage,
-      currency: requiredControls[0]?.fine_currency || 'EUR',
+      totalExposure: maxFineAmount,
+      currentExposure: currentExposure,
+      exposurePercentage: nonCompliancePercentage,
+      currency: fineCurrency,
       controlsAtRisk: gaps.length,
-      totalControls: requiredControls.length
+      totalControls: totalControls,
+      compliancePercentage: compliancePercentage,
+      maxFineAmount: maxFineAmount
     };
   }
 
