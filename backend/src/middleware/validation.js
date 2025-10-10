@@ -19,6 +19,49 @@ const validateRequest = (schema) => {
   };
 };
 
+const validateQuery = (schemaName) => {
+  return (req, res, next) => {
+    // Get the schema from the schemas object
+    const schemas = {
+      reportOverviewSchema,
+      reportFrameworksSchema,
+      reportControlsSchema,
+      reportTasksSchema,
+      reportTrendsSchema
+    };
+    
+    const schema = schemas[schemaName];
+    if (!schema) {
+      return res.status(500).json({
+        error: 'Internal error',
+        message: `Schema ${schemaName} not found`
+      });
+    }
+    
+    // Preprocess dateRange if it's a string
+    if (req.query.dateRange && typeof req.query.dateRange === 'string') {
+      try {
+        req.query.dateRange = JSON.parse(req.query.dateRange);
+      } catch (e) {
+        return res.status(400).json({
+          error: 'Validation error',
+          message: 'Invalid dateRange format. Must be valid JSON.'
+        });
+      }
+    }
+    
+    const { error } = schema.validate(req.query);
+    if (error) {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: error.details[0].message,
+        details: error.details
+      });
+    }
+    next();
+  };
+};
+
 // Login validation schema
 const loginSchema = Joi.object({
   email: Joi.string().email().required().messages({
@@ -873,8 +916,118 @@ const complianceDashboardSchema = Joi.object({
   }).optional()
 });
 
+// Report validation schemas
+const reportOverviewSchema = Joi.object({
+  entityId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Entity ID must be a valid UUID'
+  }),
+  frameworkId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  dateRange: Joi.object({
+    start: Joi.date().optional().messages({
+      'date.base': 'Start date must be a valid date'
+    }),
+    end: Joi.date().min(Joi.ref('start')).optional().messages({
+      'date.base': 'End date must be a valid date',
+      'date.min': 'End date must be after start date'
+    })
+  }).optional()
+});
+
+const reportFrameworksSchema = Joi.object({
+  frameworkId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  region: Joi.string().optional().messages({
+    'string.base': 'Region must be a string'
+  }),
+  priority: Joi.string().valid('low', 'medium', 'high', 'critical').optional().messages({
+    'any.only': 'Priority must be one of: low, medium, high, critical'
+  }),
+  riskLevel: Joi.string().valid('low', 'medium', 'high', 'critical').optional().messages({
+    'any.only': 'Risk level must be one of: low, medium, high, critical'
+  }),
+  dateRange: Joi.object({
+    start: Joi.date().optional().messages({
+      'date.base': 'Start date must be a valid date'
+    }),
+    end: Joi.date().min(Joi.ref('start')).optional().messages({
+      'date.base': 'End date must be a valid date',
+      'date.min': 'End date must be after start date'
+    })
+  }).optional()
+});
+
+const reportControlsSchema = Joi.object({
+  frameworkId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  status: Joi.string().valid('not-started', 'in-progress', 'completed', 'blocked').optional().messages({
+    'any.only': 'Status must be one of: not-started, in-progress, completed, blocked'
+  }),
+  priority: Joi.string().valid('low', 'medium', 'high', 'critical').optional().messages({
+    'any.only': 'Priority must be one of: low, medium, high, critical'
+  }),
+  category: Joi.string().optional().messages({
+    'string.base': 'Category must be a string'
+  }),
+  assignee: Joi.string().uuid().optional().messages({
+    'string.guid': 'Assignee ID must be a valid UUID'
+  })
+});
+
+const reportTasksSchema = Joi.object({
+  frameworkId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  controlId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Control ID must be a valid UUID'
+  }),
+  status: Joi.string().valid('pending', 'in-progress', 'completed', 'blocked', 'cancelled', 'overdue').optional().messages({
+    'any.only': 'Status must be one of: pending, in-progress, completed, blocked, cancelled, overdue'
+  }),
+  priority: Joi.string().valid('low', 'medium', 'high', 'critical').optional().messages({
+    'any.only': 'Priority must be one of: low, medium, high, critical'
+  }),
+  assignee: Joi.string().uuid().optional().messages({
+    'string.guid': 'Assignee ID must be a valid UUID'
+  }),
+  dateRange: Joi.object({
+    start: Joi.date().optional().messages({
+      'date.base': 'Start date must be a valid date'
+    }),
+    end: Joi.date().min(Joi.ref('start')).optional().messages({
+      'date.base': 'End date must be a valid date',
+      'date.min': 'End date must be after start date'
+    })
+  }).optional()
+});
+
+const reportTrendsSchema = Joi.object({
+  entityId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Entity ID must be a valid UUID'
+  }),
+  frameworkId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  granularity: Joi.string().valid('hourly', 'daily', 'weekly', 'monthly').optional().messages({
+    'any.only': 'Granularity must be one of: hourly, daily, weekly, monthly'
+  }),
+  dateRange: Joi.object({
+    start: Joi.date().optional().messages({
+      'date.base': 'Start date must be a valid date'
+    }),
+    end: Joi.date().min(Joi.ref('start')).optional().messages({
+      'date.base': 'End date must be a valid date',
+      'date.min': 'End date must be after start date'
+    })
+  }).optional()
+});
+
 module.exports = {
   validateRequest,
+  validateQuery,
   loginSchema,
   registerSchema,
   createEntitySchema,
@@ -911,5 +1064,11 @@ module.exports = {
   // Smart Compliance Engine Schemas
   createSmartAuditSchema,
   triggerComplianceCheckSchema,
-  complianceDashboardSchema
+  complianceDashboardSchema,
+  // Report Schemas
+  reportOverviewSchema,
+  reportFrameworksSchema,
+  reportControlsSchema,
+  reportTasksSchema,
+  reportTrendsSchema
 };

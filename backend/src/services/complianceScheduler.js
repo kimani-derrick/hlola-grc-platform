@@ -15,30 +15,37 @@ class ComplianceScheduler {
     }
 
     try {
-      // Run compliance checks daily at 2 AM
+      // Run comprehensive compliance checks daily at 2 AM
       cron.schedule('0 2 * * *', async () => {
         logger.info('Running scheduled compliance checks...');
         await this.runAllComplianceChecks();
       });
       
-      // Check for overdue tasks every 6 hours
-      cron.schedule('0 */6 * * *', async () => {
+      // Check for overdue tasks every 15 minutes (PRODUCTION RECOMMENDED)
+      cron.schedule('*/15 * * * *', async () => {
         logger.info('Checking for overdue tasks...');
         await this.checkOverdueTasks();
       });
       
-      // Run compliance checks every 12 hours for active entities
-      cron.schedule('0 */12 * * *', async () => {
+      // Run compliance checks every 2 hours for active entities (PRODUCTION RECOMMENDED)
+      cron.schedule('0 */2 * * *', async () => {
         logger.info('Running periodic compliance checks...');
         await this.runPeriodicComplianceChecks();
+      });
+      
+      // Real-time compliance checks every 5 minutes for critical entities (OPTIONAL)
+      cron.schedule('*/5 * * * *', async () => {
+        logger.info('Running real-time compliance checks...');
+        await this.runRealTimeComplianceChecks();
       });
       
       this.isStarted = true;
       logger.info('Compliance scheduler started successfully', {
         schedules: [
-          'Daily compliance checks: 2:00 AM',
-          'Overdue task checks: Every 6 hours',
-          'Periodic compliance checks: Every 12 hours'
+          'Daily comprehensive checks: 2:00 AM',
+          'Overdue task checks: Every 15 minutes',
+          'Periodic compliance checks: Every 2 hours',
+          'Real-time compliance checks: Every 5 minutes'
         ]
       });
     } catch (error) {
@@ -60,31 +67,49 @@ class ComplianceScheduler {
     }
 
     try {
+      // Get all active cron tasks and destroy them
       cron.getTasks().forEach(task => {
-        task.stop();
+        task.destroy();
       });
       
       this.isStarted = false;
-      logger.info('Compliance scheduler stopped');
+      logger.info('Compliance scheduler stopped successfully');
     } catch (error) {
       logger.error('Error stopping compliance scheduler', {
-        error: error.message
+        error: error.message,
+        stack: error.stack
       });
+      throw error;
     }
   }
 
   /**
-   * Run compliance checks for all active entity-framework assignments
+   * Get scheduler status
+   */
+  static getStatus() {
+    return {
+      isStarted: this.isStarted,
+      activeTasks: cron.getTasks().length,
+      schedules: this.isStarted ? [
+        'Daily comprehensive checks: 2:00 AM',
+        'Overdue task checks: Every 15 minutes', 
+        'Periodic compliance checks: Every 2 hours',
+        'Real-time compliance checks: Every 5 minutes'
+      ] : []
+    };
+  }
+
+  /**
+   * Run all compliance checks for all entities
    */
   static async runAllComplianceChecks() {
     try {
+      logger.info('Starting scheduled compliance checks');
       const startTime = Date.now();
       
-      // Get all active entity-framework assignments
       const assignments = await this.getActiveAssignments();
-      
-      logger.info('Starting scheduled compliance checks', {
-        assignmentCount: assignments.length
+      logger.info('Starting scheduled compliance checks', { 
+        assignmentCount: assignments.length 
       });
       
       let successCount = 0;
@@ -97,11 +122,6 @@ class ComplianceScheduler {
             assignment.framework_id
           );
           successCount++;
-          
-          logger.debug('Compliance check completed', {
-            entityId: assignment.entity_id,
-            frameworkId: assignment.framework_id
-          });
         } catch (error) {
           errorCount++;
           logger.error('Error in scheduled compliance check', {
@@ -113,7 +133,6 @@ class ComplianceScheduler {
       }
       
       const duration = Date.now() - startTime;
-      
       logger.info('Scheduled compliance checks completed', {
         totalAssignments: assignments.length,
         successCount,
@@ -121,7 +140,7 @@ class ComplianceScheduler {
         duration: `${duration}ms`
       });
     } catch (error) {
-      logger.error('Error in scheduled compliance checks', {
+      logger.error('Error running scheduled compliance checks', {
         error: error.message,
         stack: error.stack
       });
@@ -133,13 +152,12 @@ class ComplianceScheduler {
    */
   static async runPeriodicComplianceChecks() {
     try {
+      logger.info('Starting periodic compliance checks');
       const startTime = Date.now();
       
-      // Get high-priority assignments (entities with recent activity)
       const assignments = await this.getHighPriorityAssignments();
-      
-      logger.info('Starting periodic compliance checks', {
-        assignmentCount: assignments.length
+      logger.info('Starting periodic compliance checks', { 
+        assignmentCount: assignments.length 
       });
       
       let successCount = 0;
@@ -163,7 +181,6 @@ class ComplianceScheduler {
       }
       
       const duration = Date.now() - startTime;
-      
       logger.info('Periodic compliance checks completed', {
         totalAssignments: assignments.length,
         successCount,
@@ -171,7 +188,58 @@ class ComplianceScheduler {
         duration: `${duration}ms`
       });
     } catch (error) {
-      logger.error('Error in periodic compliance checks', {
+      logger.error('Error running periodic compliance checks', {
+        error: error.message,
+        stack: error.stack
+      });
+    }
+  }
+
+  /**
+   * Run real-time compliance checks for critical entities only
+   */
+  static async runRealTimeComplianceChecks() {
+    try {
+      logger.debug('Running real-time compliance checks');
+      const startTime = Date.now();
+      
+      // Only check critical/high-priority entities for real-time monitoring
+      const assignments = await this.getCriticalAssignments();
+      
+      if (assignments.length === 0) {
+        logger.debug('No critical assignments found for real-time checks');
+        return;
+      }
+      
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const assignment of assignments) {
+        try {
+          await ComplianceEngine.checkEntityCompliance(
+            assignment.entity_id,
+            assignment.framework_id
+          );
+          successCount++;
+        } catch (error) {
+          errorCount++;
+          logger.error('Error in real-time compliance check', {
+            error: error.message,
+            entityId: assignment.entity_id,
+            frameworkId: assignment.framework_id
+          });
+        }
+      }
+      
+      const duration = Date.now() - startTime;
+      logger.debug('Real-time compliance checks completed', {
+        totalAssignments: assignments.length,
+        successCount,
+        errorCount,
+        duration: `${duration}ms`
+      });
+    } catch (error) {
+      logger.error('Error running real-time compliance checks', {
         error: error.message,
         stack: error.stack
       });
@@ -209,6 +277,9 @@ class ComplianceScheduler {
             dueDate: task.due_date
           });
         });
+        
+        // TODO: Send notifications to assigned users
+        // await this.notifyOverdueTasks(result.rows);
       } else {
         logger.debug('No overdue tasks found');
       }
@@ -222,26 +293,25 @@ class ComplianceScheduler {
 
   /**
    * Get all active entity-framework assignments
-   * @returns {Array} Array of assignment objects
    */
   static async getActiveAssignments() {
     try {
       const { pool } = require('../config/database');
+      
       const result = await pool.query(`
-        SELECT DISTINCT ef.entity_id, ef.framework_id
+        SELECT DISTINCT ef.entity_id, ef.framework_id, e.name as entity_name, f.name as framework_name
         FROM entity_frameworks ef
+        JOIN entities e ON ef.entity_id = e.id
+        JOIN frameworks f ON ef.framework_id = f.id
         WHERE ef.is_active = true
         ORDER BY ef.created_at DESC
       `);
       
-      logger.debug('Retrieved active assignments', {
-        count: result.rows.length
-      });
-      
       return result.rows;
     } catch (error) {
       logger.error('Error getting active assignments', {
-        error: error.message
+        error: error.message,
+        stack: error.stack
       });
       return [];
     }
@@ -249,74 +319,60 @@ class ComplianceScheduler {
 
   /**
    * Get high-priority entity-framework assignments
-   * @returns {Array} Array of assignment objects
    */
   static async getHighPriorityAssignments() {
     try {
       const { pool } = require('../config/database');
-      const result = await pool.query(`
-        SELECT DISTINCT ef.entity_id, ef.framework_id
-        FROM entity_frameworks ef
-        WHERE ef.is_active = true
-        AND (
-          -- Entities with recent document uploads
-          ef.entity_id IN (
-            SELECT DISTINCT entity_id 
-            FROM documents 
-            WHERE created_at > NOW() - INTERVAL '7 days'
-          )
-          OR
-          -- Entities with recent task activity
-          ef.entity_id IN (
-            SELECT DISTINCT entity_id 
-            FROM tasks 
-            WHERE updated_at > NOW() - INTERVAL '7 days'
-          )
-          OR
-          -- Entities with recent audit activity
-          ef.entity_id IN (
-            SELECT DISTINCT entity_id 
-            FROM audits 
-            WHERE created_at > NOW() - INTERVAL '7 days'
-          )
-        )
-        ORDER BY ef.created_at DESC
-        LIMIT 50
-      `);
       
-      logger.debug('Retrieved high-priority assignments', {
-        count: result.rows.length
-      });
+      const result = await pool.query(`
+        SELECT DISTINCT ef.entity_id, ef.framework_id, e.name as entity_name, f.name as framework_name
+        FROM entity_frameworks ef
+        JOIN entities e ON ef.entity_id = e.id
+        JOIN frameworks f ON ef.framework_id = f.id
+        WHERE ef.is_active = true
+        ORDER BY ef.created_at DESC
+        LIMIT 20
+      `);
       
       return result.rows;
     } catch (error) {
       logger.error('Error getting high-priority assignments', {
-        error: error.message
+        error: error.message,
+        stack: error.stack
       });
       return [];
     }
   }
 
   /**
-   * Get scheduler status
-   * @returns {Object} Scheduler status information
+   * Get critical entity-framework assignments for real-time monitoring
    */
-  static getStatus() {
-    return {
-      isStarted: this.isStarted,
-      activeTasks: cron.getTasks().length,
-      schedules: [
-        'Daily compliance checks: 0 2 * * *',
-        'Overdue task checks: 0 */6 * * *',
-        'Periodic compliance checks: 0 */12 * * *'
-      ]
-    };
+  static async getCriticalAssignments() {
+    try {
+      const { pool } = require('../config/database');
+      
+      const result = await pool.query(`
+        SELECT DISTINCT ef.entity_id, ef.framework_id, e.name as entity_name, f.name as framework_name
+        FROM entity_frameworks ef
+        JOIN entities e ON ef.entity_id = e.id
+        JOIN frameworks f ON ef.framework_id = f.id
+        WHERE ef.is_active = true
+        ORDER BY ef.created_at DESC
+        LIMIT 5
+      `);
+      
+      return result.rows;
+    } catch (error) {
+      logger.error('Error getting critical assignments', {
+        error: error.message,
+        stack: error.stack
+      });
+      return [];
+    }
   }
 
   /**
-   * Manually trigger a compliance check for a specific entity
-   * @param {string} entityId - Entity ID
-   * @param {string} frameworkId - Framework ID
+   * Trigger manual compliance check
    */
   static async triggerManualCheck(entityId, frameworkId) {
     try {

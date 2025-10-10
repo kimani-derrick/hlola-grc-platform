@@ -27,6 +27,7 @@ const auditGapRoutes = require('./routes/auditGaps');
 const complianceHistoryRoutes = require('./routes/complianceHistory');
 const auditTimelineRoutes = require('./routes/auditTimeline');
 const complianceRoutes = require('./routes/compliance');
+const reportRoutes = require('./routes/reports');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -102,6 +103,7 @@ app.use('/api/audit-gaps', auditGapRoutes);
 app.use('/api/compliance/history', complianceHistoryRoutes);
 app.use('/api/audit/timeline', auditTimelineRoutes);
 app.use('/api/compliance', complianceRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -124,6 +126,7 @@ app.get('/', (req, res) => {
       complianceHistory: '/api/compliance/history',
       auditTimeline: '/api/audit/timeline',
       compliance: '/api/compliance',
+      reports: '/api/reports',
       documentation: '/api/docs'
     }
   });
