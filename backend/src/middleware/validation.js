@@ -2,6 +2,11 @@ const Joi = require('joi');
 
 const validateRequest = (schema) => {
   return (req, res, next) => {
+    // Preprocess tags field if it's a string
+    if (req.body.tags && typeof req.body.tags === 'string') {
+      req.body.tags = req.body.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+    }
+    
     const { error } = schema.validate(req.body);
     if (error) {
       return res.status(400).json({
@@ -347,6 +352,121 @@ const updateTaskStatusSchema = Joi.object({
   })
 });
 
+// Document validation schemas
+const uploadDocumentSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  title: Joi.string().min(2).max(255).required().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 255 characters',
+    'any.required': 'Title is required'
+  }),
+  description: Joi.string().max(1000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 1000 characters'
+  }),
+  documentType: Joi.string().valid('policy', 'procedure', 'evidence', 'certificate', 'report', 'contract', 'other').required().messages({
+    'any.only': 'Document type must be one of: policy, procedure, evidence, certificate, report, contract, other',
+    'any.required': 'Document type is required'
+  }),
+  frameworkId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  controlId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Control ID must be a valid UUID'
+  }),
+  taskId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Task ID must be a valid UUID'
+  }),
+  tags: Joi.array().items(Joi.string().max(50)).optional().default([]).messages({
+    'array.base': 'Tags must be an array',
+    'string.max': 'Each tag must not exceed 50 characters'
+  }),
+  accessLevel: Joi.string().valid('public', 'internal', 'confidential', 'restricted').optional().default('internal').messages({
+    'any.only': 'Access level must be one of: public, internal, confidential, restricted'
+  }),
+  expiryDate: Joi.date().optional().allow(null).messages({
+    'date.base': 'Expiry date must be a valid date'
+  })
+});
+
+const updateDocumentSchema = Joi.object({
+  name: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Name must be at least 2 characters long',
+    'string.max': 'Name must not exceed 500 characters'
+  }),
+  description: Joi.string().max(1000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 1000 characters'
+  }),
+  status: Joi.string().valid('draft', 'review', 'approved', 'rejected', 'archived').optional().messages({
+    'any.only': 'Status must be one of: draft, review, approved, rejected, archived'
+  }),
+  isEvidence: Joi.boolean().optional()
+});
+
+const createDocumentVersionSchema = Joi.object({
+  entityId: Joi.string().uuid().required().messages({
+    'string.guid': 'Entity ID must be a valid UUID',
+    'any.required': 'Entity ID is required'
+  }),
+  title: Joi.string().min(2).max(255).required().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 255 characters',
+    'any.required': 'Title is required'
+  }),
+  description: Joi.string().max(1000).optional().allow('').messages({
+    'string.max': 'Description must not exceed 1000 characters'
+  }),
+  documentType: Joi.string().valid('policy', 'procedure', 'evidence', 'certificate', 'report', 'contract', 'other').required().messages({
+    'any.only': 'Document type must be one of: policy, procedure, evidence, certificate, report, contract, other',
+    'any.required': 'Document type is required'
+  }),
+  frameworkId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  controlId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Control ID must be a valid UUID'
+  }),
+  taskId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Task ID must be a valid UUID'
+  }),
+  tags: Joi.array().items(Joi.string().max(50)).optional().default([]).messages({
+    'array.base': 'Tags must be an array',
+    'string.max': 'Each tag must not exceed 50 characters'
+  }),
+  accessLevel: Joi.string().valid('public', 'internal', 'confidential', 'restricted').optional().default('internal').messages({
+    'any.only': 'Access level must be one of: public, internal, confidential, restricted'
+  }),
+  expiryDate: Joi.date().optional().allow(null).messages({
+    'date.base': 'Expiry date must be a valid date'
+  })
+});
+
+const searchDocumentsSchema = Joi.object({
+  search: Joi.string().min(1).max(100).required().messages({
+    'string.min': 'Search term must be at least 1 character long',
+    'string.max': 'Search term must not exceed 100 characters',
+    'any.required': 'Search term is required'
+  }),
+  entityId: Joi.string().uuid().optional().messages({
+    'string.guid': 'Entity ID must be a valid UUID'
+  }),
+  documentType: Joi.string().valid('policy', 'procedure', 'evidence', 'certificate', 'report', 'contract', 'other').optional().messages({
+    'any.only': 'Document type must be one of: policy, procedure, evidence, certificate, report, contract, other'
+  }),
+  accessLevel: Joi.string().valid('public', 'internal', 'confidential', 'restricted').optional().messages({
+    'any.only': 'Access level must be one of: public, internal, confidential, restricted'
+  }),
+  limit: Joi.number().integer().min(1).max(100).optional().default(20).messages({
+    'number.min': 'Limit must be at least 1',
+    'number.max': 'Limit must not exceed 100'
+  }),
+  offset: Joi.number().integer().min(0).optional().default(0).messages({
+    'number.min': 'Offset must be 0 or greater'
+  })
+});
+
 module.exports = {
   validateRequest,
   loginSchema,
@@ -364,5 +484,9 @@ module.exports = {
   updateControlStatusSchema,
   createTaskSchema,
   updateTaskSchema,
-  updateTaskStatusSchema
+  updateTaskStatusSchema,
+  uploadDocumentSchema,
+  updateDocumentSchema,
+  createDocumentVersionSchema,
+  searchDocumentsSchema
 };
