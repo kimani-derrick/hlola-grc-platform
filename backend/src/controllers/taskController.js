@@ -142,6 +142,41 @@ const getAllTasks = async (req, res, next) => {
   }
 };
 
+const getAllTasksUnassigned = async (req, res, next) => {
+  try {
+    const { organizationId } = req.user;
+    const filters = req.query;
+
+    logger.info('Fetching all tasks (including unassigned)', {
+      requestId: req.id,
+      organizationId: organizationId,
+      filters: filters
+    });
+
+    // Get all tasks without entity restrictions
+    const tasks = await Task.findAllUnassigned(filters);
+    const total = await Task.countAllUnassigned(filters);
+
+    res.status(200).json({
+      success: true,
+      tasks,
+      pagination: {
+        total,
+        limit: filters.limit ? parseInt(filters.limit) : null,
+        offset: filters.offset ? parseInt(filters.offset) : null
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching all tasks (unassigned)', {
+      requestId: req.id,
+      organizationId: req.user.organizationId,
+      error: error.message,
+      stack: error.stack
+    });
+    next(error);
+  }
+};
+
 const getTasksByControl = async (req, res, next) => {
   try {
     const { controlId } = req.params;
@@ -485,6 +520,7 @@ module.exports = {
   createTask,
   getTask,
   getAllTasks,
+  getAllTasksUnassigned,
   getTasksByControl,
   getTasksByUser,
   getTasksByEntity,

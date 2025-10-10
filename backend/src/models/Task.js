@@ -308,6 +308,103 @@ class Task {
     const result = await query(queryText, params);
     return parseInt(result.rows[0].count, 10);
   }
+
+  static async findAllUnassigned(filters = {}) {
+    let queryText = `
+      SELECT t.*, 
+             c.title as control_title, c.description as control_description,
+             c.framework_id, c.control_id as control_code,
+             f.name as framework_name, f.region, f.country
+      FROM tasks t
+      JOIN controls c ON t.control_id = c.id
+      LEFT JOIN frameworks f ON c.framework_id = f.id
+      WHERE 1=1
+    `;
+    const params = [];
+    let paramCount = 1;
+
+    if (filters.status) {
+      queryText += ` AND t.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND t.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.assigneeId) {
+      queryText += ` AND t.assignee_id = $${paramCount++}`;
+      params.push(filters.assigneeId);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+    if (filters.frameworkId) {
+      queryText += ` AND c.framework_id = $${paramCount++}`;
+      params.push(filters.frameworkId);
+    }
+
+    // Add sorting
+    const sortBy = filters.sortBy || 'created_at';
+    const sortOrder = filters.sortOrder || 'DESC';
+    queryText += ` ORDER BY t.${sortBy} ${sortOrder}`;
+
+    // Add pagination
+    if (filters.limit) {
+      queryText += ` LIMIT $${paramCount++}`;
+      params.push(parseInt(filters.limit));
+    }
+    if (filters.offset) {
+      queryText += ` OFFSET $${paramCount++}`;
+      params.push(parseInt(filters.offset));
+    }
+
+    const result = await query(queryText, params);
+    return result.rows;
+  }
+
+  static async countAllUnassigned(filters = {}) {
+    let queryText = `
+      SELECT COUNT(*) as count
+      FROM tasks t
+      JOIN controls c ON t.control_id = c.id
+      WHERE 1=1
+    `;
+    const params = [];
+    let paramCount = 1;
+
+    if (filters.status) {
+      queryText += ` AND t.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND t.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.assigneeId) {
+      queryText += ` AND t.assignee_id = $${paramCount++}`;
+      params.push(filters.assigneeId);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+    if (filters.frameworkId) {
+      queryText += ` AND c.framework_id = $${paramCount++}`;
+      params.push(filters.frameworkId);
+    }
+
+    const result = await query(queryText, params);
+    return parseInt(result.rows[0].count, 10);
+  }
 }
 
 module.exports = Task;

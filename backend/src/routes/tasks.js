@@ -3,6 +3,7 @@ const {
   createTask,
   getTask,
   getAllTasks,
+  getAllTasksUnassigned,
   getTasksByControl,
   getTasksByUser,
   getTasksByEntity,
@@ -21,8 +22,9 @@ router.use(authenticateToken);
 
 // Task Management
 router.post('/', requireRole(['admin', 'compliance_manager']), validateRequest(createTaskSchema), createTask);
-router.get('/', getAllTasks);
 router.get('/stats', getTaskStats);
+router.get('/all', getAllTasksUnassigned); // Get all tasks including unassigned ones
+router.get('/', getAllTasks);
 router.get('/:id', getTask);
 router.put('/:id', validateRequest(updateTaskSchema), updateTask);
 router.put('/:id/status', validateRequest(updateTaskStatusSchema), updateTaskStatus);
