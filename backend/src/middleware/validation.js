@@ -280,6 +280,73 @@ const updateControlStatusSchema = Joi.object({
   reviewNotes: Joi.string().optional().allow('')
 });
 
+// Task validation schemas
+const createTaskSchema = Joi.object({
+  controlId: Joi.string().uuid().required().messages({
+    'string.guid': 'Control ID must be a valid UUID',
+    'any.required': 'Control ID is required'
+  }),
+  title: Joi.string().min(2).max(500).required().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters',
+    'any.required': 'Title is required'
+  }),
+  description: Joi.string().optional().allow(''),
+  priority: Joi.string().valid('high', 'medium', 'low').optional().default('medium').messages({
+    'any.only': 'Priority must be one of: high, medium, low'
+  }),
+  category: Joi.string().max(100).optional().allow(''),
+  assigneeId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Assignee ID must be a valid UUID'
+  }),
+  dueDate: Joi.date().optional().allow(null),
+  estimatedHours: Joi.number().integer().min(0).optional().messages({
+    'number.min': 'Estimated hours must be 0 or greater'
+  })
+});
+
+const updateTaskSchema = Joi.object({
+  title: Joi.string().min(2).max(500).optional().messages({
+    'string.min': 'Title must be at least 2 characters long',
+    'string.max': 'Title must not exceed 500 characters'
+  }),
+  description: Joi.string().optional().allow(''),
+  priority: Joi.string().valid('high', 'medium', 'low').optional().messages({
+    'any.only': 'Priority must be one of: high, medium, low'
+  }),
+  category: Joi.string().max(100).optional().allow(''),
+  assigneeId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Assignee ID must be a valid UUID'
+  }),
+  dueDate: Joi.date().optional().allow(null),
+  estimatedHours: Joi.number().integer().min(0).optional().messages({
+    'number.min': 'Estimated hours must be 0 or greater'
+  }),
+  actualHours: Joi.number().integer().min(0).optional().messages({
+    'number.min': 'Actual hours must be 0 or greater'
+  }),
+  progress: Joi.number().integer().min(0).max(100).optional().messages({
+    'number.min': 'Progress must be between 0 and 100',
+    'number.max': 'Progress must be between 0 and 100'
+  }),
+  evidenceAttached: Joi.boolean().optional(),
+  blockers: Joi.array().items(Joi.string()).optional()
+});
+
+const updateTaskStatusSchema = Joi.object({
+  status: Joi.string().valid('pending', 'in-progress', 'completed', 'blocked', 'cancelled').required().messages({
+    'any.only': 'Status must be one of: pending, in-progress, completed, blocked, cancelled',
+    'any.required': 'Status is required'
+  }),
+  progress: Joi.number().integer().min(0).max(100).optional().messages({
+    'number.min': 'Progress must be between 0 and 100',
+    'number.max': 'Progress must be between 0 and 100'
+  }),
+  actualHours: Joi.number().integer().min(0).optional().messages({
+    'number.min': 'Actual hours must be 0 or greater'
+  })
+});
+
 module.exports = {
   validateRequest,
   loginSchema,
@@ -294,5 +361,8 @@ module.exports = {
   createControlSchema,
   updateControlSchema,
   assignControlSchema,
-  updateControlStatusSchema
+  updateControlStatusSchema,
+  createTaskSchema,
+  updateTaskSchema,
+  updateTaskStatusSchema
 };

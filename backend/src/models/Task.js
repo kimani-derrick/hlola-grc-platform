@@ -1,0 +1,281 @@
+const { pool } = require('../config/database');
+
+const query = (text, params) => pool.query(text, params);
+
+class Task {
+  static async create({ controlId, title, description, priority, category, assigneeId, dueDate, estimatedHours }) {
+    const result = await query(
+      `INSERT INTO tasks (control_id, title, description, status, priority, category, assignee_id, due_date, estimated_hours)
+       VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8)
+       RETURNING *`,
+      [controlId, title, description, priority, category, assigneeId, dueDate, estimatedHours]
+    );
+    return result.rows[0];
+  }
+
+  static async findById(id, organizationId) {
+    const result = await query(
+      `SELECT t.*, 
+              c.title as control_title, c.description as control_description,
+              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name, u1.email as assignee_email
+       FROM tasks t
+       JOIN controls c ON t.control_id = c.id
+       JOIN control_assignments ca ON c.id = ca.control_id
+       JOIN entities e ON ca.entity_id = e.id
+       LEFT JOIN users u1 ON t.assignee_id = u1.id
+       WHERE t.id = $1 AND e.organization_id = $2`,
+      [id, organizationId]
+    );
+    return result.rows[0];
+  }
+
+  static async findAll(filters = {}, organizationId) {
+    let queryText = `
+      SELECT t.*, 
+             c.title as control_title, c.description as control_description,
+             u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
+      FROM tasks t
+      JOIN controls c ON t.control_id = c.id
+      JOIN control_assignments ca ON c.id = ca.control_id
+      JOIN entities e ON ca.entity_id = e.id
+      LEFT JOIN users u1 ON t.assignee_id = u1.id
+      WHERE e.organization_id = $1
+    `;
+    const params = [organizationId];
+    let paramCount = 2;
+
+    if (filters.status) {
+      queryText += ` AND t.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND t.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.assigneeId) {
+      queryText += ` AND t.assignee_id = $${paramCount++}`;
+      params.push(filters.assigneeId);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+
+    // Add sorting
+    const sortBy = filters.sortBy || 'created_at';
+    const sortOrder = filters.sortOrder || 'DESC';
+    queryText += ` ORDER BY t.${sortBy} ${sortOrder}`;
+
+    // Add pagination
+    if (filters.limit) {
+      queryText += ` LIMIT $${paramCount++}`;
+      params.push(parseInt(filters.limit));
+    }
+    if (filters.offset) {
+      queryText += ` OFFSET $${paramCount++}`;
+      params.push(parseInt(filters.offset));
+    }
+
+    const result = await query(queryText, params);
+    return result.rows;
+  }
+
+  static async findByControlId(controlId, organizationId) {
+    const result = await query(
+      `SELECT t.*, 
+              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
+       FROM tasks t
+       JOIN controls c ON t.control_id = c.id
+       JOIN control_assignments ca ON c.id = ca.control_id
+       JOIN entities e ON ca.entity_id = e.id
+       LEFT JOIN users u1 ON t.assignee_id = u1.id
+       WHERE t.control_id = $1 AND e.organization_id = $2
+       ORDER BY t.created_at DESC`,
+      [controlId, organizationId]
+    );
+    return result.rows;
+  }
+
+  static async findByUserId(userId, organizationId) {
+    const result = await query(
+      `SELECT t.*, 
+              c.title as control_title, c.description as control_description
+       FROM tasks t
+       JOIN controls c ON t.control_id = c.id
+       JOIN control_assignments ca ON c.id = ca.control_id
+       JOIN entities e ON ca.entity_id = e.id
+       WHERE t.assignee_id = $1 AND e.organization_id = $2
+       ORDER BY t.due_date ASC, t.priority DESC`,
+      [userId, organizationId]
+    );
+    return result.rows;
+  }
+
+  static async findByEntityId(entityId, organizationId) {
+    const result = await query(
+      `SELECT t.*, 
+              c.title as control_title, c.description as control_description,
+              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
+       FROM tasks t
+       JOIN controls c ON t.control_id = c.id
+       JOIN control_assignments ca ON c.id = ca.control_id
+       JOIN entities e ON ca.entity_id = e.id
+       LEFT JOIN users u1 ON t.assignee_id = u1.id
+       WHERE ca.entity_id = $1 AND e.organization_id = $2
+       ORDER BY t.due_date ASC, t.priority DESC`,
+      [entityId, organizationId]
+    );
+    return result.rows;
+  }
+
+  static async update(id, { title, description, priority, category, assigneeId, dueDate, estimatedHours, actualHours, progress, evidenceAttached, blockers }) {
+    const updates = [];
+    const values = [];
+    let paramCount = 1;
+
+    if (title !== undefined) { updates.push(`title = $${paramCount++}`); values.push(title); }
+    if (description !== undefined) { updates.push(`description = $${paramCount++}`); values.push(description); }
+    if (priority !== undefined) { updates.push(`priority = $${paramCount++}`); values.push(priority); }
+    if (category !== undefined) { updates.push(`category = $${paramCount++}`); values.push(category); }
+    if (assigneeId !== undefined) { updates.push(`assignee_id = $${paramCount++}`); values.push(assigneeId); }
+    if (dueDate !== undefined) { updates.push(`due_date = $${paramCount++}`); values.push(dueDate); }
+    if (estimatedHours !== undefined) { updates.push(`estimated_hours = $${paramCount++}`); values.push(estimatedHours); }
+    if (actualHours !== undefined) { updates.push(`actual_hours = $${paramCount++}`); values.push(actualHours); }
+    if (progress !== undefined) { updates.push(`progress = $${paramCount++}`); values.push(progress); }
+    if (evidenceAttached !== undefined) { updates.push(`evidence_attached = $${paramCount++}`); values.push(evidenceAttached); }
+    if (blockers !== undefined) { updates.push(`blockers = $${paramCount++}`); values.push(blockers); }
+
+    if (updates.length === 0) {
+      return await Task.findById(id);
+    }
+
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
+    const result = await query(
+      `UPDATE tasks SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+      values
+    );
+    return result.rows[0];
+  }
+
+  static async updateStatus(id, { status, progress, actualHours }) {
+    const updates = [];
+    const values = [];
+    let paramCount = 1;
+
+    if (status !== undefined) { 
+      updates.push(`status = $${paramCount++}`); 
+      values.push(status);
+      
+      // Set completed_date when status is completed
+      if (status === 'completed') {
+        updates.push(`completed_date = CURRENT_TIMESTAMP`);
+      } else if (status !== 'completed') {
+        updates.push(`completed_date = NULL`);
+      }
+    }
+    if (progress !== undefined) { updates.push(`progress = $${paramCount++}`); values.push(progress); }
+    if (actualHours !== undefined) { updates.push(`actual_hours = $${paramCount++}`); values.push(actualHours); }
+
+    if (updates.length === 0) {
+      return await Task.findById(id);
+    }
+
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
+    const result = await query(
+      `UPDATE tasks SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+      values
+    );
+    return result.rows[0];
+  }
+
+  static async delete(id) {
+    const result = await query(
+      `DELETE FROM tasks WHERE id = $1 RETURNING id`,
+      [id]
+    );
+    return result.rows[0];
+  }
+
+  static async getTaskStats(organizationId, filters = {}) {
+    let queryText = `
+      SELECT 
+        COUNT(*) as total_tasks,
+        COUNT(CASE WHEN t.status = 'pending' THEN 1 END) as pending_tasks,
+        COUNT(CASE WHEN t.status = 'in-progress' THEN 1 END) as in_progress_tasks,
+        COUNT(CASE WHEN t.status = 'completed' THEN 1 END) as completed_tasks,
+        COUNT(CASE WHEN t.status = 'blocked' THEN 1 END) as blocked_tasks,
+        COUNT(CASE WHEN t.status = 'cancelled' THEN 1 END) as cancelled_tasks,
+        COUNT(CASE WHEN t.priority = 'high' THEN 1 END) as high_priority_tasks,
+        COUNT(CASE WHEN t.priority = 'medium' THEN 1 END) as medium_priority_tasks,
+        COUNT(CASE WHEN t.priority = 'low' THEN 1 END) as low_priority_tasks,
+        COUNT(CASE WHEN t.due_date < CURRENT_DATE AND t.status != 'completed' THEN 1 END) as overdue_tasks,
+        COUNT(CASE WHEN t.due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days' AND t.status != 'completed' THEN 1 END) as due_soon_tasks
+      FROM tasks t
+      JOIN controls c ON t.control_id = c.id
+      JOIN control_assignments ca ON c.id = ca.control_id
+      JOIN entities e ON ca.entity_id = e.id
+      WHERE e.organization_id = $1
+    `;
+    const params = [organizationId];
+    let paramCount = 2;
+
+    if (filters.entityId) {
+      queryText += ` AND ca.entity_id = $${paramCount++}`;
+      params.push(filters.entityId);
+    }
+    if (filters.assigneeId) {
+      queryText += ` AND t.assignee_id = $${paramCount++}`;
+      params.push(filters.assigneeId);
+    }
+
+    const result = await query(queryText, params);
+    return result.rows[0];
+  }
+
+  static async countAll(filters = {}, organizationId) {
+    let queryText = `
+      SELECT COUNT(*) as count
+      FROM tasks t
+      JOIN controls c ON t.control_id = c.id
+      JOIN control_assignments ca ON c.id = ca.control_id
+      JOIN entities e ON ca.entity_id = e.id
+      WHERE e.organization_id = $1
+    `;
+    const params = [organizationId];
+    let paramCount = 2;
+
+    if (filters.status) {
+      queryText += ` AND t.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND t.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.assigneeId) {
+      queryText += ` AND t.assignee_id = $${paramCount++}`;
+      params.push(filters.assigneeId);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+
+    const result = await query(queryText, params);
+    return parseInt(result.rows[0].count, 10);
+  }
+}
+
+module.exports = Task;
