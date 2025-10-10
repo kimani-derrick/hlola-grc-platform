@@ -53,7 +53,15 @@ class ReportAggregator {
         LEFT JOIN frameworks f ON ef.framework_id = f.id
         LEFT JOIN controls c ON f.id = c.framework_id
         LEFT JOIN control_assignments ca ON c.id = ca.control_id
-        LEFT JOIN tasks t ON c.id = t.control_id
+        LEFT JOIN tasks t ON c.id = t.control_id 
+          AND t.created_at >= e.created_at
+          AND EXISTS (
+            SELECT 1 FROM control_assignments ca2 
+            JOIN entities e2 ON ca2.entity_id = e2.id 
+            WHERE ca2.control_id = t.control_id 
+            AND e2.organization_id = e.organization_id
+            AND ca2.entity_id = e.id
+          )
         LEFT JOIN documents d ON c.id = d.control_id
         LEFT JOIN audit_gaps ag ON e.id = ag.entity_id
         LEFT JOIN compliance_history ch ON e.id = ch.entity_id
@@ -164,7 +172,15 @@ class ReportAggregator {
         LEFT JOIN entities e ON ef.entity_id = e.id
         LEFT JOIN controls c ON f.id = c.framework_id
         LEFT JOIN control_assignments ca ON c.id = ca.control_id
-        LEFT JOIN tasks t ON c.id = t.control_id
+        LEFT JOIN tasks t ON c.id = t.control_id 
+          AND t.created_at >= e.created_at
+          AND EXISTS (
+            SELECT 1 FROM control_assignments ca2 
+            JOIN entities e2 ON ca2.entity_id = e2.id 
+            WHERE ca2.control_id = t.control_id 
+            AND e2.organization_id = e.organization_id
+            AND ca2.entity_id = e.id
+          )
         LEFT JOIN documents d ON c.id = d.control_id
         LEFT JOIN audit_gaps ag ON e.id = ag.entity_id AND f.id = ag.framework_id
         LEFT JOIN compliance_history ch ON e.id = ch.entity_id AND f.id = ch.framework_id
@@ -282,7 +298,15 @@ class ReportAggregator {
         JOIN frameworks f ON c.framework_id = f.id
         LEFT JOIN control_assignments ca ON c.id = ca.control_id
         LEFT JOIN entities e ON ca.entity_id = e.id
-        LEFT JOIN tasks t ON c.id = t.control_id
+        LEFT JOIN tasks t ON c.id = t.control_id 
+          AND t.created_at >= e.created_at
+          AND EXISTS (
+            SELECT 1 FROM control_assignments ca2 
+            JOIN entities e2 ON ca2.entity_id = e2.id 
+            WHERE ca2.control_id = t.control_id 
+            AND e2.organization_id = e.organization_id
+            AND ca2.entity_id = e.id
+          )
         LEFT JOIN documents d ON c.id = d.control_id
         LEFT JOIN audit_gaps ag ON e.id = ag.entity_id AND c.id = ag.control_id
         ${whereClause}

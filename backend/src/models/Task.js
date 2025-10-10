@@ -55,6 +55,11 @@ class Task {
       JOIN entities e ON ca.entity_id = e.id
       LEFT JOIN users u1 ON t.assignee_id = u1.id
       WHERE e.organization_id = $1
+      AND t.created_at >= (
+        SELECT MIN(e2.created_at) 
+        FROM entities e2 
+        WHERE e2.organization_id = $1
+      )
     `;
     const params = [organizationId];
     let paramCount = 2;
