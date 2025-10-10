@@ -360,7 +360,7 @@ class ReportAggregator {
     try {
       const { frameworkId, controlId, status, priority, assignee, dateRange } = filters;
       
-      let whereClause = 'WHERE e.organization_id = $1';
+      let whereClause = '';
       const params = [organizationId];
       let paramCount = 1;
 
@@ -403,6 +403,11 @@ class ReportAggregator {
         params.push(dateRange.end);
       }
 
+      // Add WHERE clause prefix if we have additional filters
+      if (whereClause) {
+        whereClause = ' AND' + whereClause.substring(3); // Remove the first " AND"
+      }
+
       const query = `
         SELECT 
           t.id,
@@ -431,6 +436,8 @@ class ReportAggregator {
         JOIN frameworks f ON c.framework_id = f.id
         JOIN control_assignments ca ON c.id = ca.control_id
         JOIN entities e ON ca.entity_id = e.id
+        WHERE e.organization_id = $1
+        AND t.created_at >= e.created_at
         LEFT JOIN users u ON t.assignee_id = u.id
         LEFT JOIN documents d ON c.id = d.control_id
         ${whereClause}
