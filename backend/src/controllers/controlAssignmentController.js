@@ -1,6 +1,7 @@
 const ControlAssignment = require('../models/ControlAssignment');
 const Control = require('../models/Control');
 const Entity = require('../models/Entity');
+const realtimeEventEmitter = require('../services/realtimeEventEmitter');
 const logger = require('../config/logger');
 
 const assignControlToEntity = async (req, res, next) => {
@@ -46,6 +47,14 @@ const assignControlToEntity = async (req, res, next) => {
     logger.info('Control assigned to entity successfully', {
       requestId: req.id,
       assignmentId: assignment.id
+    });
+
+    // Emit real-time event for control assignment
+    realtimeEventEmitter.emitControlAssigned({
+      controlId: controlId,
+      entityId: entityId,
+      frameworkId: control.framework_id,
+      assignedBy: req.user.userId
     });
 
     res.status(201).json({
@@ -195,6 +204,15 @@ const updateControlStatus = async (req, res, next) => {
     logger.info('Control status updated successfully', {
       requestId: req.id,
       assignmentId: updatedAssignment.id
+    });
+
+    // Emit real-time event for control status change
+    realtimeEventEmitter.emitControlStatusChanged({
+      controlId: controlId,
+      entityId: entityId,
+      oldStatus: existingAssignment.status,
+      newStatus: updatedAssignment.status,
+      updatedBy: req.user.userId
     });
 
     res.status(200).json({

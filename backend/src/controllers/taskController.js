@@ -1,5 +1,6 @@
 const Task = require('../models/Task');
 const Control = require('../models/Control');
+const realtimeEventEmitter = require('../services/realtimeEventEmitter');
 const logger = require('../config/logger');
 
 const createTask = async (req, res, next) => {
@@ -40,6 +41,19 @@ const createTask = async (req, res, next) => {
       requestId: req.id,
       taskId: task.id,
       title: task.title
+    });
+
+    // Emit real-time event for task creation
+    realtimeEventEmitter.emitTaskCreated({
+      taskId: task.id,
+      entityId: task.entity_id,
+      controlId: task.control_id,
+      frameworkId: task.framework_id,
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      assigneeId: task.assignee_id,
+      createdBy: userId
     });
 
     res.status(201).json({
@@ -265,6 +279,20 @@ const updateTask = async (req, res, next) => {
       taskId: updatedTask.id
     });
 
+    // Emit real-time event for task update (including assignment changes)
+    const assignmentChanged = existingTask.assignee_id !== updatedTask.assignee_id;
+    if (assignmentChanged) {
+      realtimeEventEmitter.emitTaskAssigned({
+        taskId: updatedTask.id,
+        entityId: updatedTask.entity_id,
+        controlId: updatedTask.control_id,
+        frameworkId: updatedTask.framework_id,
+        assigneeId: updatedTask.assignee_id,
+        priority: updatedTask.priority,
+        assignedBy: userId
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: 'Task updated successfully',
@@ -341,6 +369,19 @@ const updateTaskStatus = async (req, res, next) => {
         entityId: updatedTask.entity_id
       });
     }
+
+    // Emit real-time event for task status change
+    realtimeEventEmitter.emitTaskStatusChanged({
+      taskId: updatedTask.id,
+      entityId: updatedTask.entity_id,
+      controlId: updatedTask.control_id,
+      frameworkId: updatedTask.framework_id,
+      oldStatus: existingTask.status,
+      newStatus: updatedTask.status,
+      priority: updatedTask.priority,
+      assigneeId: updatedTask.assignee_id,
+      updatedBy: userId
+    });
 
     res.status(200).json({
       success: true,

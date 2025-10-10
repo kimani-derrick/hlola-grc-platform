@@ -4,6 +4,7 @@ const Framework = require('../models/Framework');
 const Control = require('../models/Control');
 const Task = require('../models/Task');
 const storageService = require('../services/storageService');
+const realtimeEventEmitter = require('../services/realtimeEventEmitter');
 const logger = require('../config/logger');
 
 const uploadDocument = async (req, res, next) => {
@@ -134,6 +135,16 @@ const uploadDocument = async (req, res, next) => {
         entityId: document.entity_id
       });
     }
+
+    // Emit real-time event for document upload
+    realtimeEventEmitter.emitDocumentUploaded({
+      documentId: document.id,
+      entityId: document.entity_id,
+      controlId: document.control_id,
+      frameworkId: document.framework_id,
+      documentType: document.document_type,
+      uploadedBy: userId
+    });
 
     res.status(201).json({
       success: true,
@@ -514,6 +525,16 @@ const updateDocument = async (req, res, next) => {
       documentId: updatedDocument.id
     });
 
+    // Emit real-time event for document update
+    realtimeEventEmitter.emitDocumentUpdated({
+      documentId: updatedDocument.id,
+      entityId: updatedDocument.entity_id,
+      controlId: updatedDocument.control_id,
+      frameworkId: updatedDocument.framework_id,
+      documentType: updatedDocument.document_type,
+      updatedBy: userId
+    });
+
     res.status(200).json({
       success: true,
       message: 'Document updated successfully',
@@ -599,6 +620,16 @@ const deleteDocument = async (req, res, next) => {
         entityId: document.entity_id
       });
     }
+
+    // Emit real-time event for document deletion
+    realtimeEventEmitter.emitDocumentDeleted({
+      documentId: id,
+      entityId: document.entity_id,
+      controlId: document.control_id,
+      frameworkId: document.framework_id,
+      documentType: document.document_type,
+      deletedBy: userId
+    });
 
     res.status(200).json({
       success: true,

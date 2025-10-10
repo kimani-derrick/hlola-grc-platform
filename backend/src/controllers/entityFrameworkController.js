@@ -1,6 +1,7 @@
 const EntityFramework = require('../models/EntityFramework');
 const Entity = require('../models/Entity');
 const Framework = require('../models/Framework');
+const realtimeEventEmitter = require('../services/realtimeEventEmitter');
 const logger = require('../config/logger');
 
 const assignFrameworkToEntity = async (req, res, next) => {
@@ -65,6 +66,14 @@ const assignFrameworkToEntity = async (req, res, next) => {
         frameworkId
       });
     }
+
+    // Emit real-time event for framework assignment
+    realtimeEventEmitter.emitFrameworkAssigned({
+      frameworkId: frameworkId,
+      entityId: entityId,
+      complianceScore: complianceScore,
+      assignedBy: req.user.userId
+    });
 
     res.status(201).json({
       success: true,
@@ -268,6 +277,13 @@ const removeFrameworkFromEntity = async (req, res, next) => {
       requestId: req.id,
       entityId: entityId,
       frameworkId: frameworkId
+    });
+
+    // Emit real-time event for framework removal
+    realtimeEventEmitter.emitFrameworkRemoved({
+      frameworkId: frameworkId,
+      entityId: entityId,
+      removedBy: req.user.userId
     });
 
     res.status(200).json({

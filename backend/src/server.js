@@ -151,7 +151,22 @@ const startServer = async () => {
     
     // Start compliance scheduler
     const ComplianceScheduler = require('./services/complianceScheduler');
+    const realtimeEventEmitter = require('./services/realtimeEventEmitter');
+    
+    // Start compliance scheduler
     ComplianceScheduler.start();
+    
+    // Initialize real-time event emitter
+    logger.info('Real-time event emitter initialized', {
+      service: 'grc-backend',
+      eventTypes: [
+        'document.uploaded', 'document.updated', 'document.deleted',
+        'task.created', 'task.status.changed', 'task.completed', 'task.assigned',
+        'control.assigned', 'control.completed', 'control.status.changed',
+        'framework.assigned', 'framework.removed',
+        'entity.created', 'entity.updated'
+      ]
+    });
     logger.info('Compliance scheduler initialized');
     
     // Start the server
