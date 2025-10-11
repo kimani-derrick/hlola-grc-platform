@@ -1,0 +1,11 @@
+GDPR Cross-Border Data Transfers Documentation
+
+This document outlines our procedures for cross-border data transfers under GDPR Chapter V.
+
+1. Adequacy Decisions - We rely on adequacy decisions for transfers to approved countries
+2. Standard Contractual Clauses (SCCs) - We use EU Commission approved SCCs
+3. Binding Corporate Rules - We have implemented BCRs for intra-group transfers
+4. Certification Schemes - We participate in approved certification schemes
+5. Derogations - We use specific derogations where applicable
+
+All transfers are documented and comply with GDPR requirements.

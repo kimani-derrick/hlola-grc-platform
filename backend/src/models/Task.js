@@ -48,9 +48,11 @@ class Task {
     let queryText = `
       SELECT t.*, 
              c.title as control_title, c.description as control_description,
+             f.id as framework_id, f.name as framework_name, f.region as framework_region,
              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
       FROM tasks t
       JOIN controls c ON t.control_id = c.id
+      JOIN frameworks f ON c.framework_id = f.id
       JOIN control_assignments ca ON c.id = ca.control_id
       JOIN entities e ON ca.entity_id = e.id
       LEFT JOIN users u1 ON t.assignee_id = u1.id

@@ -101,12 +101,30 @@ const uploadDocument = async (req, res, next) => {
       }
     );
 
+    // If this is evidence and no taskId provided, try to find related tasks
+    let linkedTaskId = taskId;
+    if (documentType === 'evidence' && !taskId && controlId) {
+      // Find tasks for this control that are not yet completed
+      const relatedTasks = await Task.findByControlId(controlId, organizationId);
+      const pendingTasks = relatedTasks.filter(task => task.status === 'pending');
+      
+      if (pendingTasks.length > 0) {
+        // Link to the first pending task for this control
+        linkedTaskId = pendingTasks[0].id;
+        logger.info('Auto-linked evidence document to task', {
+          documentTitle: title,
+          taskId: linkedTaskId,
+          controlId: controlId
+        });
+      }
+    }
+
     // Create document record
     const document = await Document.create({
       entityId,
       frameworkId: frameworkId || null,
       controlId: controlId || null,
-      taskId: taskId || null,
+      taskId: linkedTaskId || null,
       title,
       description: description || '',
       documentType,

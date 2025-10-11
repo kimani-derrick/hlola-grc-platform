@@ -14,6 +14,11 @@ class ComplianceScheduler {
       return;
     }
 
+    // COMPLETELY DISABLED - All compliance checks are now real-time only
+    logger.info('All cron jobs permanently disabled - using real-time compliance checks only');
+    this.isStarted = true;
+    return;
+
     try {
       // Run comprehensive compliance checks daily at 2 AM
       cron.schedule('0 2 * * *', async () => {
@@ -21,20 +26,20 @@ class ComplianceScheduler {
         await this.runAllComplianceChecks();
       });
       
-      // Check for overdue tasks every 15 minutes (PRODUCTION RECOMMENDED)
-      cron.schedule('*/15 * * * *', async () => {
+      // Check for overdue tasks every 30 minutes (OPTIMIZED)
+      cron.schedule('*/30 * * * *', async () => {
         logger.info('Checking for overdue tasks...');
         await this.checkOverdueTasks();
       });
       
-      // Run compliance checks every 2 hours for active entities (PRODUCTION RECOMMENDED)
-      cron.schedule('0 */2 * * *', async () => {
+      // Run compliance checks every 4 hours for active entities (OPTIMIZED)
+      cron.schedule('0 */4 * * *', async () => {
         logger.info('Running periodic compliance checks...');
         await this.runPeriodicComplianceChecks();
       });
       
-      // Real-time compliance checks every 5 minutes for critical entities (OPTIONAL)
-      cron.schedule('*/5 * * * *', async () => {
+      // Real-time compliance checks every 15 minutes for critical entities (OPTIMIZED)
+      cron.schedule('*/15 * * * *', async () => {
         logger.info('Running real-time compliance checks...');
         await this.runRealTimeComplianceChecks();
       });
@@ -43,9 +48,9 @@ class ComplianceScheduler {
       logger.info('Compliance scheduler started successfully', {
         schedules: [
           'Daily comprehensive checks: 2:00 AM',
-          'Overdue task checks: Every 15 minutes',
-          'Periodic compliance checks: Every 2 hours',
-          'Real-time compliance checks: Every 5 minutes'
+          'Overdue task checks: Every 30 minutes',
+          'Periodic compliance checks: Every 4 hours',
+          'Real-time compliance checks: Every 15 minutes'
         ]
       });
     } catch (error) {
@@ -203,47 +208,81 @@ class ComplianceScheduler {
       logger.debug('Running real-time compliance checks');
       const startTime = Date.now();
       
-      // Only check critical/high-priority entities for real-time monitoring
-      const assignments = await this.getCriticalAssignments();
+      // Set a timeout to prevent blocking operations
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Real-time compliance check timeout')), 30000); // 30 second timeout
+      });
       
-      if (assignments.length === 0) {
-        logger.debug('No critical assignments found for real-time checks');
-        return;
-      }
+      const compliancePromise = this.executeRealTimeChecks();
       
-      let successCount = 0;
-      let errorCount = 0;
-      
-      for (const assignment of assignments) {
-        try {
-          await ComplianceEngine.checkEntityCompliance(
-            assignment.entity_id,
-            assignment.framework_id
-          );
-          successCount++;
-        } catch (error) {
-          errorCount++;
-          logger.error('Error in real-time compliance check', {
-            error: error.message,
-            entityId: assignment.entity_id,
-            frameworkId: assignment.framework_id
-          });
-        }
-      }
+      await Promise.race([compliancePromise, timeoutPromise]);
       
       const duration = Date.now() - startTime;
       logger.debug('Real-time compliance checks completed', {
-        totalAssignments: assignments.length,
-        successCount,
-        errorCount,
         duration: `${duration}ms`
       });
     } catch (error) {
-      logger.error('Error running real-time compliance checks', {
-        error: error.message,
-        stack: error.stack
-      });
+      if (error.message === 'Real-time compliance check timeout') {
+        logger.warn('Real-time compliance checks timed out - skipping this cycle');
+      } else {
+        logger.error('Error running real-time compliance checks', {
+          error: error.message,
+          stack: error.stack
+        });
+      }
     }
+  }
+
+  /**
+   * Execute real-time compliance checks with proper error handling
+   */
+  static async executeRealTimeChecks() {
+    // Only check critical/high-priority entities for real-time monitoring
+    const assignments = await this.getCriticalAssignments();
+    
+    if (assignments.length === 0) {
+      logger.debug('No critical assignments found for real-time checks');
+      return;
+    }
+    
+    let successCount = 0;
+    let errorCount = 0;
+    
+    // Process assignments in batches to prevent blocking
+    const batchSize = 5;
+    for (let i = 0; i < assignments.length; i += batchSize) {
+      const batch = assignments.slice(i, i + batchSize);
+      
+      await Promise.allSettled(
+        batch.map(async (assignment) => {
+          try {
+            await ComplianceEngine.checkEntityCompliance(
+              assignment.entity_id,
+              assignment.framework_id
+            );
+            successCount++;
+          } catch (error) {
+            errorCount++;
+            logger.error('Error in real-time compliance check', {
+              error: error.message,
+              entityId: assignment.entity_id,
+              frameworkId: assignment.framework_id
+            });
+          }
+        })
+      );
+      
+      // Small delay between batches to prevent blocking
+      if (i + batchSize < assignments.length) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    
+    logger.debug('Real-time compliance checks batch completed', {
+      totalAssignments: assignments.length,
+      successCount,
+      errorCount
+    });
   }
 
   /**

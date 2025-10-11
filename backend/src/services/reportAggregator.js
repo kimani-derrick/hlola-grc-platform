@@ -405,7 +405,7 @@ class ReportAggregator {
 
       // Add WHERE clause prefix if we have additional filters
       if (whereClause) {
-        whereClause = ' AND' + whereClause.substring(3); // Remove the first " AND"
+        whereClause = whereClause; // whereClause already starts with " AND"
       }
 
       const query = `

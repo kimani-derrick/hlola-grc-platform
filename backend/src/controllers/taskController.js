@@ -377,6 +377,29 @@ const updateTaskStatus = async (req, res, next) => {
       });
     }
 
+    // If completing a task, check for required evidence
+    if (status === 'completed') {
+      const Document = require('../models/Document');
+      const evidenceDocuments = await Document.findByTask(id, organizationId, { 
+        documentType: 'evidence' 
+      });
+      
+      if (evidenceDocuments.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Evidence required',
+          message: 'Cannot complete task without uploading evidence. Please upload evidence documents before marking the task as completed.',
+          requiredAction: 'upload_evidence'
+        });
+      }
+
+      logger.info('Task completion validated with evidence', {
+        requestId: req.id,
+        taskId: id,
+        evidenceCount: evidenceDocuments.length
+      });
+    }
+
     const updatedTask = await Task.updateStatus(id, { status, progress, actualHours });
 
     if (!updatedTask) {

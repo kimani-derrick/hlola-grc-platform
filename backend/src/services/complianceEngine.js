@@ -169,13 +169,16 @@ class ComplianceEngine {
       task.control_id === control.id && task.status === 'completed'
     );
     
-    const hasEvidence = hasDocument || hasCompletedTask;
+    // For compliance, we require BOTH completed tasks AND evidence documents
+    // This ensures that tasks cannot be completed without proper evidence
+    const hasEvidence = hasCompletedTask && hasDocument;
     
     logger.debug('Control evidence check', {
       controlId: control.id,
       hasDocument,
       hasCompletedTask,
-      hasEvidence
+      hasEvidence,
+      requirement: 'both_task_and_evidence'
     });
     
     return hasEvidence;
