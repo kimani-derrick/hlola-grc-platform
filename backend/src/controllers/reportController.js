@@ -1,4 +1,5 @@
 const ReportAggregator = require('../services/reportAggregator');
+const OptimizedReportAggregator = require('../services/optimizedReportAggregator');
 const InsightsGenerator = require('../services/insightsGenerator');
 const logger = require('../config/logger');
 
@@ -20,7 +21,7 @@ const getOverviewReport = async (req, res, next) => {
       filters
     });
 
-    const stats = await ReportAggregator.aggregateOrganizationStats(organizationId, filters);
+    const stats = await OptimizedReportAggregator.aggregateOrganizationStats(organizationId, filters);
 
     res.json({
       success: true,
@@ -74,7 +75,7 @@ const getFrameworksReport = async (req, res, next) => {
       filters
     });
 
-    const frameworks = await ReportAggregator.aggregateFrameworkProgress(organizationId, filters);
+    const frameworks = await OptimizedReportAggregator.aggregateFrameworksProgress(organizationId, filters);
 
     // Calculate summary statistics
     const summary = {
@@ -190,7 +191,7 @@ const getTasksReport = async (req, res, next) => {
       filters
     });
 
-    const tasks = await ReportAggregator.aggregateTaskProgress(organizationId, filters);
+    const tasks = await OptimizedReportAggregator.aggregateTaskProgress(organizationId, filters);
 
     // Calculate summary statistics
     const summary = {
