@@ -184,7 +184,7 @@ export default function DashboardContent() {
                 value={dashboardData?.complianceScore || 0}
                 maxValue={100}
                 title="Overall Compliance Score"
-                status={dashboardData?.complianceScore > 80 ? "good" : dashboardData?.complianceScore > 50 ? "warning" : "critical"}
+                status={(dashboardData?.complianceScore || 0) > 80 ? "good" : (dashboardData?.complianceScore || 0) > 50 ? "warning" : "critical"}
                 size={gaugeSize}
                 progress={dashboardData?.completionRate || 0}
                 controls={dashboardData?.totalControls || 0}
@@ -200,7 +200,7 @@ export default function DashboardContent() {
           <RiskExposureGauge
             exposureAmount={entityData.riskExposure}
             riskLevel={dashboardData?.riskLevel || selectedEntity.riskLevel || "critical"}
-            industryAverage={5000000}
+            industryAverage={Math.round(entityData.riskExposure * 0.3)} // 30% of current exposure
             trend="up"
             trendPercentage={15}
             size={gaugeSize}

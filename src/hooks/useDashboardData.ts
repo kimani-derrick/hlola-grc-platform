@@ -2,6 +2,34 @@ import { useState, useEffect } from 'react';
 import { apiService, DashboardData } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
+// Function to calculate risk exposure based on framework risk levels
+function calculateRiskExposure(frameworks: any[]): number {
+  if (!frameworks || frameworks.length === 0) return 0;
+  
+  // Define potential fine amounts by risk level (in KES)
+  const fineAmounts = {
+    low: 500000,      // 500K KES
+    medium: 2000000,  // 2M KES
+    high: 5000000,    // 5M KES
+    critical: 10000000 // 10M KES
+  };
+  
+  let totalExposure = 0;
+  const uniqueFrameworks = new Set();
+  
+  frameworks.forEach(framework => {
+    // Avoid counting duplicate frameworks
+    const frameworkKey = `${framework.name}-${framework.riskLevel}`;
+    if (!uniqueFrameworks.has(frameworkKey)) {
+      uniqueFrameworks.add(frameworkKey);
+      const riskLevel = framework.riskLevel || 'medium';
+      totalExposure += fineAmounts[riskLevel as keyof typeof fineAmounts] || fineAmounts.medium;
+    }
+  });
+  
+  return totalExposure;
+}
+
 export interface DashboardMetrics {
   totalTasks: number;
   completedTasks: number;
@@ -62,7 +90,7 @@ export function useDashboardData(organizationId?: string) {
       // Process the data
       const overview = overviewResponse.data?.overview || {};
       const tasks = tasksResponse.data?.summary || {};
-      const frameworks = frameworksResponse.data?.summary || {};
+      const frameworksSummary = frameworksResponse.data?.summary || {};
       const documents = documentsResponse.data || [];
       const auditGaps = auditGapsResponse.data || [];
       const allFrameworks = allFrameworksResponse.data || [];
@@ -71,7 +99,7 @@ export function useDashboardData(organizationId?: string) {
       console.log('🔍 DEBUG - API Responses:');
       console.log('Overview:', overview);
       console.log('Tasks:', tasks);
-      console.log('Frameworks:', frameworks);
+      console.log('Frameworks Summary:', frameworksSummary);
       console.log('Documents:', documents);
       console.log('Audit Gaps:', auditGaps);
 
@@ -99,7 +127,16 @@ export function useDashboardData(organizationId?: string) {
       const frameworkCoverage = totalAvailableFrameworks > 0 ? (assignedFrameworks / totalAvailableFrameworks) * 100 : 0;
 
       const criticalIssues = auditGaps.filter((gap: any) => gap.severity === 'critical').length;
-      const riskExposure = overview.riskExposure || 0;
+      
+      // Calculate risk exposure based on assigned frameworks
+      const frameworks = frameworksResponse.data?.frameworks || [];
+      const riskExposure = calculateRiskExposure(frameworks);
+      
+      // DEBUG: Log risk exposure calculation
+      console.log('🔍 DEBUG - Risk Exposure Calculation:');
+      console.log('Frameworks:', frameworks.map(f => ({ name: f.name, riskLevel: f.riskLevel })));
+      console.log('Calculated Risk Exposure:', riskExposure);
+      
       const complianceScore = overview.avgComplianceScore || 0;
 
       // DEBUG: Log the calculated compliance score
