@@ -55,10 +55,13 @@ class Task {
       JOIN entities e ON ca.entity_id = e.id
       LEFT JOIN users u1 ON t.assignee_id = u1.id
       WHERE e.organization_id = $1
-      AND t.created_at >= (
-        SELECT MIN(e2.created_at) 
-        FROM entities e2 
-        WHERE e2.organization_id = $1
+      AND t.created_at >= e.created_at
+      AND EXISTS (
+        SELECT 1 FROM control_assignments ca2 
+        JOIN entities e2 ON ca2.entity_id = e2.id 
+        WHERE ca2.control_id = t.control_id 
+        AND e2.organization_id = $1
+        AND ca2.entity_id = e.id
       )
     `;
     const params = [organizationId];
@@ -160,7 +163,7 @@ class Task {
               u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
        FROM tasks t
        JOIN controls c ON t.control_id = c.id
-       JOIN control_assignments ca ON c.id = ca.control_id
+       JOIN control_assignments ca ON c.id = ca.control_id AND ca.entity_id = $1
        LEFT JOIN users u1 ON t.assignee_id = u1.id
        WHERE ca.entity_id = $1
        ORDER BY t.due_date ASC, t.priority DESC`,
@@ -260,6 +263,14 @@ class Task {
       JOIN control_assignments ca ON c.id = ca.control_id
       JOIN entities e ON ca.entity_id = e.id
       WHERE e.organization_id = $1
+      AND t.created_at >= e.created_at
+      AND EXISTS (
+        SELECT 1 FROM control_assignments ca2 
+        JOIN entities e2 ON ca2.entity_id = e2.id 
+        WHERE ca2.control_id = t.control_id 
+        AND e2.organization_id = $1
+        AND ca2.entity_id = e.id
+      )
     `;
     const params = [organizationId];
     let paramCount = 2;
@@ -285,6 +296,14 @@ class Task {
       JOIN control_assignments ca ON c.id = ca.control_id
       JOIN entities e ON ca.entity_id = e.id
       WHERE e.organization_id = $1
+      AND t.created_at >= e.created_at
+      AND EXISTS (
+        SELECT 1 FROM control_assignments ca2 
+        JOIN entities e2 ON ca2.entity_id = e2.id 
+        WHERE ca2.control_id = t.control_id 
+        AND e2.organization_id = $1
+        AND ca2.entity_id = e.id
+      )
     `;
     const params = [organizationId];
     let paramCount = 2;
