@@ -1,0 +1,71 @@
+{
+  "timestamp": "2025-10-11T12:26:35.435Z",
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "successRate": "100.0%"
+  },
+  "details": [
+    {
+      "test": "Server Health Check",
+      "status": "PASSED",
+      "details": "Server is running and healthy"
+    },
+    {
+      "test": "Authentication System",
+      "status": "PASSED",
+      "details": "Authentication working"
+    },
+    {
+      "test": "Organization Management",
+      "status": "PASSED",
+      "details": "Organization CRUD working"
+    },
+    {
+      "test": "Entity Management",
+      "status": "PASSED",
+      "details": "Entity management working"
+    },
+    {
+      "test": "Framework Management",
+      "status": "PASSED",
+      "details": "Framework management working"
+    },
+    {
+      "test": "Framework Assignment",
+      "status": "PASSED",
+      "details": "Framework assignment working"
+    },
+    {
+      "test": "Control Management",
+      "status": "PASSED",
+      "details": "Control management working"
+    },
+    {
+      "test": "Task Management",
+      "status": "PASSED",
+      "details": "Task management working"
+    },
+    {
+      "test": "Document Management",
+      "status": "PASSED",
+      "details": "Document management working (list functionality)"
+    },
+    {
+      "test": "Audit Management",
+      "status": "PASSED",
+      "details": "Audit management working"
+    },
+    {
+      "test": "Reports System",
+      "status": "PASSED",
+      "details": "/reports/overview: PASSED, /reports/frameworks: PASSED, /reports/controls: PASSED, /reports/tasks: PASSED, /reports/insights: PASSED"
+    },
+    {
+      "test": "Compliance System",
+      "status": "PASSED",
+      "details": "/compliance/dashboard: PASSED, /compliance/status: PASSED, /compliance/health: PASSED"
+    }
+  ]
+}

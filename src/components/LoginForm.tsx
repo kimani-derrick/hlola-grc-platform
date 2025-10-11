@@ -186,10 +186,20 @@ export default function LoginForm() {
             <div className="glass-card bg-blue-50/50 border-blue-200 rounded-lg p-3 mt-4">
               <h4 className="text-xs font-medium text-blue-800 mb-1">Test Credentials:</h4>
               <div className="text-xs text-blue-700">
-                <p><strong>Email:</strong> admin@hlola.io</p>
-                <p><strong>Password:</strong> hlola2025</p>
-                <p className="text-xs text-blue-600 mt-1">* Create a user via API first</p>
+                <p><strong>Email:</strong> testadmin@example.com</p>
+                <p><strong>Password:</strong> admin123</p>
+                <p className="text-xs text-blue-600 mt-1">* Ready to use - click to auto-fill</p>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('testadmin@example.com');
+                  setPassword('admin123');
+                }}
+                className="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded transition-colors"
+              >
+                Use Test Credentials
+              </button>
             </div>
           </form>
         </div>

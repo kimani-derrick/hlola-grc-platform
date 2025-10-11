@@ -3,15 +3,21 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useEntity } from '../context/EntityContext';
+import { useDashboardData } from '../hooks/useDashboardData';
 import SpeedometerGauge from './SpeedometerGauge';
 import MetricCard from './MetricCard';
 import AuditOverview from './AuditOverview';
 import RiskExposureGauge from './RiskExposureGauge';
 import EntityHeader from './EntityHeader';
+import TotalTasksGauge from './TotalTasksGauge';
+import TaskCompletionRateGauge from './TaskCompletionRateGauge';
+import EvidenceUploadGauge from './EvidenceUploadGauge';
+import FrameworkCoverageGauge from './FrameworkCoverageGauge';
 
 export default function DashboardContent() {
   const { user } = useAuth();
   const { selectedEntity, isLoading: entityLoading } = useEntity();
+  const { data: dashboardData, isLoading: dataLoading, error: dataError } = useDashboardData(user?.organizationId);
   const [gaugeSize, setGaugeSize] = useState(160);
   const [isClient, setIsClient] = useState(false);
 
@@ -36,8 +42,8 @@ export default function DashboardContent() {
     return () => window.removeEventListener('resize', updateGaugeSize);
   }, []);
 
-  // Show loading state while entities are loading
-  if (entityLoading) {
+  // Show loading state while entities or data are loading
+  if (entityLoading || dataLoading) {
     return (
       <div className="space-y-6 max-w-full">
         <div className="glass-card rounded-2xl p-4">
@@ -49,6 +55,11 @@ export default function DashboardContent() {
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="glass-card rounded-2xl p-6 h-64 bg-gray-100 animate-pulse"></div>
           <div className="glass-card rounded-2xl p-6 h-64 bg-gray-100 animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="glass-card rounded-2xl p-6 h-48 bg-gray-100 animate-pulse"></div>
+          ))}
         </div>
       </div>
     );
@@ -71,36 +82,58 @@ export default function DashboardContent() {
     );
   }
 
-  // Get entity-specific data
-  const getEntitySpecificData = () => {
-    const baseData = {
-      criticalIssues: 11,
-      riskExposure: 7000000,
-      controls: 86,
-      policies: 30,
-      risks: 16,
-      tasks: 38,
-    };
+  // DEBUG: Log dashboard data
+  console.log('🔍 DEBUG - Dashboard Data:', dashboardData);
+  console.log('🔍 DEBUG - Selected Entity:', selectedEntity);
+  console.log('🔍 DEBUG - Critical Issues:', dashboardData?.criticalIssues);
+  console.log('🔍 DEBUG - Compliance Score:', dashboardData?.complianceScore);
+  console.log('🔍 DEBUG - Using Real Data?', !!dashboardData);
+  console.log('🔍 DEBUG - Data Loading?', dataLoading);
+  console.log('🔍 DEBUG - Gauge Metrics:', {
+    progress: dashboardData?.completionRate,
+    controls: dashboardData?.totalTasks,
+    done: dashboardData?.completedTasks,
+    target: 50
+  });
 
-    // Adjust data based on entity's compliance score and risk level
-    if (selectedEntity.complianceScore) {
-      const score = selectedEntity.complianceScore;
-      const multiplier = score / 100;
-      
-      return {
-        ...baseData,
-        criticalIssues: Math.max(1, Math.round(baseData.criticalIssues * (1 - multiplier + 0.2))),
-        controls: Math.round(baseData.controls * multiplier),
-        policies: Math.round(baseData.policies * multiplier),
-        risks: Math.round(baseData.risks * (1 - multiplier + 0.3)),
-        tasks: Math.round(baseData.tasks * multiplier),
-      };
-    }
-
-    return baseData;
+  // Use real dashboard data or fallback to mock data
+  const entityData = dashboardData ? {
+    criticalIssues: dashboardData.criticalIssues,
+    riskExposure: dashboardData.riskExposure,
+    controls: Math.round(dashboardData.totalTasks * 2.2), // Estimate based on tasks
+    policies: dashboardData.uploadedDocuments,
+    risks: Math.round(dashboardData.totalTasks * 0.4), // Estimate based on tasks
+    tasks: dashboardData.totalTasks,
+    completedTasks: dashboardData.completedTasks,
+    pendingTasks: dashboardData.pendingTasks,
+    inProgressTasks: dashboardData.inProgressTasks,
+    overdueTasks: dashboardData.overdueTasks,
+    completionRate: dashboardData.completionRate,
+    uploadedDocuments: dashboardData.uploadedDocuments,
+    requiredDocuments: dashboardData.requiredDocuments,
+    uploadPercentage: dashboardData.uploadPercentage,
+    assignedFrameworks: dashboardData.assignedFrameworks,
+    totalAvailableFrameworks: dashboardData.totalAvailableFrameworks,
+    frameworkCoverage: dashboardData.frameworkCoverage,
+  } : {
+    criticalIssues: 11,
+    riskExposure: 7000000,
+    controls: 86,
+    policies: 30,
+    risks: 16,
+    tasks: 38,
+    completedTasks: 15,
+    pendingTasks: 18,
+    inProgressTasks: 5,
+    overdueTasks: 3,
+    completionRate: 39,
+    uploadedDocuments: 12,
+    requiredDocuments: 38,
+    uploadPercentage: 32,
+    assignedFrameworks: 2,
+    totalAvailableFrameworks: 10,
+    frameworkCoverage: 20,
   };
-
-  const entityData = getEntitySpecificData();
 
   return (
     <div className="space-y-6 max-w-full">
@@ -139,20 +172,24 @@ export default function DashboardContent() {
             <div className="absolute top-4 left-4 z-20">
               <div className="bg-black/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-2xl border border-gray-300">
                 <div className="text-xl font-mono font-bold text-center transition-all duration-1000 ease-out text-red-600">
-                  {entityData.criticalIssues}
+                  {Math.round(dashboardData?.complianceScore || 0)}%
                 </div>
                 <div className="text-xs text-gray-300 text-center mt-1 font-semibold tracking-wider">
-                  CRITICAL
+                  COMPLIANCE
                 </div>
               </div>
             </div>
             <div className="gauge-glow">
               <SpeedometerGauge
-                value={entityData.criticalIssues}
+                value={dashboardData?.complianceScore || 0}
                 maxValue={100}
-                title="critical"
-                status="critical"
+                title="Overall Compliance Score"
+                status={dashboardData?.complianceScore > 80 ? "good" : dashboardData?.complianceScore > 50 ? "warning" : "critical"}
                 size={gaugeSize}
+                progress={dashboardData?.completionRate || 0}
+                controls={dashboardData?.totalTasks || 0}
+                done={dashboardData?.completedTasks || 0}
+                target={50}
               />
             </div>
           </div>
@@ -162,12 +199,60 @@ export default function DashboardContent() {
         <div>
           <RiskExposureGauge
             exposureAmount={entityData.riskExposure}
-            riskLevel={selectedEntity.riskLevel || "critical"}
+            riskLevel={dashboardData?.riskLevel || selectedEntity.riskLevel || "critical"}
             industryAverage={5000000}
             trend="up"
             trendPercentage={15}
             size={gaugeSize}
             currency="KES"
+          />
+        </div>
+      </div>
+
+      {/* Additional Gauges - Four New Gauges */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Tasks Gauge */}
+        <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-blue-50 to-blue-100">
+          <TotalTasksGauge
+            totalTasks={entityData.tasks}
+            maxValue={100}
+            title="Total Tasks"
+            status={entityData.tasks > 80 ? "critical" : entityData.tasks > 50 ? "warning" : "good"}
+            size={gaugeSize}
+          />
+        </div>
+
+        {/* Task Completion Rate Gauge */}
+        <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-green-50 to-green-100">
+          <TaskCompletionRateGauge
+            completionRate={entityData.completionRate}
+            totalTasks={entityData.tasks}
+            completedTasks={entityData.completedTasks}
+            title="Task Completion Rate"
+            status={entityData.completionRate > 80 ? "good" : entityData.completionRate > 50 ? "warning" : "critical"}
+            size={gaugeSize}
+          />
+        </div>
+
+        {/* Evidence Upload Gauge */}
+        <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-purple-50 to-purple-100">
+          <EvidenceUploadGauge
+            uploadedDocuments={entityData.uploadedDocuments}
+            requiredDocuments={entityData.requiredDocuments}
+            title="Evidence Upload"
+            status={entityData.uploadPercentage >= 100 ? "good" : entityData.uploadPercentage > 50 ? "warning" : "critical"}
+            size={gaugeSize}
+          />
+        </div>
+
+        {/* Framework Coverage Gauge */}
+        <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-orange-50 to-orange-100">
+          <FrameworkCoverageGauge
+            assignedFrameworks={entityData.assignedFrameworks}
+            totalAvailableFrameworks={entityData.totalAvailableFrameworks}
+            title="Framework Coverage"
+            status={entityData.frameworkCoverage > 80 ? "good" : entityData.frameworkCoverage > 50 ? "warning" : "critical"}
+            size={gaugeSize}
           />
         </div>
       </div>
@@ -178,7 +263,7 @@ export default function DashboardContent() {
         <MetricCard
           value={entityData.controls}
           label="Controls"
-          progress={selectedEntity.complianceScore || 75}
+          progress={dashboardData?.complianceScore || selectedEntity.complianceScore || 75}
           change="+5%"
           changeType="positive"
           color="green"
@@ -191,7 +276,7 @@ export default function DashboardContent() {
         <MetricCard
           value={entityData.policies}
           label="Policies"
-          progress={selectedEntity.complianceScore || 78}
+          progress={dashboardData?.complianceScore || selectedEntity.complianceScore || 78}
           change="+5%"
           changeType="positive"
           color="orange"
@@ -217,7 +302,7 @@ export default function DashboardContent() {
         <MetricCard
           value={entityData.tasks}
           label="Tasks"
-          progress={selectedEntity.complianceScore || 70}
+          progress={dashboardData?.complianceScore || selectedEntity.complianceScore || 70}
           change="0%"
           changeType="neutral"
           color="cyan"

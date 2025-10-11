@@ -2,30 +2,23 @@
 
 import { useEffect, useState } from 'react';
 
-interface SpeedometerGaugeProps {
-  value: number;
-  maxValue?: number;
+interface TaskCompletionRateGaugeProps {
+  completionRate: number; // 0-100 percentage
+  totalTasks: number;
+  completedTasks: number;
   title: string;
   status: 'critical' | 'warning' | 'good';
   size?: number;
-  // Metrics props
-  progress?: number;
-  controls?: number;
-  done?: number;
-  target?: number;
 }
 
-export default function SpeedometerGauge({ 
-  value, 
-  maxValue = 100, 
+export default function TaskCompletionRateGauge({ 
+  completionRate, 
+  totalTasks,
+  completedTasks,
   title: _title, 
   status,
-  size = 300,
-  progress,
-  controls,
-  done,
-  target
-}: SpeedometerGaugeProps) {
+  size = 300 
+}: TaskCompletionRateGaugeProps) {
   const [animatedValue, setAnimatedValue] = useState(0);
   const [isClient, setIsClient] = useState(false);
   
@@ -33,13 +26,13 @@ export default function SpeedometerGauge({
     setIsClient(true);
     
     const timer = setTimeout(() => {
-      setAnimatedValue(value);
+      setAnimatedValue(completionRate);
     }, 500);
     return () => clearTimeout(timer);
-  }, [value]);
+  }, [completionRate]);
 
-  // Calculate angle for needle (-90° at value 0, +90° at value maxValue)
-  const angle = ((animatedValue / maxValue) * 180) - 90 - 90;
+  // Calculate angle for needle (-90° at value 0, +90° at value 100)
+  const angle = ((animatedValue / 100) * 180) - 90 - 90;
   
   // Status colors with enhanced gradients
   const statusConfig = {
@@ -118,7 +111,7 @@ export default function SpeedometerGauge({
             strokeWidth="20"
             strokeLinecap="round"
             strokeDasharray={Math.PI * outerRadius}
-            strokeDashoffset={Math.PI * outerRadius - (Math.PI * outerRadius * (Math.max(0, Math.min(maxValue, animatedValue || 0)) / maxValue))}
+            strokeDashoffset={Math.PI * outerRadius - (Math.PI * outerRadius * (Math.max(0, Math.min(100, animatedValue || 0)) / 100))}
             className="transition-all duration-2000 ease-out drop-shadow-lg"
             style={{
               filter: `drop-shadow(0 0 10px ${config.color}60) drop-shadow(0 0 20px ${config.color}30)`,
@@ -166,7 +159,7 @@ export default function SpeedometerGauge({
           {/* Scale Numbers */}
           {Array.from({ length: 11 }, (_, i) => {
             const tickAngle = -90 + (i * 18);
-            const numberRadius = outerRadius + 35;
+            const numberRadius = outerRadius + 25;
             const pos = polarToCartesian(center, center, numberRadius, tickAngle);
             const number = (i * 10).toString();
             
@@ -271,15 +264,15 @@ export default function SpeedometerGauge({
 
       {/* Status Indicator */}
       <div className="mt-8 text-center">
-        <div className="text-sm font-bold text-gray-800 mb-1">Overall Compliance Score</div>
+        <div className="text-sm font-bold text-gray-800 mb-1">Task Completion Rate</div>
         <div className="flex items-center justify-center gap-1">
           <div 
             className="w-2 h-2 rounded-full animate-pulse"
             style={{ backgroundColor: config.color }}
           />
           <span className="text-xs font-medium text-gray-600">
-            {status === 'critical' ? 'Below Standards' : 
-             status === 'warning' ? 'Needs Attention' : 'Good Standing'}
+            {status === 'critical' ? 'Behind Schedule' : 
+             status === 'warning' ? 'On Track' : 'Ahead of Schedule'}
           </span>
         </div>
       </div>
@@ -287,23 +280,23 @@ export default function SpeedometerGauge({
       {/* Compact Metrics - With Dividers */}
       <div className="mt-4 flex justify-between items-center text-xs">
         <div className="text-center flex-1">
-          <div className="font-bold text-red-500">{progress !== undefined ? `${progress.toFixed(1)}%` : '0%'}</div>
-          <div className="text-gray-600">Progress</div>
+          <div className="font-bold text-green-500">{completedTasks}</div>
+          <div className="text-gray-600">Completed</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-gray-800">{controls !== undefined ? controls : 0}</div>
-          <div className="text-gray-600">Controls</div>
+          <div className="font-bold text-gray-800">{totalTasks}</div>
+          <div className="text-gray-600">Total</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-green-600">{done !== undefined ? done : 0}</div>
-          <div className="text-gray-600">Done</div>
+          <div className="font-bold text-blue-600">{animatedValue.toFixed(1)}%</div>
+          <div className="text-gray-600">Rate</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-gray-600">{target !== undefined ? `${target}%` : '50%'}</div>
-          <div className="text-gray-600">Target</div>
+          <div className="font-bold text-orange-600">{totalTasks - completedTasks}</div>
+          <div className="text-gray-600">Remaining</div>
         </div>
       </div>
     </div>

@@ -2,30 +2,21 @@
 
 import { useEffect, useState } from 'react';
 
-interface SpeedometerGaugeProps {
-  value: number;
+interface TotalTasksGaugeProps {
+  totalTasks: number;
   maxValue?: number;
   title: string;
   status: 'critical' | 'warning' | 'good';
   size?: number;
-  // Metrics props
-  progress?: number;
-  controls?: number;
-  done?: number;
-  target?: number;
 }
 
-export default function SpeedometerGauge({ 
-  value, 
+export default function TotalTasksGauge({ 
+  totalTasks, 
   maxValue = 100, 
   title: _title, 
   status,
-  size = 300,
-  progress,
-  controls,
-  done,
-  target
-}: SpeedometerGaugeProps) {
+  size = 300 
+}: TotalTasksGaugeProps) {
   const [animatedValue, setAnimatedValue] = useState(0);
   const [isClient, setIsClient] = useState(false);
   
@@ -33,10 +24,10 @@ export default function SpeedometerGauge({
     setIsClient(true);
     
     const timer = setTimeout(() => {
-      setAnimatedValue(value);
+      setAnimatedValue(totalTasks);
     }, 500);
     return () => clearTimeout(timer);
-  }, [value]);
+  }, [totalTasks]);
 
   // Calculate angle for needle (-90° at value 0, +90° at value maxValue)
   const angle = ((animatedValue / maxValue) * 180) - 90 - 90;
@@ -166,7 +157,7 @@ export default function SpeedometerGauge({
           {/* Scale Numbers */}
           {Array.from({ length: 11 }, (_, i) => {
             const tickAngle = -90 + (i * 18);
-            const numberRadius = outerRadius + 35;
+            const numberRadius = outerRadius + 25;
             const pos = polarToCartesian(center, center, numberRadius, tickAngle);
             const number = (i * 10).toString();
             
@@ -271,15 +262,15 @@ export default function SpeedometerGauge({
 
       {/* Status Indicator */}
       <div className="mt-8 text-center">
-        <div className="text-sm font-bold text-gray-800 mb-1">Overall Compliance Score</div>
+        <div className="text-sm font-bold text-gray-800 mb-1">Total Tasks</div>
         <div className="flex items-center justify-center gap-1">
           <div 
             className="w-2 h-2 rounded-full animate-pulse"
             style={{ backgroundColor: config.color }}
           />
           <span className="text-xs font-medium text-gray-600">
-            {status === 'critical' ? 'Below Standards' : 
-             status === 'warning' ? 'Needs Attention' : 'Good Standing'}
+            {status === 'critical' ? 'High Workload' : 
+             status === 'warning' ? 'Moderate Load' : 'Manageable'}
           </span>
         </div>
       </div>
@@ -287,23 +278,23 @@ export default function SpeedometerGauge({
       {/* Compact Metrics - With Dividers */}
       <div className="mt-4 flex justify-between items-center text-xs">
         <div className="text-center flex-1">
-          <div className="font-bold text-red-500">{progress !== undefined ? `${progress.toFixed(1)}%` : '0%'}</div>
-          <div className="text-gray-600">Progress</div>
+          <div className="font-bold text-blue-500">{animatedValue}</div>
+          <div className="text-gray-600">Total</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-gray-800">{controls !== undefined ? controls : 0}</div>
-          <div className="text-gray-600">Controls</div>
+          <div className="font-bold text-gray-800">{maxValue}</div>
+          <div className="text-gray-600">Capacity</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-green-600">{done !== undefined ? done : 0}</div>
-          <div className="text-gray-600">Done</div>
+          <div className="font-bold text-green-600">{Math.round((animatedValue / maxValue) * 100)}%</div>
+          <div className="text-gray-600">Utilization</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-gray-600">{target !== undefined ? `${target}%` : '50%'}</div>
-          <div className="text-gray-600">Target</div>
+          <div className="font-bold text-gray-600">Active</div>
+          <div className="text-gray-600">Status</div>
         </div>
       </div>
     </div>

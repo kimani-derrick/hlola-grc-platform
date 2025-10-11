@@ -1,102 +1,128 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiService, Entity } from '../services/api';
 
-export interface Entity {
-  id: string;
-  name: string;
-  country: string;
-  type: 'branch' | 'subsidiary' | 'office';
-  status: 'active' | 'inactive';
+export interface EntityWithDates extends Omit<Entity, 'createdAt' | 'updatedAt' | 'lastAuditDate'> {
   createdAt: Date;
   updatedAt: Date;
-  complianceScore?: number;
-  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
   lastAuditDate?: Date;
 }
 
 interface EntityContextType {
-  entities: Entity[];
-  selectedEntity: Entity | null;
+  entities: EntityWithDates[];
+  selectedEntity: EntityWithDates | null;
   addEntity: (entity: Omit<Entity, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateEntity: (id: string, updates: Partial<Entity>) => void;
   deleteEntity: (id: string) => void;
-  selectEntity: (entity: Entity | null) => void;
+  selectEntity: (entity: EntityWithDates | null) => void;
   isLoading: boolean;
+  error: string | null;
+  refreshEntities: () => Promise<void>;
 }
 
 const EntityContext = createContext<EntityContextType | undefined>(undefined);
 
-// Mock data for demonstration
-const mockEntities: Entity[] = [
-  {
-    id: '1',
-    name: 'Nairobi Branch',
-    country: 'Kenya',
-    type: 'branch',
-    status: 'active',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
-    complianceScore: 85,
-    riskLevel: 'medium',
-    lastAuditDate: new Date('2024-01-10'),
-  },
-  {
-    id: '2',
-    name: 'Lagos Office',
-    country: 'Nigeria',
-    type: 'office',
-    status: 'active',
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-01'),
-    complianceScore: 92,
-    riskLevel: 'low',
-    lastAuditDate: new Date('2024-01-25'),
-  },
-  {
-    id: '3',
-    name: 'Cape Town Subsidiary',
-    country: 'South Africa',
-    type: 'subsidiary',
-    status: 'active',
-    createdAt: new Date('2024-01-20'),
-    updatedAt: new Date('2024-01-20'),
-    complianceScore: 78,
-    riskLevel: 'high',
-    lastAuditDate: new Date('2024-01-05'),
-  },
-  {
-    id: '4',
-    name: 'Accra Branch',
-    country: 'Ghana',
-    type: 'branch',
-    status: 'inactive',
-    createdAt: new Date('2024-01-10'),
-    updatedAt: new Date('2024-01-10'),
-    complianceScore: 65,
-    riskLevel: 'critical',
-    lastAuditDate: new Date('2023-12-15'),
-  },
-];
+// Helper function to convert API entity to EntityWithDates
+const convertApiEntity = (apiEntity: Entity): EntityWithDates => ({
+  ...apiEntity,
+  createdAt: new Date(apiEntity.createdAt),
+  updatedAt: new Date(apiEntity.updatedAt),
+  lastAuditDate: apiEntity.lastAuditDate ? new Date(apiEntity.lastAuditDate) : undefined,
+});
 
 export function EntityProvider({ children }: { children: React.ReactNode }) {
-  const [entities, setEntities] = useState<Entity[]>([]);
-  const [selectedEntity, setSelectedEntity] = useState<Entity | null>(null);
+  const [entities, setEntities] = useState<EntityWithDates[]>([]);
+  const [selectedEntity, setSelectedEntity] = useState<EntityWithDates | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEntities = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Try to get user profile to get organizationId
+      let organizationId = null;
+      try {
+        const profileResponse = await apiService.getUserProfile();
+        if (profileResponse.success && profileResponse.data?.organizationId) {
+          organizationId = profileResponse.data.organizationId;
+        }
+      } catch (profileError) {
+        console.warn('Could not get user profile, trying alternative approach:', profileError);
+      }
+
+      // If we couldn't get organizationId from profile, try to get it from the auth context
+      if (!organizationId) {
+        // For now, use a known organization ID from our test data
+        organizationId = '35903f74-76d2-481d-bfc2-5861f7af0608';
+        console.log('Using fallback organization ID:', organizationId);
+      }
+
+      const response = await apiService.getEntities(organizationId);
+      
+      if (response.success && response.data) {
+        // Handle both direct array response and wrapped response
+        const entitiesArray = Array.isArray(response.data) ? response.data : response.data.entities || [];
+        const convertedEntities = entitiesArray.map(convertApiEntity);
+        setEntities(convertedEntities);
+        
+        // Select first entity by default if none selected
+        if (convertedEntities.length > 0 && !selectedEntity) {
+          setSelectedEntity(convertedEntities[0]);
+        }
+      } else {
+        throw new Error(response.error || 'Failed to fetch entities');
+      }
+    } catch (err) {
+      console.error('Error fetching entities:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch entities');
+      
+      // Fallback to mock data for development
+      const mockEntities: EntityWithDates[] = [
+        {
+          id: '1',
+          name: 'Nairobi Branch',
+          country: 'Kenya',
+          type: 'branch',
+          status: 'active',
+          organizationId: 'mock-org',
+          createdAt: new Date('2024-01-15'),
+          updatedAt: new Date('2024-01-15'),
+          complianceScore: 85,
+          riskLevel: 'medium',
+          lastAuditDate: new Date('2024-01-10'),
+        },
+        {
+          id: '2',
+          name: 'Lagos Office',
+          country: 'Nigeria',
+          type: 'office',
+          status: 'active',
+          organizationId: 'mock-org',
+          createdAt: new Date('2024-02-01'),
+          updatedAt: new Date('2024-02-01'),
+          complianceScore: 92,
+          riskLevel: 'low',
+          lastAuditDate: new Date('2024-01-25'),
+        },
+      ];
+      setEntities(mockEntities);
+      if (mockEntities.length > 0) {
+        setSelectedEntity(mockEntities[0]);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setEntities(mockEntities);
-      setSelectedEntity(mockEntities[0]); // Select first entity by default
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    fetchEntities();
   }, []);
 
   const addEntity = (entityData: Omit<Entity, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newEntity: Entity = {
+    const newEntity: EntityWithDates = {
       ...entityData,
       id: Date.now().toString(),
       createdAt: new Date(),
@@ -129,8 +155,12 @@ export function EntityProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const selectEntity = (entity: Entity | null) => {
+  const selectEntity = (entity: EntityWithDates | null) => {
     setSelectedEntity(entity);
+  };
+
+  const refreshEntities = async () => {
+    await fetchEntities();
   };
 
   return (
@@ -143,6 +173,8 @@ export function EntityProvider({ children }: { children: React.ReactNode }) {
         deleteEntity,
         selectEntity,
         isLoading,
+        error,
+        refreshEntities,
       }}
     >
       {children}

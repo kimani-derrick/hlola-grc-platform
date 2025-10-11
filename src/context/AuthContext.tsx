@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { signOut } from 'next-auth/react';
 
 interface User {
   id: string;
@@ -24,30 +24,91 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, status } = useSession();
-  const isLoading = status === 'loading';
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Extract user from NextAuth session
-  const user: User | null = session?.user ? {
-    id: session.user.id,
-    name: session.user.name || '',
-    email: session.user.email || '',
-    role: session.user.role || '',
-    organizationId: session.user.organizationId,
-    entityId: session.user.entityId,
-    department: session.user.department,
-    jobTitle: session.user.jobTitle,
-  } : null;
+  // Check for existing authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          // Verify token with backend
+          const response = await fetch('http://localhost:3001/api/auth/profile', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.user) {
+              setUser({
+                id: data.user.id,
+                name: `${data.user.firstName} ${data.user.lastName}`,
+                email: data.user.email,
+                role: data.user.role,
+                organizationId: data.user.organizationId,
+                entityId: data.user.entityId,
+                department: data.user.department,
+                jobTitle: data.user.jobTitle,
+              });
+            }
+          } else {
+            // Token is invalid, clear it
+            localStorage.removeItem('authToken');
+            sessionStorage.removeItem('authToken');
+          }
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        // Clear invalid tokens
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      // Use our backend API directly instead of NextAuth
+      const response = await fetch('http://localhost:3001/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      return result?.ok || false;
+      const data = await response.json();
+
+      if (data.success && data.token && data.user) {
+        // Store token for API calls
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', data.token);
+          sessionStorage.setItem('authToken', data.token);
+        }
+        
+        // Set user state
+        setUser({
+          id: data.user.id,
+          name: `${data.user.firstName} ${data.user.lastName}`,
+          email: data.user.email,
+          role: data.user.role,
+          organizationId: data.user.organizationId,
+          entityId: data.user.entityId,
+          department: data.user.department,
+          jobTitle: data.user.jobTitle,
+        });
+        
+        return true;
+      }
+
+      return false;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -55,7 +116,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    // Clear user state
+    setUser(null);
+    
+    // Clear our stored tokens
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+    }
+    
+    // Also sign out from NextAuth
     signOut({ redirect: false });
+    
+    // Redirect to login page
+    window.location.href = '/login';
   };
 
   return (

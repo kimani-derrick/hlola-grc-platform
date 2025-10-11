@@ -30,6 +30,12 @@ export const authOptions = {
           const data = await res.json()
 
           if (res.ok && data.success) {
+            // Store token in localStorage for API calls
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('authToken', data.token);
+              sessionStorage.setItem('authToken', data.token);
+            }
+            
             // Return user object that will be stored in JWT
             return {
               id: data.user.id,
