@@ -338,7 +338,7 @@ class OptimizedReportAggregator {
           COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'overdue') as overdue_tasks,
           COUNT(DISTINCT d.id) as total_evidence,
           AVG(ch.compliance_score) as avg_compliance_score,
-          ef.assigned_date,
+          ef.created_at as assigned_date,
           ef.compliance_score as entity_compliance_score,
           ef.audit_readiness_score,
           ef.certification_status
@@ -352,7 +352,7 @@ class OptimizedReportAggregator {
         LEFT JOIN compliance_history ch ON e.id = ch.entity_id
         ${whereClause}
         GROUP BY f.id, f.name, f.description, f.region, f.category, f.priority, 
-                 f.risk_level, f.status, ef.assigned_date, ef.compliance_score, 
+                 f.risk_level, f.status, ef.created_at, ef.compliance_score, 
                  ef.audit_readiness_score, ef.certification_status
         ORDER BY f.priority DESC, f.name ASC
       `;
