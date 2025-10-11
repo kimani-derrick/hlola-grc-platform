@@ -108,7 +108,7 @@ export default function OnboardingPage() {
       const lastName = data.lastName.trim();
 
       // First, create the organization
-      const orgResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/organizations`, {
+      const orgResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/organizations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export default function OnboardingPage() {
       const orgData = await orgResponse.json();
 
       // Then, create the user
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

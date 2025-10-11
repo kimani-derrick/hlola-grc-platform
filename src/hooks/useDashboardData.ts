@@ -18,6 +18,7 @@ export interface DashboardMetrics {
   criticalIssues: number;
   riskExposure: number;
   complianceScore: number;
+  totalControls: number; // Add missing totalControls
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
 }
 
@@ -48,12 +49,14 @@ export function useDashboardData(organizationId?: string) {
         frameworksResponse,
         documentsResponse,
         auditGapsResponse,
+        allFrameworksResponse,
       ] = await Promise.all([
         apiService.getDashboardData(orgId),
         apiService.getTasksReport(orgId),
         apiService.getFrameworksReport(orgId),
         apiService.getDocuments(orgId),
         apiService.getAuditGaps(orgId),
+        apiService.getFrameworks(), // Get all available frameworks
       ]);
 
       // Process the data
@@ -62,6 +65,7 @@ export function useDashboardData(organizationId?: string) {
       const frameworks = frameworksResponse.data?.summary || {};
       const documents = documentsResponse.data || [];
       const auditGaps = auditGapsResponse.data || [];
+      const allFrameworks = allFrameworksResponse.data || [];
 
       // DEBUG: Log the raw API responses
       console.log('🔍 DEBUG - API Responses:');
@@ -90,8 +94,8 @@ export function useDashboardData(organizationId?: string) {
       const requiredDocuments = totalTasks; // Assuming each task requires a document
       const uploadPercentage = requiredDocuments > 0 ? (uploadedDocuments / requiredDocuments) * 100 : 0;
 
-      const assignedFrameworks = frameworks.assignedFrameworks || 0;
-      const totalAvailableFrameworks = frameworks.totalAvailableFrameworks || 10; // Default to 10
+      const assignedFrameworks = overview.totalFrameworks || 0; // Use totalFrameworks from overview (assigned frameworks)
+      const totalAvailableFrameworks = allFrameworks.length || 60; // Use length of all frameworks array
       const frameworkCoverage = totalAvailableFrameworks > 0 ? (assignedFrameworks / totalAvailableFrameworks) * 100 : 0;
 
       const criticalIssues = auditGaps.filter((gap: any) => gap.severity === 'critical').length;
@@ -129,6 +133,7 @@ export function useDashboardData(organizationId?: string) {
         criticalIssues,
         riskExposure,
         complianceScore,
+        totalControls: overview.totalControls || 0, // Add missing totalControls
         riskLevel,
       });
     } catch (err) {
