@@ -91,7 +91,7 @@ export default function DashboardContent() {
   console.log('🔍 DEBUG - Data Loading?', dataLoading);
   console.log('🔍 DEBUG - Gauge Metrics:', {
     progress: dashboardData?.completionRate,
-    controls: dashboardData?.totalTasks,
+    controls: dashboardData?.totalControls,
     done: dashboardData?.completedTasks,
     target: 50
   });
@@ -100,7 +100,7 @@ export default function DashboardContent() {
   const entityData = dashboardData ? {
     criticalIssues: dashboardData.criticalIssues,
     riskExposure: dashboardData.riskExposure,
-    controls: Math.round(dashboardData.totalTasks * 2.2), // Estimate based on tasks
+    controls: dashboardData?.totalControls,
     policies: dashboardData.uploadedDocuments,
     risks: Math.round(dashboardData.totalTasks * 0.4), // Estimate based on tasks
     tasks: dashboardData.totalTasks,
@@ -187,7 +187,7 @@ export default function DashboardContent() {
                 status={dashboardData?.complianceScore > 80 ? "good" : dashboardData?.complianceScore > 50 ? "warning" : "critical"}
                 size={gaugeSize}
                 progress={dashboardData?.completionRate || 0}
-                controls={dashboardData?.totalTasks || 0}
+                controls={dashboardData?.totalControls || 0}
                 done={dashboardData?.completedTasks || 0}
                 target={50}
               />

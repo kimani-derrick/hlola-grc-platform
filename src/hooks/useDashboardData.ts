@@ -77,7 +77,14 @@ export function useDashboardData(organizationId?: string) {
       const pendingTasks = tasks.pendingTasks || 0;
       const inProgressTasks = tasks.inProgressTasks || 0;
       const overdueTasks = tasks.overdueTasks || 0;
-      const completionRate = tasks.completionRate || 0;
+      // Calculate completion rate from tasks data
+      const completionRate = tasks.totalTasks > 0 ? (tasks.completedTasks / tasks.totalTasks) * 100 : 0;
+      
+      // DEBUG: Log completion rate calculation
+      console.log('🔍 DEBUG - Completion Rate Calculation:');
+      console.log('Total Tasks:', tasks.totalTasks);
+      console.log('Completed Tasks:', tasks.completedTasks);
+      console.log('Calculated Completion Rate:', completionRate);
 
       const uploadedDocuments = documents.length;
       const requiredDocuments = totalTasks; // Assuming each task requires a document
