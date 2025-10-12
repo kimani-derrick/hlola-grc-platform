@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '../../../../components/DashboardLayout';
 import CountryPopupModal from '../../../../components/CountryPopupModal';
 import CountryDetailView from '../../../../components/CountryDetailView';
+import { apiService } from '../../../../services/api';
 import FrameworkCard from '../../../../components/FrameworkCard';
 import { Framework, ControlDetail, Priority } from '../../../../types/frameworks';
-import { controlDetails } from '../../../../data/frameworks';
 import { getPriorityColor, getRiskLevelColor } from '../../../../utils/frameworkUtils';
 import { formatDate } from '../../../../utils/dateUtils';
 import { useActiveFrameworks } from '../../../../context/ActiveFrameworksContext';
@@ -27,6 +27,25 @@ export default function FrameworksPage() {
   const [popupFramework, setPopupFramework] = useState<Framework | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
+  const [controlsById, setControlsById] = useState<Record<string, ControlDetail>>({});
+  const [frameworkControlsCount, setFrameworkControlsCount] = useState<Record<string, number>>({});
+  const [loadingControls, setLoadingControls] = useState(false);
+  const [controlsError, setControlsError] = useState<string | null>(null);
+
+  // Preload grouped control counts once (to avoid stale seeded counts)
+  // and override card/popup display when available
+  useEffect(() => {
+    (async () => {
+      try {
+        const grouped = await apiService.getControlsGroupedByFramework();
+        if (grouped.success && Array.isArray(grouped.data)) {
+          const map: Record<string, number> = {};
+          (grouped.data as any[]).forEach((r: any) => { map[r.framework_id] = Number(r.control_count) || 0; });
+          setFrameworkControlsCount(map);
+        }
+      } catch (_) { /* ignore */ }
+    })();
+  }, []);
 
   const filteredFrameworks = frameworks.filter(framework => {
     const matchesSearch = framework.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -168,12 +187,45 @@ export default function FrameworksPage() {
     setPopupFramework(null);
   };
 
-  const handleViewControls = () => {
-    if (popupFramework) {
+  const handleViewControls = async () => {
+    if (!popupFramework) return;
+    try {
+      setLoadingControls(true);
+      setControlsError(null);
+      // Fetch controls from backend
+      const res = await apiService.getControlsByFramework(popupFramework.id);
+      if (res.success && (res as any).data && Array.isArray((res as any).data)) {
+        // Map minimal details into controlDetails store (by id)
+        const details: any = {};
+        (res as any).data.forEach((c: any) => {
+          details[c.id] = {
+            id: c.id,
+            title: c.title || c.control_id || 'Control',
+            subtitle: c.category || '',
+            article: c.reference || '',
+            description: c.description || '',
+            detailedDescription: c.description || '',
+            requirements: [],
+            implementation: [],
+            compliance: { status: 'unknown', progress: 0, lastUpdated: '', nextReview: '' },
+            evidence: []
+          };
+        });
+        setControlsById(details);
+        // Store fetched count for this framework so cards and modal reflect real number
+        setFrameworkControlsCount((prev) => ({ ...prev, [popupFramework.id]: (res as any).data.length }));
+      } else if (!res.success) {
+        setControlsError(res.error || 'Failed to load controls');
+      }
+      // Open the detailed view
       setSelectedFramework(popupFramework);
       setActiveTab('controls');
+    } catch (e:any) {
+      setControlsError(e?.message || 'Failed to load controls');
+    } finally {
       setIsPopupOpen(false);
       setPopupFramework(null);
+      setLoadingControls(false);
     }
   };
 
@@ -368,6 +420,7 @@ export default function FrameworksPage() {
                     isFrameworkActive={isFrameworkActive}
                     onCountryClick={handleCountryClick}
                     onAddToActive={addFrameworkToActive}
+                controlsCount={frameworkControlsCount[framework.id] ?? framework.requirements}
                   />
                 ))}
               </div>
@@ -395,7 +448,8 @@ export default function FrameworksPage() {
             <CountryDetailView
               selectedFramework={selectedFramework}
               selectedControl={selectedControl}
-              controlDetails={controlDetails}
+              controlDetails={controlsById}
+              controls={Object.values(controlsById)}
               onBack={() => setSelectedFramework(null)}
               onControlSelect={setSelectedControl}
               onControlClose={() => setSelectedControl(null)}
@@ -411,6 +465,7 @@ export default function FrameworksPage() {
           isOpen={isPopupOpen}
           onClose={handleClosePopup}
           onViewControls={handleViewControls}
+          controlsCount={popupFramework ? (frameworkControlsCount[popupFramework.id] ?? null) : null}
         />
       </div>
     </DashboardLayout>

@@ -16,13 +16,15 @@ interface CountryPopupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onViewControls: () => void;
+  controlsCount?: number | null;
 }
 
 export default function CountryPopupModal({ 
   framework, 
   isOpen, 
   onClose, 
-  onViewControls 
+  onViewControls,
+  controlsCount = null
 }: CountryPopupModalProps) {
   if (!isOpen || !framework) return null;
 
@@ -84,14 +86,14 @@ export default function CountryPopupModal({
           </div>
 
           {/* Requirements Breakdown */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {/* Total Requirements */}
             <div className="bg-purple-50 rounded-lg p-4 text-center">
               <div className="text-purple-600 text-sm font-medium mb-1">
                 Total Requirements
               </div>
               <div className="text-2xl font-bold text-gray-900">
-                {framework.requirements}
+                {typeof controlsCount === 'number' ? controlsCount : framework.requirements}
               </div>
             </div>
 
@@ -101,17 +103,7 @@ export default function CountryPopupModal({
                 Controls
               </div>
               <div className="text-2xl font-bold text-gray-900">
-                {framework.controls}
-              </div>
-            </div>
-
-            {/* Evidence Items */}
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <div className="text-green-600 text-sm font-medium mb-1">
-                Evidence Items
-              </div>
-              <div className="text-2xl font-bold text-gray-900">
-                1
+                {typeof controlsCount === 'number' ? controlsCount : framework.controls}
               </div>
             </div>
           </div>

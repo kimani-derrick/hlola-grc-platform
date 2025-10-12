@@ -200,6 +200,30 @@ class ApiService {
     return this.makeRequest(`/entities/${entityId}/frameworks`);
   }
 
+  // Controls
+  async getControlsByFramework(frameworkId: string): Promise<ApiResponse<any>> {
+    const response = await this.makeRequest(`/controls/framework/${frameworkId}`);
+    if (!response.success) return response;
+    const anyResp: any = response as any;
+    const controls = anyResp?.data?.controls || anyResp?.controls || anyResp?.data || [];
+    return {
+      success: true,
+      data: controls,
+      error: null
+    } as any;
+  }
+
+  async getControlsGroupedByFramework(): Promise<ApiResponse<Array<{ framework_id: string; control_count: number }>>> {
+    const response = await this.makeRequest(`/controls/grouped/framework`);
+    if (!response.success) return response as any;
+    const anyResp: any = response as any;
+    const rows = anyResp?.data?.groupedControls || anyResp?.groupedControls || anyResp?.data || [];
+    const normalized = Array.isArray(rows)
+      ? rows.map((r: any) => ({ framework_id: r.framework_id, control_count: Number(r.control_count) || 0 }))
+      : [];
+    return { success: true, data: normalized };
+  }
+
   // Documents
   async getDocuments(organizationId: string): Promise<ApiResponse<any[]>> {
     return this.makeRequest(`/documents?organizationId=${organizationId}`);

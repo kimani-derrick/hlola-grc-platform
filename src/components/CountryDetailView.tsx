@@ -7,6 +7,7 @@ interface CountryDetailViewProps {
   selectedFramework: Framework;
   selectedControl: string | null;
   controlDetails: Record<string, ControlDetail>;
+  controls?: ControlDetail[];
   onBack: () => void;
   onControlSelect: (controlId: string) => void;
   onControlClose: () => void;
@@ -18,12 +19,17 @@ export default function CountryDetailView({
   selectedFramework,
   selectedControl,
   controlDetails,
+  controls = [],
   onBack,
   onControlSelect,
   onControlClose,
   getRiskLevelColor,
   getPriorityColor
 }: CountryDetailViewProps) {
+  const computedControlsCount = (controls && controls.length) || selectedFramework.controls || selectedFramework.requirements || 0;
+  const evidenceCount = controls && controls.length > 0
+    ? controls.reduce((sum, c) => sum + ((c as any).evidence ? (c as any).evidence.length : 0), 0)
+    : 0;
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm border">
@@ -79,7 +85,7 @@ export default function CountryDetailView({
                   </div>
                   <div className="text-right">
                     <div className="text-sm text-gray-500">Legal Framework</div>
-                    <div className="text-2xl font-bold text-gray-900">{selectedFramework.requirements} Requirements</div>
+                    <div className="text-2xl font-bold text-gray-900">{computedControlsCount} Controls</div>
                   </div>
                 </div>
               </div>
@@ -96,16 +102,13 @@ export default function CountryDetailView({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-blue-50 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-blue-600 mb-1">Controls</div>
-                    <div className="text-3xl font-bold text-gray-900">{selectedFramework.controls}</div>
+                    <div className="text-3xl font-bold text-gray-900">{computedControlsCount}</div>
                   </div>
                   <div className="bg-green-50 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-green-600 mb-1">Tasks</div>
                     <div className="text-3xl font-bold text-gray-900">{selectedFramework.tasks.length}</div>
                   </div>
-                  <div className="bg-purple-50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-600 mb-1">Evidence</div>
-                    <div className="text-3xl font-bold text-gray-900">{Math.floor(selectedFramework.controls * 0.8)}</div>
-                  </div>
+                  {/* Evidence removed in view-only controls context */}
                 </div>
               </div>
 
@@ -117,7 +120,7 @@ export default function CountryDetailView({
                     <p className="text-gray-600">Manage compliance requirements and evidence</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">{selectedFramework.controls} Controls</span>
+                    <span className="text-sm text-gray-500">{(controls && controls.length) || selectedFramework.controls} Controls</span>
                     <div className="flex gap-1">
                       <button className="px-3 py-1 bg-teal-600 text-white rounded text-sm">Table</button>
                       <button className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm">List</button>
@@ -125,64 +128,36 @@ export default function CountryDetailView({
                   </div>
                 </div>
 
-                {/* Controls Cards */}
+                {/* Controls Cards - real data */}
                 <div className="space-y-4">
-                  {/* Control 1 */}
-                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-001</span>
-                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 6</span>
+                  {controls && controls.length > 0 ? (
+                    controls.map((c) => (
+                      <div key={c.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">{c.id}</span>
+                              {c.article ? (
+                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">{c.article}</span>
+                              ) : null}
+                            </div>
+                            <h5 className="font-semibold text-gray-900 mb-2">{c.title}</h5>
+                            {c.subtitle && <h6 className="font-medium text-gray-700 mb-2">{c.subtitle}</h6>}
+                            {c.description && (
+                              <p className="text-gray-600 text-sm mb-3">{c.description}</p>
+                            )}
+                            <button 
+                              onClick={() => onControlSelect(c.id)}
+                              className="text-teal-600 hover:text-teal-700 text-sm font-medium"
+                            >
+                              View Details →
+                            </button>
+                          </div>
                         </div>
-                        <h5 className="font-semibold text-gray-900 mb-2">Data Protection Principles</h5>
-                        <h6 className="font-medium text-gray-700 mb-2">Lawful Basis for Processing</h6>
-                        <p className="text-gray-600 text-sm mb-3">
-                          Organizations must establish and document lawful basis for all personal data processing activities
-                        </p>
-                        <button 
-                          onClick={() => onControlSelect('DZA-001')}
-                          className="text-teal-600 hover:text-teal-700 text-sm font-medium"
-                        >
-                          View Details →
-                        </button>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Control 2 */}
-                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">DZA-002</span>
-                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">Art. 15</span>
-                        </div>
-                        <h5 className="font-semibold text-gray-900 mb-2">Data Subject Rights</h5>
-                        <h6 className="font-medium text-gray-700 mb-2">Right to Access</h6>
-                        <p className="text-gray-600 text-sm mb-3">
-                          Organizations must provide data subjects with access to their personal data upon request
-                        </p>
-                        <button 
-                          onClick={() => onControlSelect('DZA-002')}
-                          className="text-teal-600 hover:text-teal-700 text-sm font-medium"
-                        >
-                          View Details →
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Additional Controls Placeholder */}
-                  {selectedFramework.controls > 2 && (
-                    <div className="text-center py-8">
-                      <div className="text-gray-400 mb-2">
-                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                      </div>
-                      <p className="text-gray-500">+{selectedFramework.controls - 2} more controls</p>
-                    </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-gray-500 py-8">No controls found for this framework.</div>
                   )}
                 </div>
               </div>

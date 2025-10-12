@@ -8,6 +8,7 @@ interface FrameworkCardProps {
   isFrameworkActive: (id: string) => boolean;
   onCountryClick: (framework: Framework) => void;
   onAddToActive: (id: string) => void;
+  controlsCount?: number;
 }
 
 export default function FrameworkCard({
@@ -15,7 +16,8 @@ export default function FrameworkCard({
   activeFrameworkTab,
   isFrameworkActive,
   onCountryClick,
-  onAddToActive
+  onAddToActive,
+  controlsCount
 }: FrameworkCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow">
@@ -53,7 +55,7 @@ export default function FrameworkCard({
             ></div>
           </div>
           <div className="text-sm text-gray-600">
-            Requirements {framework.requirements}
+            Requirements {typeof controlsCount === 'number' ? controlsCount : framework.requirements}
           </div>
         </div>
 
