@@ -126,20 +126,7 @@ export default function ControlDetailsModal({ control, isOpen, onClose }: Contro
           </div>
         </div>
 
-        {/* Modal Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Close
-            </button>
-            <button className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-              Mark as Complete
-            </button>
-          </div>
-        </div>
+        {/* Modal footer removed per design request */}
       </div>
     </div>
   );

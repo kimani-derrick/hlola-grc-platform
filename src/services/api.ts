@@ -197,7 +197,26 @@ class ApiService {
   }
 
   async getEntityFrameworks(entityId: string): Promise<ApiResponse<any[]>> {
-    return this.makeRequest(`/entities/${entityId}/frameworks`);
+    const response = await this.makeRequest(`/entities/${entityId}/frameworks`);
+    if (!response.success) return response as any;
+    const anyResp: any = response as any;
+    const rows = anyResp?.data?.frameworks || anyResp?.frameworks || anyResp?.data || [];
+    return {
+      success: true,
+      data: rows,
+    } as any;
+  }
+
+  async assignFrameworkToEntity(entityId: string, frameworkId: string, payload?: { complianceScore?: number; auditReadinessScore?: number; certificationStatus?: string }): Promise<ApiResponse<any>> {
+    const body = {
+      complianceScore: payload?.complianceScore ?? 0,
+      auditReadinessScore: payload?.auditReadinessScore ?? 0,
+      certificationStatus: payload?.certificationStatus ?? 'not-applicable'
+    };
+    return this.makeRequest(`/entities/${entityId}/frameworks/${frameworkId}`, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
   }
 
   // Controls

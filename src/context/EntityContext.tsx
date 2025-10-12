@@ -42,25 +42,8 @@ export function EntityProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       setError(null);
       
-      // Try to get user profile to get organizationId
-      let organizationId = null;
-      try {
-        const profileResponse = await apiService.getUserProfile();
-        if (profileResponse.success && profileResponse.data?.organizationId) {
-          organizationId = profileResponse.data.organizationId;
-        }
-      } catch (profileError) {
-        console.warn('Could not get user profile, trying alternative approach:', profileError);
-      }
-
-      // If we couldn't get organizationId from profile, try to get it from the auth context
-      if (!organizationId) {
-        // For now, use a known organization ID from our test data
-        organizationId = '35903f74-76d2-481d-bfc2-5861f7af0608';
-        console.log('Using fallback organization ID:', organizationId);
-      }
-
-      const response = await apiService.getEntities(organizationId);
+      // Always rely on backend to infer organization from auth token
+      const response = await apiService.getEntities(undefined as any);
       
       if (response.success && response.data) {
         // Handle both direct array response and wrapped response
@@ -78,40 +61,7 @@ export function EntityProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Error fetching entities:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch entities');
-      
-      // Fallback to mock data for development
-      const mockEntities: EntityWithDates[] = [
-        {
-          id: '1',
-          name: 'Nairobi Branch',
-          country: 'Kenya',
-          type: 'branch',
-          status: 'active',
-          organizationId: 'mock-org',
-          createdAt: new Date('2024-01-15'),
-          updatedAt: new Date('2024-01-15'),
-          complianceScore: 85,
-          riskLevel: 'medium',
-          lastAuditDate: new Date('2024-01-10'),
-        },
-        {
-          id: '2',
-          name: 'Lagos Office',
-          country: 'Nigeria',
-          type: 'office',
-          status: 'active',
-          organizationId: 'mock-org',
-          createdAt: new Date('2024-02-01'),
-          updatedAt: new Date('2024-02-01'),
-          complianceScore: 92,
-          riskLevel: 'low',
-          lastAuditDate: new Date('2024-01-25'),
-        },
-      ];
-      setEntities(mockEntities);
-      if (mockEntities.length > 0) {
-        setSelectedEntity(mockEntities[0]);
-      }
+      // No mock fallback: API-only as requested
     } finally {
       setIsLoading(false);
     }

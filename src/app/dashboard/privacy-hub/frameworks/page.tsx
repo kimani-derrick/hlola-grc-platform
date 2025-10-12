@@ -10,11 +10,13 @@ import { Framework, ControlDetail, Priority } from '../../../../types/frameworks
 import { getPriorityColor, getRiskLevelColor } from '../../../../utils/frameworkUtils';
 import { formatDate } from '../../../../utils/dateUtils';
 import { useActiveFrameworks } from '../../../../context/ActiveFrameworksContext';
+import { useEntity } from '../../../../context/EntityContext';
 import { useFrameworksData } from '../../../../hooks/useFrameworksData';
 
 
 export default function FrameworksPage() {
-  const { activeFrameworkIds, addActiveFramework, removeActiveFramework, isFrameworkActive } = useActiveFrameworks();
+  const { activeFrameworkIds, addActiveFramework, removeActiveFramework, isFrameworkActive, setActiveFrameworkIds } = useActiveFrameworks() as any;
+  const { selectedEntity } = useEntity();
   const { frameworks, isLoading, error, refetch } = useFrameworksData();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -22,7 +24,7 @@ export default function FrameworksPage() {
   const [selectedFramework, setSelectedFramework] = useState<Framework | null>(null);
   const [activeTab, setActiveTab] = useState<'controls'>('controls');
   const [selectedFilter, setSelectedFilter] = useState<'Legal' | 'Other'>('Legal');
-  const [selectedEntity, setSelectedEntity] = useState<string>('Entity 2');
+  const [selectedEntityName, setSelectedEntityName] = useState<string>('Entity 2');
   const [activeFrameworkTab, setActiveFrameworkTab] = useState<'active' | 'library'>('library');
   const [popupFramework, setPopupFramework] = useState<Framework | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -31,6 +33,26 @@ export default function FrameworksPage() {
   const [frameworkControlsCount, setFrameworkControlsCount] = useState<Record<string, number>>({});
   const [loadingControls, setLoadingControls] = useState(false);
   const [controlsError, setControlsError] = useState<string | null>(null);
+  // API-only active frameworks (ignore local cache)
+  const [assignedFrameworkIds, setAssignedFrameworkIds] = useState<string[]>([]);
+
+  // Load Active Frameworks from backend for current entity
+  const refreshAssignedFrameworks = async () => {
+    try {
+      if (!selectedEntity?.id) return;
+      const resp: any = await apiService.getEntityFrameworks(selectedEntity.id);
+      if (resp.success) {
+        const list = Array.isArray(resp.data) ? resp.data : [];
+        const ids = list.map((f: any) => f.framework_id || f.frameworkId || f.id).filter(Boolean);
+        setAssignedFrameworkIds(ids);
+        if (typeof setActiveFrameworkIds === 'function') setActiveFrameworkIds(ids);
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    refreshAssignedFrameworks();
+  }, [selectedEntity?.id]);
 
   // Preload grouped control counts once (to avoid stale seeded counts)
   // and override card/popup display when available
@@ -56,8 +78,8 @@ export default function FrameworksPage() {
     // Apply different filters based on tab
     let matchesFilter = true;
     if (activeFrameworkTab === 'active') {
-      // In active tab, only show frameworks that are in activeFrameworkIds array
-      matchesFilter = activeFrameworkIds.includes(framework.id);
+      // API-only: show only frameworks assigned via API
+      matchesFilter = assignedFrameworkIds.includes(framework.id);
     } else {
       // In library tab, apply Legal/Other filter
       const region = (framework.region || '').toLowerCase();
@@ -232,7 +254,7 @@ export default function FrameworksPage() {
   // Get frameworks based on current tab
   const getDisplayFrameworks = () => {
     if (activeFrameworkTab === 'active') {
-      return frameworks.filter(framework => activeFrameworkIds.includes(framework.id));
+      return frameworks.filter(framework => assignedFrameworkIds.includes(framework.id));
     }
     return frameworks;
   };
@@ -295,8 +317,8 @@ export default function FrameworksPage() {
               <div className="relative">
                 <select 
                   className="px-3 py-2 pr-8 rounded-lg glass-input text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/30 min-w-[140px] appearance-none"
-                  value={selectedEntity}
-                  onChange={(e) => setSelectedEntity(e.target.value)}
+                  value={selectedEntityName}
+                  onChange={(e) => setSelectedEntityName(e.target.value)}
                 >
                   <option value="Test Entity" className="text-gray-900">Test Entity</option>
                   <option value="Entity 2" className="text-gray-900">Entity 2</option>
@@ -419,7 +441,22 @@ export default function FrameworksPage() {
                     activeFrameworkTab={activeFrameworkTab}
                     isFrameworkActive={isFrameworkActive}
                     onCountryClick={handleCountryClick}
-                    onAddToActive={addFrameworkToActive}
+                    onAddToActive={async (id: string) => {
+                      if (!selectedEntity?.id) {
+                        console.error('No selected entity; cannot assign framework');
+                        return;
+                      }
+                      try {
+                        const resp = await apiService.assignFrameworkToEntity(selectedEntity.id, id, { complianceScore: 0, auditReadinessScore: 0, certificationStatus: 'not-applicable' });
+                        if (resp.success) {
+                          await refreshAssignedFrameworks(); // reflect API state only
+                        } else {
+                          console.error('Failed to assign framework:', resp.error);
+                        }
+                      } catch (e) {
+                        console.error('Assign framework error:', e);
+                      }
+                    }}
                 controlsCount={frameworkControlsCount[framework.id] ?? framework.requirements}
                   />
                 ))}

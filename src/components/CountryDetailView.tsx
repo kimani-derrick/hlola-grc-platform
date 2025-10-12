@@ -164,20 +164,7 @@ export default function CountryDetailView({
             </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button className="flex-1 bg-[#26558e] text-white px-6 py-3 rounded-lg hover:bg-[#1e4470] transition-colors font-medium">
-              Start Compliance Process
-            </button>
-            <button className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-              Generate Report
-            </button>
-            <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-              Get Help
-            </button>
-          </div>
-        </div>
+        {/* Footer actions removed per design update */}
       </div>
 
       {/* Control Details Modal */}
