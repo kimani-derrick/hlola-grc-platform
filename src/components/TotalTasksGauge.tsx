@@ -12,13 +12,16 @@ interface TotalTasksGaugeProps {
 
 export default function TotalTasksGauge({ 
   totalTasks, 
-  maxValue = 100, 
+  maxValue, 
   title: _title, 
   status,
   size = 300 
 }: TotalTasksGaugeProps) {
   const [animatedValue, setAnimatedValue] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  
+  // Calculate dynamic maxValue if not provided
+  const dynamicMaxValue = maxValue || Math.max(100, Math.ceil(totalTasks / 50) * 50);
   
   useEffect(() => {
     setIsClient(true);
@@ -30,7 +33,7 @@ export default function TotalTasksGauge({
   }, [totalTasks]);
 
   // Calculate angle for needle (-90° at value 0, +90° at value maxValue)
-  const angle = ((animatedValue / maxValue) * 180) - 90 - 90;
+  const angle = ((animatedValue / dynamicMaxValue) * 180) - 90 - 90;
   
   // Status colors with enhanced gradients
   const statusConfig = {
@@ -109,7 +112,7 @@ export default function TotalTasksGauge({
             strokeWidth="20"
             strokeLinecap="round"
             strokeDasharray={Math.PI * outerRadius}
-            strokeDashoffset={Math.PI * outerRadius - (Math.PI * outerRadius * (Math.max(0, Math.min(maxValue, animatedValue || 0)) / maxValue))}
+            strokeDashoffset={Math.PI * outerRadius - (Math.PI * outerRadius * (Math.max(0, Math.min(dynamicMaxValue, animatedValue || 0)) / dynamicMaxValue))}
             className="transition-all duration-2000 ease-out drop-shadow-lg"
             style={{
               filter: `drop-shadow(0 0 10px ${config.color}60) drop-shadow(0 0 20px ${config.color}30)`,
@@ -159,7 +162,7 @@ export default function TotalTasksGauge({
             const tickAngle = -90 + (i * 18);
             const numberRadius = outerRadius + 25;
             const pos = polarToCartesian(center, center, numberRadius, tickAngle);
-            const number = (i * 10).toString();
+            const number = Math.round((i * dynamicMaxValue) / 10).toString();
             
             return (
               <text
@@ -283,12 +286,12 @@ export default function TotalTasksGauge({
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-gray-800">{maxValue}</div>
+          <div className="font-bold text-gray-800">{dynamicMaxValue}</div>
           <div className="text-gray-600">Capacity</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-green-600">{Math.round((animatedValue / maxValue) * 100)}%</div>
+          <div className="font-bold text-green-600">{Math.round((animatedValue / dynamicMaxValue) * 100)}%</div>
           <div className="text-gray-600">Utilization</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
