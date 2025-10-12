@@ -6,14 +6,16 @@ import CountryPopupModal from '../../../../components/CountryPopupModal';
 import CountryDetailView from '../../../../components/CountryDetailView';
 import FrameworkCard from '../../../../components/FrameworkCard';
 import { Framework, ControlDetail, Priority } from '../../../../types/frameworks';
-import { frameworks, controlDetails } from '../../../../data/frameworks';
+import { controlDetails } from '../../../../data/frameworks';
 import { getPriorityColor, getRiskLevelColor } from '../../../../utils/frameworkUtils';
 import { formatDate } from '../../../../utils/dateUtils';
 import { useActiveFrameworks } from '../../../../context/ActiveFrameworksContext';
+import { useFrameworksData } from '../../../../hooks/useFrameworksData';
 
 
 export default function FrameworksPage() {
   const { activeFrameworkIds, addActiveFramework, removeActiveFramework, isFrameworkActive } = useActiveFrameworks();
+  const { frameworks, isLoading, error, refetch } = useFrameworksData();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -39,13 +41,107 @@ export default function FrameworksPage() {
       matchesFilter = activeFrameworkIds.includes(framework.id);
     } else {
       // In library tab, apply Legal/Other filter
-      matchesFilter = selectedFilter === 'Legal' ? 
-        (framework.type === 'Legal') : 
-        (framework.type === 'Other' || framework.type === 'Standards');
+      const region = (framework.region || '').toLowerCase();
+      matchesFilter = selectedFilter === 'Legal'
+        ? region === 'africa'
+        : region !== 'africa';
     }
     
     return matchesSearch && matchesCategory && matchesStatus && matchesFilter;
   });
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen bg-gray-50 rounded-3xl mx-4 mt-8">
+          <div className="bg-hlola-gradient-strong px-6 py-8 rounded-3xl">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.581 9.67-8.5 11.317C4.581 16.67 1 12.225 1 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-white">Privacy Hub</h1>
+                    <div className="mt-1">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white/90 backdrop-blur-sm">
+                        &gt; Frameworks
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto px-6 py-8">
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading frameworks...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen bg-gray-50 rounded-3xl mx-4 mt-8">
+          <div className="bg-hlola-gradient-strong px-6 py-8 rounded-3xl">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.581 9.67-8.5 11.317C4.581 16.67 1 12.225 1 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-white">Privacy Hub</h1>
+                    <div className="mt-1">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white/90 backdrop-blur-sm">
+                        &gt; Frameworks
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto px-6 py-8">
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load frameworks</h3>
+                  <p className="text-gray-600 mb-4">{error}</p>
+                  <button
+                    onClick={refetch}
+                    className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const toggleTaskCompletion = (frameworkId: string, taskId: string) => {
     // This would typically update the backend
@@ -247,7 +343,7 @@ export default function FrameworksPage() {
                         : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                     }`}
                   >
-                    African Legal Frameworks
+                    African Legal Frameworks ({frameworks.filter(f => (f.region || '').toLowerCase() === 'africa').length})
                   </button>
                   <button
                     onClick={() => setSelectedFilter('Other')}
@@ -257,7 +353,7 @@ export default function FrameworksPage() {
                         : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                     }`}
                   >
-                    Other Frameworks
+                    Other Frameworks ({frameworks.filter(f => (f.region || '').toLowerCase() !== 'africa').length})
                   </button>
                 </div>
               )}

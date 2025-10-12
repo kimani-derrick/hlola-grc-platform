@@ -1012,3 +1012,4 @@ Common HTTP status codes used:
 - File storage is handled by a custom storage service
 - JWT tokens are used for stateless authentication
 
+

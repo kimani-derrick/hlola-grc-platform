@@ -83,6 +83,30 @@ class ApiService {
 
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+      
+      // Handle 304 Not Modified - browser will use cached data
+      if (response.status === 304) {
+        // For 304 responses, we need to make a fresh request without cache
+        const freshConfig = {
+          ...config,
+          cache: 'no-cache' as RequestCache,
+        };
+        const freshResponse = await fetch(`${API_BASE_URL}${endpoint}`, freshConfig);
+        const freshData = await freshResponse.json();
+        
+        if (!freshResponse.ok) {
+          return {
+            success: false,
+            error: freshData.error || freshData.message || 'Request failed',
+          };
+        }
+        
+        return {
+          success: true,
+          data: freshData.data || freshData,
+        };
+      }
+      
       const data = await response.json();
 
       if (!response.ok) {
@@ -144,7 +168,32 @@ class ApiService {
 
   // Frameworks
   async getFrameworks(): Promise<ApiResponse<any[]>> {
-    return this.makeRequest('/frameworks');
+    const response = await this.makeRequest('/frameworks');
+    
+    // If the request failed, return the error response as-is
+    if (!response.success) {
+      return response;
+    }
+    
+    // Backend returns { success, frameworks, pagination }
+    // Normalize into ApiResponse<{data: frameworks[]}>
+    // Try response.data.frameworks first, then response.frameworks
+    const anyResponse: any = response as any;
+    const frameworks = anyResponse?.data?.frameworks || anyResponse?.frameworks;
+
+    if (Array.isArray(frameworks)) {
+      return {
+        success: true,
+        data: frameworks,
+        error: null
+      };
+    }
+    
+    return {
+      success: false,
+      error: 'No frameworks data received',
+      data: []
+    };
   }
 
   async getEntityFrameworks(entityId: string): Promise<ApiResponse<any[]>> {
@@ -168,13 +217,6 @@ class ApiService {
   // User profile
   async getUserProfile(): Promise<ApiResponse<any>> {
     const response = await this.makeRequest('/auth/profile');
-    
-    // If profile doesn't have organizationId, try to get it from the token
-    if (response.success && response.data && !response.data.organizationId) {
-      // For now, return a mock organizationId since the profile endpoint doesn't include it
-      response.data.organizationId = '35903f74-76d2-481d-bfc2-5861f7af0608';
-    }
-    
     return response;
   }
 }

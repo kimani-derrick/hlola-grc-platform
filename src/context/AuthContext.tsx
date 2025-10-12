@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
+import { apiFetch, apiFetchWithAuth } from '../utils/api';
 
 interface User {
   id: string;
@@ -34,14 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const token = localStorage.getItem('authToken');
         if (token) {
           // Verify token with backend
-          const response = await fetch('http://localhost:3001/api/auth/profile', {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
+          const response = await apiFetchWithAuth('/auth/profile');
           
           if (response.ok) {
-            const data = await response.json();
+            const data = response.data;
             if (data.success && data.user) {
               setUser({
                 id: data.user.id,
@@ -76,36 +73,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       // Use our backend API directly instead of NextAuth
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await apiFetch('/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      if (response.ok) {
+        const data = response.data;
 
-      if (data.success && data.token && data.user) {
-        // Store token for API calls
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('authToken', data.token);
-          sessionStorage.setItem('authToken', data.token);
+        if (data.success && data.token && data.user) {
+          // Store token for API calls
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('authToken', data.token);
+            sessionStorage.setItem('authToken', data.token);
+          }
+          
+          // Set user state
+          setUser({
+            id: data.user.id,
+            name: `${data.user.firstName} ${data.user.lastName}`,
+            email: data.user.email,
+            role: data.user.role,
+            organizationId: data.user.organizationId,
+            entityId: data.user.entityId,
+            department: data.user.department,
+            jobTitle: data.user.jobTitle,
+          });
+          
+          return true;
         }
-        
-        // Set user state
-        setUser({
-          id: data.user.id,
-          name: `${data.user.firstName} ${data.user.lastName}`,
-          email: data.user.email,
-          role: data.user.role,
-          organizationId: data.user.organizationId,
-          entityId: data.user.entityId,
-          department: data.user.department,
-          jobTitle: data.user.jobTitle,
-        });
-        
-        return true;
       }
 
       return false;
