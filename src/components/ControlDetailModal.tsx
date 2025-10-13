@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import TaskDetailModal from './TaskDetailModal';
+import AddTaskModal from './AddTaskModal';
 import { Control } from './controls/ControlCard';
 import { apiService } from '../services/api';
 
@@ -114,6 +115,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [tasksLoading, setTasksLoading] = useState(false);
   const [tasksError, setTasksError] = useState<string | null>(null);
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   // Fetch tasks when control changes
   useEffect(() => {
@@ -193,6 +195,34 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
         break;
       default:
         setActiveTaskMenu(null);
+    }
+  };
+
+  const handleTaskCreated = () => {
+    // Refresh the tasks list
+    if (control?.id) {
+      const fetchTasks = async () => {
+        setTasksLoading(true);
+        setTasksError(null);
+        
+        try {
+          const response = await apiService.getTasksByControl(control.id);
+          
+          if (response.success && response.data) {
+            const mappedTasks = response.data.map(mapApiTaskToTask);
+            setTasks(mappedTasks);
+          } else {
+            setTasksError(response.error || 'Failed to fetch tasks');
+          }
+        } catch (error) {
+          console.error('Error fetching tasks:', error);
+          setTasksError('Failed to fetch tasks');
+        } finally {
+          setTasksLoading(false);
+        }
+      };
+      
+      fetchTasks();
     }
   };
 
@@ -338,7 +368,10 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                 </svg>
                 <h3 className="text-lg font-semibold text-gray-900">Tasks Management</h3>
               </div>
-              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
+              <button 
+                onClick={() => setIsAddTaskOpen(true)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -610,6 +643,14 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
           }}
         />
       )}
+
+      {/* Add Task Modal */}
+      <AddTaskModal
+        isOpen={isAddTaskOpen}
+        onClose={() => setIsAddTaskOpen(false)}
+        controlId={control.id}
+        onTaskCreated={handleTaskCreated}
+      />
     </div>
   );
 }

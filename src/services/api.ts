@@ -173,7 +173,7 @@ class ApiService {
     
     // If the request failed, return the error response as-is
     if (!response.success) {
-      return response;
+      return response as ApiResponse<any[]>;
     }
     
     // Backend returns { success, frameworks, pagination }
@@ -186,7 +186,7 @@ class ApiService {
       return {
         success: true,
         data: frameworks,
-        error: null
+        error: undefined
       };
     }
     
@@ -340,6 +340,23 @@ class ApiService {
   async getCommentStats(): Promise<ApiResponse<any>> {
     const response = await this.makeRequest('/comments/stats');
     return response;
+  }
+
+  // Task Management
+  async createTask(taskData: {
+    controlId: string;
+    title: string;
+    description?: string;
+    priority?: 'high' | 'medium' | 'low';
+    category?: string;
+    assigneeId?: string;
+    dueDate?: string;
+    estimatedHours?: number;
+  }): Promise<ApiResponse<any>> {
+    return this.makeRequest('/tasks', {
+      method: 'POST',
+      body: JSON.stringify(taskData)
+    });
   }
 }
 
