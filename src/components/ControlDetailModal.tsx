@@ -130,7 +130,24 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
         
         if (response.success && response.data) {
           const mappedTasks = response.data.map(mapApiTaskToTask);
-          setTasks(mappedTasks);
+          console.log('🔍 Raw tasks from API:', response.data.length);
+          console.log('🔍 Mapped tasks:', mappedTasks.length);
+          
+          // Check for duplicate IDs in raw data
+          const rawIds = response.data.map((task: any) => task.id);
+          const uniqueRawIds = new Set(rawIds);
+          if (rawIds.length !== uniqueRawIds.size) {
+            console.warn('⚠️ Duplicate task IDs found in API response:', rawIds.length - uniqueRawIds.size, 'duplicates');
+          }
+          
+          // Deduplicate tasks by ID to prevent duplicate keys
+          const taskMap = new Map<string, Task>();
+          mappedTasks.forEach(task => {
+            taskMap.set(task.id, task);
+          });
+          const uniqueTasks = Array.from(taskMap.values());
+          console.log('🔍 Unique tasks after deduplication:', uniqueTasks.length);
+          setTasks(uniqueTasks);
         } else {
           setTasksError(response.error || 'Failed to load tasks');
           setTasks([]);
@@ -210,7 +227,16 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
           
           if (response.success && response.data) {
             const mappedTasks = response.data.map(mapApiTaskToTask);
-            setTasks(mappedTasks);
+            console.log('🔄 Refreshing tasks - Raw:', response.data.length, 'Mapped:', mappedTasks.length);
+            
+            // Deduplicate tasks by ID to prevent duplicate keys
+            const taskMap = new Map<string, Task>();
+            mappedTasks.forEach(task => {
+              taskMap.set(task.id, task);
+            });
+            const uniqueTasks = Array.from(taskMap.values());
+            console.log('🔄 After deduplication:', uniqueTasks.length);
+            setTasks(uniqueTasks);
           } else {
             setTasksError(response.error || 'Failed to fetch tasks');
           }
@@ -641,6 +667,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
             setIsTaskDetailOpen(false);
             setSelectedTask(null);
           }}
+          onTaskCompleted={handleTaskCreated}
         />
       )}
 

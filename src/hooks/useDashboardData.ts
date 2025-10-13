@@ -51,17 +51,16 @@ export interface DashboardMetrics {
 }
 
 export function useDashboardData(organizationId?: string) {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [data, setData] = useState<DashboardMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
-    // Use provided organizationId, user's organizationId, or fallback to known test org
-    const orgId = organizationId || user?.organizationId || '35903f74-76d2-481d-bfc2-5861f7af0608';
-    
+    // Use provided organizationId or user's organizationId
+    const orgId = organizationId || user?.organizationId;
     if (!orgId) {
-      setError('No organization ID available');
+      // Do not error or set demo data; wait for auth/user to be ready
       setIsLoading(false);
       return;
     }
@@ -88,7 +87,7 @@ export function useDashboardData(organizationId?: string) {
       ]);
 
       // Process the data
-      const overview = overviewResponse.data?.overview || {};
+      const overview: any = overviewResponse.data?.overview || {};
       const tasks = tasksResponse.data?.summary || {};
       const frameworksSummary = frameworksResponse.data?.summary || {};
       const documents = documentsResponse.data || [];
@@ -129,12 +128,12 @@ export function useDashboardData(organizationId?: string) {
       const criticalIssues = auditGaps.filter((gap: any) => gap.severity === 'critical').length;
       
       // Calculate risk exposure based on assigned frameworks
-      const frameworks = frameworksResponse.data?.frameworks || [];
+      const frameworks: any[] = frameworksResponse.data?.frameworks || [];
       const riskExposure = calculateRiskExposure(frameworks);
       
       // DEBUG: Log risk exposure calculation
       console.log('🔍 DEBUG - Risk Exposure Calculation:');
-      console.log('Frameworks:', frameworks.map(f => ({ name: f.name, riskLevel: f.riskLevel })));
+      console.log('Frameworks:', frameworks.map((f: any) => ({ name: f.name, riskLevel: f.riskLevel })));
       console.log('Calculated Risk Exposure:', riskExposure);
       
       const complianceScore = overview.avgComplianceScore || 0;
@@ -154,7 +153,7 @@ export function useDashboardData(organizationId?: string) {
         riskLevel = 'medium';
       }
 
-      setData({
+      const nextData: DashboardMetrics = {
         totalTasks,
         completedTasks,
         pendingTasks,
@@ -172,38 +171,31 @@ export function useDashboardData(organizationId?: string) {
         complianceScore,
         totalControls: overview.totalControls || 0, // Add missing totalControls
         riskLevel,
-      });
+      };
+
+      setData(nextData);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
-      
-      // Fallback to mock data
-      setData({
-        totalTasks: 38,
-        completedTasks: 15,
-        pendingTasks: 18,
-        inProgressTasks: 5,
-        overdueTasks: 3,
-        completionRate: 39,
-        uploadedDocuments: 12,
-        requiredDocuments: 38,
-        uploadPercentage: 32,
-        assignedFrameworks: 2,
-        totalAvailableFrameworks: 10,
-        frameworkCoverage: 20,
-        criticalIssues: 11,
-        riskExposure: 7000000,
-        complianceScore: 65,
-        riskLevel: 'critical',
-      });
+      // Do not inject demo data. Keep previous data if any; otherwise leave null.
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    // Wait for auth to finish loading
+    if (authLoading) return;
+
+    const orgId = organizationId || user?.organizationId;
+    if (!orgId) {
+      setIsLoading(false);
+      setError('No organization ID available');
+      return;
+    }
+
     fetchDashboardData();
-  }, [organizationId, user?.organizationId]);
+  }, [authLoading, organizationId, user?.organizationId]);
 
   return {
     data,

@@ -14,7 +14,7 @@ import EvidenceUploadGauge from './EvidenceUploadGauge';
 import FrameworkCoverageGauge from './FrameworkCoverageGauge';
 
 export default function DashboardContent() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { selectedEntity, isLoading: entityLoading } = useEntity();
   const { data: dashboardData, isLoading: dataLoading, error: dataError } = useDashboardData(user?.organizationId);
   const { recentActivities, priorityActions, loading: activitiesLoading, error: activitiesError } = useActivitiesData(user?.organizationId);
@@ -42,8 +42,8 @@ export default function DashboardContent() {
     return () => window.removeEventListener('resize', updateGaugeSize);
   }, []);
 
-  // Show loading state while entities or data are loading
-  if (entityLoading || dataLoading) {
+  // Show loading state while auth or entities are loading, but not if we have cached data
+  if (authLoading || entityLoading || (dataLoading && !dashboardData)) {
     return (
       <div className="space-y-6 max-w-full">
         <div className="glass-card rounded-2xl p-4">
@@ -96,43 +96,25 @@ export default function DashboardContent() {
     target: 50
   });
 
-  // Use real dashboard data or fallback to mock data
-  const entityData = dashboardData ? {
-    criticalIssues: dashboardData.criticalIssues,
-    riskExposure: dashboardData.riskExposure,
-    controls: dashboardData?.totalControls,
-    policies: dashboardData.uploadedDocuments,
-    risks: Math.round(dashboardData.totalTasks * 0.4), // Estimate based on tasks
-    tasks: dashboardData.totalTasks,
-    completedTasks: dashboardData.completedTasks,
-    pendingTasks: dashboardData.pendingTasks,
-    inProgressTasks: dashboardData.inProgressTasks,
-    overdueTasks: dashboardData.overdueTasks,
-    completionRate: dashboardData.completionRate,
-    uploadedDocuments: dashboardData.uploadedDocuments,
-    requiredDocuments: dashboardData.requiredDocuments,
-    uploadPercentage: dashboardData.uploadPercentage,
-    assignedFrameworks: dashboardData.assignedFrameworks,
-    totalAvailableFrameworks: dashboardData.totalAvailableFrameworks,
-    frameworkCoverage: dashboardData.frameworkCoverage,
-  } : {
-    criticalIssues: 11,
-    riskExposure: 7000000,
-    controls: 86,
-    policies: 30,
-    risks: 16,
-    tasks: 38,
-    completedTasks: 15,
-    pendingTasks: 18,
-    inProgressTasks: 5,
-    overdueTasks: 3,
-    completionRate: 39,
-    uploadedDocuments: 12,
-    requiredDocuments: 38,
-    uploadPercentage: 32,
-    assignedFrameworks: 2,
-    totalAvailableFrameworks: 10,
-    frameworkCoverage: 20,
+  // Use real dashboard data or zeros when none is available
+  const entityData = {
+    criticalIssues: dashboardData?.criticalIssues || 0,
+    riskExposure: dashboardData?.riskExposure || 0,
+    controls: dashboardData?.totalControls || 0,
+    policies: dashboardData?.uploadedDocuments || 0,
+    risks: Math.round((dashboardData?.totalTasks || 0) * 0.4),
+    tasks: dashboardData?.totalTasks || 0,
+    completedTasks: dashboardData?.completedTasks || 0,
+    pendingTasks: dashboardData?.pendingTasks || 0,
+    inProgressTasks: dashboardData?.inProgressTasks || 0,
+    overdueTasks: dashboardData?.overdueTasks || 0,
+    completionRate: dashboardData?.completionRate || 0,
+    uploadedDocuments: dashboardData?.uploadedDocuments || 0,
+    requiredDocuments: dashboardData?.requiredDocuments || 0,
+    uploadPercentage: dashboardData?.uploadPercentage || 0,
+    assignedFrameworks: dashboardData?.assignedFrameworks || 0,
+    totalAvailableFrameworks: dashboardData?.totalAvailableFrameworks || 0,
+    frameworkCoverage: dashboardData?.frameworkCoverage || 0,
   };
 
   return (

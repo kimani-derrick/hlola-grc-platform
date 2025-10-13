@@ -17,6 +17,26 @@ class ComplianceEventListener {
 
       const entityId = document.entity_id;
       
+      // Update task evidence status if this is evidence for a specific task
+      if (document.document_type === 'evidence' && document.task_id) {
+        try {
+          const Task = require('../models/Task');
+          await Task.update(document.task_id, { evidenceAttached: true });
+          
+          logger.info('Task evidence status updated', {
+            taskId: document.task_id,
+            documentId: document.id,
+            evidenceAttached: true
+          });
+        } catch (error) {
+          logger.error('Error updating task evidence status', {
+            error: error.message,
+            taskId: document.task_id,
+            documentId: document.id
+          });
+        }
+      }
+      
       // Get all frameworks for this entity
       const frameworks = await this.getEntityFrameworks(entityId);
       

@@ -189,9 +189,23 @@ const getProfile = async (req, res) => {
       });
     }
 
+    // Return user data in the same format as login
+    const userData = {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      role: user.role,
+      department: user.department,
+      jobTitle: user.job_title,
+      organizationId: user.organization_id,
+      entityId: user.entity_id,
+      createdAt: user.created_at
+    };
+
     res.json({
       success: true,
-      user
+      user: userData
     });
 
   } catch (error) {

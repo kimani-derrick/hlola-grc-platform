@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import { apiService } from '../services/api';
+import EvidenceUploadModal from './EvidenceUploadModal';
+import { useAuth } from '../context/AuthContext';
+import { useEntity } from '../context/EntityContext';
 
 interface Comment {
   id: string;
@@ -20,6 +23,21 @@ interface Comment {
   };
 }
 
+interface Document {
+  id: string;
+  name: string;
+  description: string;
+  document_type: string;
+  file_path: string;
+  file_size: number;
+  mime_type: string;
+  is_evidence: boolean;
+  created_at: string;
+  uploaded_by: string;
+  uploader_first_name: string;
+  uploader_last_name: string;
+}
+
 interface TaskDetailModalProps {
   task: {
     id: string;
@@ -33,6 +51,7 @@ interface TaskDetailModalProps {
   };
   isOpen: boolean;
   onClose: () => void;
+  onTaskCompleted?: () => void;
 }
 
 const getStatusColor = (status: string) => {
@@ -59,12 +78,18 @@ const getProgressColor = (progress: number) => {
   return 'bg-gray-300';
 };
 
-export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailModalProps) {
+export default function TaskDetailModal({ task, isOpen, onClose, onTaskCompleted }: TaskDetailModalProps) {
+  const { user } = useAuth();
+  const { selectedEntity } = useEntity();
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentsError, setCommentsError] = useState<string | null>(null);
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [evidence, setEvidence] = useState<Document[]>([]);
+  const [evidenceLoading, setEvidenceLoading] = useState(false);
+  const [evidenceError, setEvidenceError] = useState<string | null>(null);
+  const [isEvidenceUploadOpen, setIsEvidenceUploadOpen] = useState(false);
 
   // Fetch comments when modal opens
   useEffect(() => {
@@ -91,6 +116,33 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
     };
 
     fetchComments();
+  }, [isOpen, task?.id]);
+
+  // Fetch evidence when modal opens
+  useEffect(() => {
+    const fetchEvidence = async () => {
+      if (!isOpen || !task?.id) return;
+      
+      setEvidenceLoading(true);
+      setEvidenceError(null);
+      
+      try {
+        const response = await apiService.getDocumentsByTask(task.id);
+        
+        if (response.success && response.data) {
+          setEvidence(response.data);
+        } else {
+          setEvidenceError(response.error || 'Failed to fetch evidence');
+        }
+      } catch (error) {
+        console.error('Error fetching evidence:', error);
+        setEvidenceError('Failed to fetch evidence');
+      } finally {
+        setEvidenceLoading(false);
+      }
+    };
+
+    fetchEvidence();
   }, [isOpen, task?.id]);
 
   const handleAddComment = async () => {
@@ -122,6 +174,39 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
       console.error('Error adding comment:', error);
     } finally {
       setSubmittingComment(false);
+    }
+  };
+
+  const handleEvidenceUploaded = () => {
+    // Refresh evidence list
+    const fetchEvidence = async () => {
+      try {
+        const response = await apiService.getDocumentsByTask(task.id);
+        if (response.success && response.data) {
+          setEvidence(response.data);
+        }
+      } catch (error) {
+        console.error('Error refreshing evidence:', error);
+      }
+    };
+    fetchEvidence();
+  };
+
+  const handleCompleteTask = async () => {
+    try {
+      const response = await apiService.updateTaskStatus(task.id, 'completed');
+      if (response.success) {
+        // Call the callback to refresh parent component
+        if (onTaskCompleted) {
+          onTaskCompleted();
+        }
+        // Close modal
+        onClose();
+      } else {
+        console.error('Failed to complete task:', response.error);
+      }
+    } catch (error) {
+      console.error('Error completing task:', error);
     }
   };
 
@@ -285,16 +370,94 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
                 <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
-                <h3 className="text-lg font-semibold text-gray-900">Task Evidence (Loading...)</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Task Evidence {evidenceLoading ? '(Loading...)' : `(${evidence.length})`}
+                </h3>
               </div>
-              <button className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 font-medium">
+              <button 
+                onClick={() => setIsEvidenceUploadOpen(true)}
+                disabled={!selectedEntity?.id && !user?.entityId}
+                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
                 Upload Evidence
               </button>
             </div>
-            <p className="text-sm text-gray-600">Upload evidence files to document completion of this task.</p>
+            <p className="text-sm text-gray-600">
+              Upload evidence files to document completion of this task.
+              {(!selectedEntity?.id && !user?.entityId) && (
+                <span className="text-red-500 block mt-1">
+                  ⚠️ No entity selected. Please select an entity first.
+                </span>
+              )}
+            </p>
+            
+            {/* Evidence List */}
+            {evidenceLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <span className="ml-2 text-gray-600">Loading evidence...</span>
+              </div>
+            ) : evidenceError ? (
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-sm text-red-600">{evidenceError}</p>
+              </div>
+            ) : evidence.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p>No evidence uploaded yet</p>
+                <p className="text-sm">Upload files to document task completion</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {evidence.map((doc) => (
+                  <div key={doc.id} className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{doc.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {doc.description || 'No description'} • 
+                          {(doc.file_size / 1024).toFixed(1)} KB • 
+                          Uploaded by {doc.uploader_first_name} {doc.uploader_last_name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">
+                        {new Date(doc.created_at).toLocaleDateString()}
+                      </span>
+                      <button className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Complete Task Button */}
+            {evidence.length > 0 && task.status !== 'completed' && (
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  onClick={handleCompleteTask}
+                  className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Complete Task
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Comments & Updates */}
@@ -404,6 +567,17 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
           </div>
         </div>
       </div>
+
+      {/* Evidence Upload Modal */}
+      {(selectedEntity?.id || user?.entityId) && (
+        <EvidenceUploadModal
+          isOpen={isEvidenceUploadOpen}
+          onClose={() => setIsEvidenceUploadOpen(false)}
+          taskId={task.id}
+          entityId={selectedEntity?.id || user?.entityId} // Use selected entity or user's entity
+          onEvidenceUploaded={handleEvidenceUploaded}
+        />
+      )}
     </div>
   );
 }

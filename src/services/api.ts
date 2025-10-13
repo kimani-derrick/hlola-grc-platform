@@ -75,6 +75,8 @@ class ApiService {
     
     const config: RequestInit = {
       ...options,
+      // Ensure we bypass any browser cache on all API calls
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
@@ -90,7 +92,7 @@ class ApiService {
         // For 304 responses, we need to make a fresh request without cache
         const freshConfig = {
           ...config,
-          cache: 'no-cache' as RequestCache,
+          cache: 'reload' as RequestCache,
         };
         const freshResponse = await fetch(`${API_BASE_URL}${endpoint}`, freshConfig);
         const freshData = await freshResponse.json();
@@ -357,6 +359,44 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(taskData)
     });
+  }
+
+  async updateTaskStatus(taskId: string, status: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/tasks/${taskId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+  }
+
+  // Document Management
+  async uploadDocument(formData: FormData): Promise<ApiResponse<any>> {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/documents`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+    return {
+      success: response.ok,
+      data: data.data || data,
+      error: response.ok ? undefined : data.error || data.message
+    };
+  }
+
+  async getDocumentsByTask(taskId: string): Promise<ApiResponse<any[]>> {
+    const response = await this.makeRequest(`/documents/tasks/${taskId}`);
+    if (!response.success) return response as ApiResponse<any[]>;
+    const anyResp: any = response as any;
+    const documents = anyResp?.data?.documents || anyResp?.documents || anyResp?.data || [];
+    return {
+      success: true,
+      data: documents,
+      error: undefined
+    } as ApiResponse<any[]>;
   }
 }
 

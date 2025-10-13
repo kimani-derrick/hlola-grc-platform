@@ -33,28 +33,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('authToken');
+        const cachedUser = localStorage.getItem('userData');
+        
+        // Immediately set cached user data for instant dashboard loading
+        if (cachedUser) {
+          try {
+            const userData = JSON.parse(cachedUser);
+            setUser(userData);
+            console.log('🔍 DEBUG - Restored user from cache:', userData);
+          } catch (e) {
+            console.error('Failed to parse cached user data:', e);
+          }
+        }
+        
         if (token) {
-          // Verify token with backend
+          // Verify token with backend in background
           const response = await apiFetchWithAuth('/auth/profile');
           
           if (response.ok) {
             const data = response.data;
             if (data.success && data.user) {
-              setUser({
+              // Get current cached user data to preserve organizationId if API doesn't return it
+              const currentUser = user || (cachedUser ? JSON.parse(cachedUser) : null);
+              
+              const userData = {
                 id: data.user.id,
                 name: `${data.user.firstName} ${data.user.lastName}`,
                 email: data.user.email,
                 role: data.user.role,
-                organizationId: data.user.organizationId,
-                entityId: data.user.entityId,
-                department: data.user.department,
-                jobTitle: data.user.jobTitle,
-              });
+                // Preserve organizationId from cache if API doesn't return it
+                organizationId: data.user.organizationId || currentUser?.organizationId,
+                entityId: data.user.entityId || currentUser?.entityId,
+                department: data.user.department || currentUser?.department,
+                jobTitle: data.user.jobTitle || currentUser?.jobTitle,
+              };
+              setUser(userData);
+              // Update cache with fresh data
+              localStorage.setItem('userData', JSON.stringify(userData));
+              console.log('🔍 DEBUG - Updated user from API:', userData);
             }
           } else {
             // Token is invalid, clear it
             localStorage.removeItem('authToken');
             sessionStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            setUser(null);
           }
         }
       } catch (error) {
@@ -62,6 +85,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Clear invalid tokens
         localStorage.removeItem('authToken');
         sessionStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -89,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           
           // Set user state
-          setUser({
+          const userData = {
             id: data.user.id,
             name: `${data.user.firstName} ${data.user.lastName}`,
             email: data.user.email,
@@ -98,7 +123,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             entityId: data.user.entityId,
             department: data.user.department,
             jobTitle: data.user.jobTitle,
-          });
+          };
+          setUser(userData);
+          
+          // Cache user data for instant loading on refresh
+          localStorage.setItem('userData', JSON.stringify(userData));
+          console.log('🔍 DEBUG - Cached user data on login:', userData);
           
           return true;
         }
@@ -115,10 +145,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear user state
     setUser(null);
     
-    // Clear our stored tokens
+    // Clear our stored tokens and user data
     if (typeof window !== 'undefined') {
       localStorage.removeItem('authToken');
       sessionStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
     }
     
     // Also sign out from NextAuth
