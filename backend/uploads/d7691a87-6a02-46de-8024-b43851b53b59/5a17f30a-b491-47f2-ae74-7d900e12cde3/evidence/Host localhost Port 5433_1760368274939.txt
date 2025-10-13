@@ -1,0 +1,5 @@
+Host: localhost
+Port: 5433 (Docker mapped port)
+Database: hlola_grc_platform
+Username: hlola_user
+Password: hlola2025

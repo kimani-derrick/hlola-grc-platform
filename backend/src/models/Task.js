@@ -57,14 +57,6 @@ class Task {
       JOIN entities e ON ca.entity_id = e.id
       LEFT JOIN users u1 ON t.assignee_id = u1.id
       WHERE e.organization_id = $1
-      AND t.created_at >= e.created_at
-      AND EXISTS (
-        SELECT 1 FROM control_assignments ca2 
-        JOIN entities e2 ON ca2.entity_id = e2.id 
-        WHERE ca2.control_id = t.control_id 
-        AND e2.organization_id = $1
-        AND ca2.entity_id = e.id
-      )
     `;
     const params = [organizationId];
     let paramCount = 2;
