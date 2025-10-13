@@ -145,9 +145,13 @@ class ApiService {
     }
   }
 
-  // Dashboard data
-  async getDashboardData(organizationId: string): Promise<ApiResponse<DashboardData>> {
-    return this.makeRequest<DashboardData>(`/reports/overview`);
+  // Dashboard data - using simple tasks API instead of complex compliance endpoints
+  async getTaskStats(organizationId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/tasks/stats`);
+  }
+
+  async getAllTasks(organizationId: string): Promise<ApiResponse<any[]>> {
+    return this.makeRequest<any[]>(`/tasks`);
   }
 
   // Entities
