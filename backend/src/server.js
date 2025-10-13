@@ -28,6 +28,7 @@ const complianceHistoryRoutes = require('./routes/complianceHistory');
 const auditTimelineRoutes = require('./routes/auditTimeline');
 const complianceRoutes = require('./routes/compliance');
 const reportRoutes = require('./routes/reports');
+const commentRoutes = require('./routes/comments');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -104,6 +105,7 @@ app.use('/api/compliance/history', complianceHistoryRoutes);
 app.use('/api/audit/timeline', auditTimelineRoutes);
 app.use('/api/compliance', complianceRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -127,6 +129,7 @@ app.get('/', (req, res) => {
       auditTimeline: '/api/audit/timeline',
       compliance: '/api/compliance',
       reports: '/api/reports',
+      comments: '/api/comments',
       documentation: '/api/docs'
     }
   });

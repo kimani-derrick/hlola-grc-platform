@@ -236,14 +236,14 @@ class ApiService {
   // Tasks by Control
   async getTasksByControl(controlId: string): Promise<ApiResponse<any[]>> {
     const response = await this.makeRequest(`/tasks/controls/${controlId}`);
-    if (!response.success) return response;
+    if (!response.success) return response as ApiResponse<any[]>;
     const anyResp: any = response as any;
     const tasks = anyResp?.data?.tasks || anyResp?.tasks || anyResp?.data || [];
     return {
       success: true,
       data: tasks,
-      error: null
-    } as any;
+      error: undefined
+    } as ApiResponse<any[]>;
   }
 
   async getControlsGroupedByFramework(): Promise<ApiResponse<Array<{ framework_id: string; control_count: number }>>> {
@@ -274,6 +274,71 @@ class ApiService {
   // User profile
   async getUserProfile(): Promise<ApiResponse<any>> {
     const response = await this.makeRequest('/auth/profile');
+    return response;
+  }
+
+  // Comments
+  async createComment(commentData: {
+    entityId?: string;
+    taskId?: string;
+    controlId?: string;
+    frameworkId?: string;
+    parentCommentId?: string;
+    content: string;
+    commentType?: 'general' | 'update' | 'question' | 'resolution' | 'note';
+    isInternal?: boolean;
+    isResolved?: boolean;
+  }): Promise<ApiResponse<any>> {
+    return this.makeRequest('/comments', {
+      method: 'POST',
+      body: JSON.stringify(commentData)
+    });
+  }
+
+  async getCommentsByTask(taskId: string): Promise<ApiResponse<any[]>> {
+    const response = await this.makeRequest(`/comments/tasks/${taskId}`);
+    if (!response.success) return response as ApiResponse<any[]>;
+    const anyResp: any = response as any;
+    const comments = anyResp?.data?.comments || anyResp?.comments || anyResp?.data || [];
+    return {
+      success: true,
+      data: comments,
+      error: undefined
+    } as ApiResponse<any[]>;
+  }
+
+  async getCommentsByEntity(entityId: string): Promise<ApiResponse<any[]>> {
+    const response = await this.makeRequest(`/comments/entities/${entityId}`);
+    if (!response.success) return response as ApiResponse<any[]>;
+    const anyResp: any = response as any;
+    const comments = anyResp?.data?.comments || anyResp?.comments || anyResp?.data || [];
+    return {
+      success: true,
+      data: comments,
+      error: undefined
+    } as ApiResponse<any[]>;
+  }
+
+  async updateComment(commentId: string, updateData: {
+    content?: string;
+    commentType?: 'general' | 'update' | 'question' | 'resolution' | 'note';
+    isInternal?: boolean;
+    isResolved?: boolean;
+  }): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/comments/${commentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData)
+    });
+  }
+
+  async deleteComment(commentId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/comments/${commentId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getCommentStats(): Promise<ApiResponse<any>> {
+    const response = await this.makeRequest('/comments/stats');
     return response;
   }
 }

@@ -1,7 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDate } from '../utils/dateUtils';
+import { apiService } from '../services/api';
+
+interface Comment {
+  id: string;
+  content: string;
+  commentType: 'general' | 'update' | 'question' | 'resolution' | 'note';
+  isInternal: boolean;
+  isResolved: boolean;
+  createdAt: string;
+  updatedAt: string;
+  author: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
 
 interface TaskDetailModalProps {
   task: {
@@ -44,6 +61,122 @@ const getProgressColor = (progress: number) => {
 
 export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailModalProps) {
   const [comment, setComment] = useState('');
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsError, setCommentsError] = useState<string | null>(null);
+  const [submittingComment, setSubmittingComment] = useState(false);
+
+  // Fetch comments when modal opens
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!isOpen || !task?.id) return;
+      
+      setCommentsLoading(true);
+      setCommentsError(null);
+      
+      try {
+        const response = await apiService.getCommentsByTask(task.id);
+        
+        if (response.success && response.data) {
+          setComments(response.data);
+        } else {
+          setCommentsError(response.error || 'Failed to load comments');
+        }
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+        setCommentsError('Failed to load comments');
+      } finally {
+        setCommentsLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, [isOpen, task?.id]);
+
+  const handleAddComment = async () => {
+    if (!comment.trim() || submittingComment) return;
+
+    setSubmittingComment(true);
+    
+    try {
+      const response = await apiService.createComment({
+        taskId: task.id,
+        content: comment.trim(),
+        commentType: 'general'
+      });
+
+      if (response.success) {
+        setComment('');
+        // Small delay to ensure comment is saved
+        setTimeout(async () => {
+          // Refresh comments
+          const commentsResponse = await apiService.getCommentsByTask(task.id);
+          if (commentsResponse.success && commentsResponse.data) {
+            setComments(commentsResponse.data);
+          }
+        }, 100);
+      } else {
+        console.error('Failed to add comment:', response.error);
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const getCommentTypeColor = (commentType: string) => {
+    switch (commentType) {
+      case 'update':
+        return 'bg-blue-100 text-blue-800';
+      case 'question':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'resolution':
+        return 'bg-green-100 text-green-800';
+      case 'note':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatCommentTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return 'Unknown time';
+    }
+    
+    // The server sends UTC time, but we need to account for the 3-hour timezone difference
+    // Kenya is UTC+3, so the server time is already 3 hours behind Kenya time
+    // We need to compare the server time directly with current time since both are in local timezone
+    const diffInMilliseconds = now.getTime() - date.getTime();
+    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+    const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
+    const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInHours / 24);
+    
+    // Debug logging to help troubleshoot
+    console.log('Time calculation debug:', {
+      serverTime: dateString,
+      serverTimeLocal: date.toString(),
+      localNow: now.toString(),
+      diffInSeconds,
+      diffInMinutes,
+      diffInHours
+    });
+    
+    // More precise time calculation
+    if (diffInSeconds < 10) return 'Just now';
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    return formatDate(dateString);
+  };
 
   if (!isOpen) return null;
 
@@ -54,7 +187,10 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
+                <p className="text-sm text-gray-500 font-mono">Task ID: {task.id}</p>
+              </div>
               <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${getStatusColor(task.status)}`}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -183,34 +319,88 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
                     placeholder="Add a comment or update..."
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none pr-24"
                     rows={3}
+                    disabled={submittingComment}
                   />
-                  <button className="absolute bottom-2 right-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center gap-1 text-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                    Add Comment
+                  <button 
+                    onClick={handleAddComment}
+                    disabled={!comment.trim() || submittingComment}
+                    className="absolute bottom-2 right-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center gap-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submittingComment ? (
+                      <div className="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
+                    )}
+                    {submittingComment ? 'Adding...' : 'Add Comment'}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Existing Comments */}
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-semibold text-sm">JS</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-gray-900">John Smith</span>
-                    <span className="text-sm text-gray-500">2 hours ago</span>
-                  </div>
-                  <p className="text-sm text-gray-700">
-                    Started working on the data inventory update. Will have the first draft ready by tomorrow.
-                  </p>
+            {/* Comments Loading State */}
+            {commentsLoading && (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">Loading comments...</span>
+              </div>
+            )}
+
+            {/* Comments Error State */}
+            {commentsError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-red-800">{commentsError}</span>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Existing Comments */}
+            {!commentsLoading && !commentsError && (
+              <div className="space-y-3">
+                {comments.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <p>No comments yet. Be the first to add one!</p>
+                  </div>
+                ) : (
+                  comments.map((comment) => (
+                    <div key={comment.id} className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 font-semibold text-sm">
+                          {comment.author.firstName?.[0]}{comment.author.lastName?.[0]}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-gray-900">
+                            {comment.author.firstName} {comment.author.lastName}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {formatCommentTime(comment.createdAt)}
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCommentTypeColor(comment.commentType)}`}>
+                            {comment.commentType}
+                          </span>
+                          {comment.isInternal && (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              Internal
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-700">{comment.content}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

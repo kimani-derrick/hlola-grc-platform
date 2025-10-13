@@ -43,6 +43,11 @@ class RealtimeEventEmitter extends EventEmitter {
     this.on('entity.created', this.handleEntityCreated.bind(this));
     this.on('entity.updated', this.handleEntityUpdated.bind(this));
 
+    // Comment-related events
+    this.on('comment.created', this.handleCommentCreated.bind(this));
+    this.on('comment.updated', this.handleCommentUpdated.bind(this));
+    this.on('comment.deleted', this.handleCommentDeleted.bind(this));
+
     logger.info('Real-time event handlers initialized', {
       service: 'grc-backend',
       eventTypes: [
@@ -50,7 +55,8 @@ class RealtimeEventEmitter extends EventEmitter {
         'task.created', 'task.status.changed', 'task.completed', 'task.assigned',
         'control.assigned', 'control.completed', 'control.status.changed',
         'framework.assigned', 'framework.removed',
-        'entity.created', 'entity.updated'
+        'entity.created', 'entity.updated',
+        'comment.created', 'comment.updated', 'comment.deleted'
       ]
     });
   }
@@ -638,6 +644,65 @@ class RealtimeEventEmitter extends EventEmitter {
    */
   emitEntityUpdated(data) {
     this.emit('entity.updated', data);
+  }
+
+  /**
+   * Handle comment created event
+   */
+  handleCommentCreated(data) {
+    logger.info('Comment created event handled', {
+      service: 'grc-backend',
+      commentId: data.commentId,
+      taskId: data.taskId,
+      authorId: data.authorId,
+      commentType: data.commentType
+    });
+  }
+
+  /**
+   * Handle comment updated event
+   */
+  handleCommentUpdated(data) {
+    logger.info('Comment updated event handled', {
+      service: 'grc-backend',
+      commentId: data.commentId,
+      taskId: data.taskId,
+      authorId: data.authorId,
+      commentType: data.commentType
+    });
+  }
+
+  /**
+   * Handle comment deleted event
+   */
+  handleCommentDeleted(data) {
+    logger.info('Comment deleted event handled', {
+      service: 'grc-backend',
+      commentId: data.commentId,
+      taskId: data.taskId,
+      authorId: data.authorId
+    });
+  }
+
+  /**
+   * Emit comment created event
+   */
+  emitCommentCreated(data) {
+    this.emit('comment.created', data);
+  }
+
+  /**
+   * Emit comment updated event
+   */
+  emitCommentUpdated(data) {
+    this.emit('comment.updated', data);
+  }
+
+  /**
+   * Emit comment deleted event
+   */
+  emitCommentDeleted(data) {
+    this.emit('comment.deleted', data);
   }
 }
 

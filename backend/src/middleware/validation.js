@@ -1025,6 +1025,55 @@ const reportTrendsSchema = Joi.object({
   }).optional()
 });
 
+// Comment validation schemas
+const createCommentSchema = Joi.object({
+  entityId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Entity ID must be a valid UUID'
+  }),
+  taskId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Task ID must be a valid UUID'
+  }),
+  controlId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Control ID must be a valid UUID'
+  }),
+  frameworkId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Framework ID must be a valid UUID'
+  }),
+  parentCommentId: Joi.string().uuid().optional().allow(null).messages({
+    'string.guid': 'Parent comment ID must be a valid UUID'
+  }),
+  content: Joi.string().min(1).max(2000).required().messages({
+    'string.min': 'Comment content must be at least 1 character long',
+    'string.max': 'Comment content must not exceed 2000 characters',
+    'any.required': 'Comment content is required'
+  }),
+  commentType: Joi.string().valid('general', 'update', 'question', 'resolution', 'note').optional().default('general').messages({
+    'any.only': 'Comment type must be one of: general, update, question, resolution, note'
+  }),
+  isInternal: Joi.boolean().optional().default(false),
+  isResolved: Joi.boolean().optional().default(false)
+}).custom((value, helpers) => {
+  // At least one entity reference must be provided
+  if (!value.entityId && !value.taskId && !value.controlId && !value.frameworkId) {
+    return helpers.error('any.custom', {
+      message: 'At least one entity reference (entityId, taskId, controlId, or frameworkId) must be provided'
+    });
+  }
+  return value;
+});
+
+const updateCommentSchema = Joi.object({
+  content: Joi.string().min(1).max(2000).optional().messages({
+    'string.min': 'Comment content must be at least 1 character long',
+    'string.max': 'Comment content must not exceed 2000 characters'
+  }),
+  commentType: Joi.string().valid('general', 'update', 'question', 'resolution', 'note').optional().messages({
+    'any.only': 'Comment type must be one of: general, update, question, resolution, note'
+  }),
+  isInternal: Joi.boolean().optional(),
+  isResolved: Joi.boolean().optional()
+});
+
 module.exports = {
   validateRequest,
   validateQuery,
@@ -1070,5 +1119,8 @@ module.exports = {
   reportFrameworksSchema,
   reportControlsSchema,
   reportTasksSchema,
-  reportTrendsSchema
+  reportTrendsSchema,
+  // Comment Schemas
+  createCommentSchema,
+  updateCommentSchema
 };

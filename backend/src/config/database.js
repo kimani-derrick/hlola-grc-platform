@@ -10,6 +10,8 @@ const pool = new Pool({
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
+  // Set timezone to East Africa Time (UTC+3)
+  options: '-c timezone=Africa/Nairobi'
 });
 
 // Test database connection
