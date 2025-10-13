@@ -3,23 +3,10 @@
 import { useState, useEffect } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import TaskDetailModal from './TaskDetailModal';
+import { Control } from './controls/ControlCard';
 
 interface ControlDetailModalProps {
-  control: {
-    id: string;
-    title: string;
-    description: string;
-    country: string;
-    framework: string;
-    status: 'completed' | 'in-progress' | 'not-started' | 'needs-review';
-    priority: 'high' | 'medium' | 'low';
-    category: string;
-    dueDate: string;
-    assignee: string;
-    completionRate: number;
-    estimatedHours: number;
-    businessImpact: string;
-  };
+  control: Control;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -31,8 +18,8 @@ interface Task {
   type: 'system' | 'manual';
   status: 'completed' | 'in-progress' | 'not-started' | 'overdue';
   progress: number;
-  assignee: string;
-  dueDate: string;
+  assignee?: string;
+  dueDate?: string;
 }
 
 // Generate tasks based on the control

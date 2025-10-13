@@ -1,7 +1,8 @@
 // API service for dashboard data
 import { getAuthToken } from '../utils/auth';
+import { env } from '../config/environment';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = env.apiUrl;
 
 export interface ApiResponse<T> {
   success: boolean;

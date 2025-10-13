@@ -1,5 +1,7 @@
 // Central API configuration utility
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { env } from '../config/environment';
+
+export const API_BASE_URL = env.apiUrl;
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;

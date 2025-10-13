@@ -6,7 +6,12 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "env:dev": "node scripts/setup-env.js dev",
+    "env:prod": "node scripts/setup-env.js prod",
+    "env:staging": "node scripts/setup-env.js staging",
+    "env:validate": "node scripts/setup-env.js validate",
+    "setup": "npm run env:dev && npm install"
   },
   "dependencies": {
     "axios": "^1.12.2",
