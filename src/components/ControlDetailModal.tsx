@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import TaskDetailModal from './TaskDetailModal';
 import { Control } from './controls/ControlCard';
+import { apiService } from '../services/api';
 
 interface ControlDetailModalProps {
   control: Control;
@@ -16,63 +17,53 @@ interface Task {
   title: string;
   description: string;
   type: 'system' | 'manual';
-  status: 'completed' | 'in-progress' | 'not-started' | 'overdue';
+  status: 'completed' | 'in-progress' | 'not-started' | 'overdue' | 'pending';
   progress: number;
   assignee?: string;
   dueDate?: string;
+  priority?: 'high' | 'medium' | 'low';
+  category?: string;
+  estimated_hours?: number;
+  actual_hours?: number;
+  evidence_attached?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
-// Generate tasks based on the control
-const generateTasksForControl = (control: ControlDetailModalProps['control']): Task[] => {
-  const baseTasks = [
-    {
-      id: `${control.id}-1`,
-      title: 'Update data inventory for compliance',
-      description: 'Review and update the data inventory to ensure it meets current compliance requirements',
-      type: 'system' as const,
-      status: 'in-progress' as const,
-      progress: 60,
-      assignee: 'John Doe',
-      dueDate: '2024-06-15'
-    },
-    {
-      id: `${control.id}-2`,
-      title: 'Implement access controls',
-      description: 'Set up proper access controls and permission management',
-      type: 'system' as const,
-      status: 'not-started' as const,
-      progress: 0,
-      assignee: 'Sarah Smith',
-      dueDate: '2024-05-30'
-    },
-    {
-      id: `${control.id}-3`,
-      title: 'Document processing activities',
-      description: 'Create comprehensive documentation of all data processing activities',
-      type: 'manual' as const,
-      status: 'overdue' as const,
-      progress: 30,
-      assignee: 'Mike Johnson',
-      dueDate: '2024-04-15'
-    }
-  ];
+// Map API task data to our Task interface
+const mapApiTaskToTask = (apiTask: any): Task => {
+  // Map API status to our status enum
+  const statusMap: { [key: string]: Task['status'] } = {
+    'completed': 'completed',
+    'in-progress': 'in-progress',
+    'pending': 'pending',
+    'not-started': 'not-started',
+    'overdue': 'overdue'
+  };
 
-  // Add control-specific tasks
-  const controlSpecificTasks = [
-    {
-      id: `${control.id}-4`,
-      title: control.title,
-      description: control.description,
-      type: 'system' as const,
-      status: control.status === 'completed' ? 'completed' as const : 
-              control.status === 'in-progress' ? 'in-progress' as const : 'not-started' as const,
-      progress: control.completionRate || 0,
-      assignee: control.assignee || 'Compliance Team',
-      dueDate: control.dueDate || '2024-12-31'
-    }
-  ];
+  // Determine if task is overdue
+  const isOverdue = apiTask.due_date && new Date(apiTask.due_date) < new Date() && apiTask.status !== 'completed';
+  const status = isOverdue ? 'overdue' : (statusMap[apiTask.status] || 'not-started');
 
-  return [...baseTasks, ...controlSpecificTasks];
+  return {
+    id: apiTask.id,
+    title: apiTask.title,
+    description: apiTask.description,
+    type: apiTask.auto_generated ? 'system' as const : 'manual' as const,
+    status: status,
+    progress: apiTask.progress || 0,
+    assignee: apiTask.assignee_first_name && apiTask.assignee_last_name 
+      ? `${apiTask.assignee_first_name} ${apiTask.assignee_last_name}` 
+      : undefined,
+    dueDate: apiTask.due_date,
+    priority: apiTask.priority,
+    category: apiTask.category,
+    estimated_hours: apiTask.estimated_hours,
+    actual_hours: apiTask.actual_hours,
+    evidence_attached: apiTask.evidence_attached,
+    created_at: apiTask.created_at,
+    updated_at: apiTask.updated_at
+  };
 };
 
 const getStatusColor = (status: string) => {
@@ -81,6 +72,8 @@ const getStatusColor = (status: string) => {
       return 'bg-green-50 text-green-700 border border-green-200';
     case 'in-progress':
       return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+    case 'pending':
+      return 'bg-yellow-50 text-yellow-700 border border-yellow-200';
     case 'not-started':
       return 'bg-gray-50 text-gray-700 border border-gray-200';
     case 'overdue':
@@ -119,13 +112,40 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [tasksLoading, setTasksLoading] = useState(false);
+  const [tasksError, setTasksError] = useState<string | null>(null);
 
-  // Update tasks when control changes
+  // Fetch tasks when control changes
   useEffect(() => {
-    if (control) {
-      setTasks(generateTasksForControl(control));
+    const fetchTasks = async () => {
+      if (!control?.id) return;
+      
+      setTasksLoading(true);
+      setTasksError(null);
+      
+      try {
+        const response = await apiService.getTasksByControl(control.id);
+        
+        if (response.success && response.data) {
+          const mappedTasks = response.data.map(mapApiTaskToTask);
+          setTasks(mappedTasks);
+        } else {
+          setTasksError(response.error || 'Failed to load tasks');
+          setTasks([]);
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+        setTasksError('Failed to load tasks');
+        setTasks([]);
+      } finally {
+        setTasksLoading(false);
+      }
+    };
+
+    if (isOpen && control?.id) {
+      fetchTasks();
     }
-  }, [control]);
+  }, [control?.id, isOpen]);
 
   // Note: menu is toggle-only; clicking an action will close it
 
@@ -134,6 +154,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
   const completedTasks = tasks.filter(t => t.status === 'completed').length;
   const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length;
   const overdueTasks = tasks.filter(t => t.status === 'overdue').length;
+  const pendingTasks = tasks.filter(t => t.status === 'pending').length;
 
   const handleTaskAction = (taskId: string, action: string) => {
     switch (action) {
@@ -323,7 +344,16 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
 
             <div className="flex items-center gap-4 mb-4">
               <div className="text-sm text-gray-600">
-                {tasks.length} total tasks • {completedTasks} completed • {inProgressTasks} in progress • {overdueTasks} overdue
+                {tasksLoading ? (
+                  <span className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    Loading tasks...
+                  </span>
+                ) : tasksError ? (
+                  <span className="text-red-600">Error: {tasksError}</span>
+                ) : (
+                  `${tasks.length} total tasks • ${completedTasks} completed • ${inProgressTasks} in progress • ${pendingTasks} pending • ${overdueTasks} overdue`
+                )}
               </div>
             </div>
 
@@ -365,7 +395,29 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
 
             {/* Task Cards */}
             <div className="space-y-3">
-              {filteredTasks.map((task) => (
+              {tasksLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading tasks...</p>
+                </div>
+              ) : tasksError ? (
+                <div className="text-center py-8">
+                  <div className="text-red-600 text-xl mb-4">⚠️</div>
+                  <p className="text-red-600 mb-4">{tasksError}</p>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : filteredTasks.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-400 text-4xl mb-4">📋</div>
+                  <p className="text-gray-600">No tasks found for this control.</p>
+                </div>
+              ) : (
+                filteredTasks.map((task) => (
                 <div key={task.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -391,18 +443,35 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                           </div>
                           <span className="text-xs">{task.progress}%</span>
                         </div>
-                        <span className="flex items-center gap-1">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          {task.assignee}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0v1a2 2 0 002 2h4a2 2 0 002-2V7m-6 0h6m-6 0H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2" />
-                          </svg>
-                          {formatDate(task.dueDate)}
-                        </span>
+                        {task.assignee && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            {task.assignee}
+                          </span>
+                        )}
+                        {task.dueDate && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0v1a2 2 0 002 2h4a2 2 0 002-2V7m-6 0h6m-6 0H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2" />
+                            </svg>
+                            {formatDate(task.dueDate)}
+                          </span>
+                        )}
+                        {task.priority && (
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                            {task.priority.toUpperCase()}
+                          </span>
+                        )}
+                        {task.evidence_attached && (
+                          <span className="flex items-center gap-1 text-green-600">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Evidence
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -472,7 +541,8 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                     </div>
                   )}
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

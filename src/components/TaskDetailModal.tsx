@@ -9,10 +9,10 @@ interface TaskDetailModalProps {
     title: string;
     description: string;
     type: 'system' | 'manual';
-    status: 'completed' | 'in-progress' | 'not-started' | 'overdue';
+    status: 'completed' | 'in-progress' | 'not-started' | 'overdue' | 'pending';
     progress: number;
-    assignee: string;
-    dueDate: string;
+    assignee?: string;
+    dueDate?: string;
   };
   isOpen: boolean;
   onClose: () => void;
@@ -24,6 +24,8 @@ const getStatusColor = (status: string) => {
       return 'bg-green-100 text-green-800';
     case 'in-progress':
       return 'bg-blue-100 text-blue-800';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800';
     case 'not-started':
       return 'bg-gray-100 text-gray-800';
     case 'overdue':
@@ -53,11 +55,11 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium flex items-center gap-1">
+              <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${getStatusColor(task.status)}`}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                In Progress
+                {task.status.charAt(0).toUpperCase() + task.status.slice(1).replace('-', ' ')}
               </span>
             </div>
             <button
@@ -97,7 +99,7 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0v1a2 2 0 002 2h4a2 2 0 002-2V7m-6 0h6m-6 0H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2" />
                 </svg>
-                <span className="text-gray-700">{formatDate(task.dueDate)}</span>
+                <span className="text-gray-700">{task.dueDate ? formatDate(task.dueDate) : 'No due date set'}</span>
               </div>
             </div>
           </div>
@@ -106,15 +108,31 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-gray-900">Assigned To</h3>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                  <span className="text-gray-600 font-semibold text-lg">JD</span>
+              {task.assignee ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-gray-600 font-semibold text-lg">
+                      {task.assignee.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{task.assignee}</p>
+                    <p className="text-sm text-gray-500">Compliance Officer</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">John Doe</p>
-                  <p className="text-sm text-gray-500">Compliance Officer</p>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-500">Unassigned</p>
+                    <p className="text-sm text-gray-400">No one assigned to this task</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-gray-900">Source</h3>

@@ -233,6 +233,19 @@ class ApiService {
     } as any;
   }
 
+  // Tasks by Control
+  async getTasksByControl(controlId: string): Promise<ApiResponse<any[]>> {
+    const response = await this.makeRequest(`/tasks/controls/${controlId}`);
+    if (!response.success) return response;
+    const anyResp: any = response as any;
+    const tasks = anyResp?.data?.tasks || anyResp?.tasks || anyResp?.data || [];
+    return {
+      success: true,
+      data: tasks,
+      error: null
+    } as any;
+  }
+
   async getControlsGroupedByFramework(): Promise<ApiResponse<Array<{ framework_id: string; control_count: number }>>> {
     const response = await this.makeRequest(`/controls/grouped/framework`);
     if (!response.success) return response as any;
