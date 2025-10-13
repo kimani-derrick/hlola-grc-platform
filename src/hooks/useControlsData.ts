@@ -28,7 +28,10 @@ const mapApiControlToControl = (apiControl: any, frameworkName: string, framewor
     estimatedHours: apiControl.estimated_hours || apiControl.estimatedHours,
     businessImpact: apiControl.business_impact || apiControl.businessImpact,
     reference: apiControl.reference || apiControl.article,
-    control_id: apiControl.control_id
+    control_id: apiControl.control_id,
+    legal_requirements: apiControl.legal_requirements,
+    implementation_guidance: apiControl.implementation_guidance,
+    evidence_requirements: apiControl.evidence_requirements
   };
 };
 

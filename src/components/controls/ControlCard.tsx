@@ -20,6 +20,9 @@ export interface Control {
   businessImpact?: string;
   reference?: string;
   control_id?: string;
+  legal_requirements?: string;
+  implementation_guidance?: string;
+  evidence_requirements?: string[];
 }
 
 interface ControlCardProps {

@@ -268,7 +268,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                     </svg>
                     <h4 className="font-semibold text-gray-900">Legal Provision</h4>
                   </div>
-                  <p className="text-sm text-gray-600">Art. 6</p>
+                  <p className="text-sm text-gray-600">{control.legal_requirements || 'Not specified'}</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -277,7 +277,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                     </svg>
                     <h4 className="font-semibold text-gray-900">Implementation Guidance</h4>
                   </div>
-                  <p className="text-sm text-gray-600">Document the lawful basis for processing in your data processing register.</p>
+                  <p className="text-sm text-gray-600">{control.implementation_guidance || 'Not specified'}</p>
                 </div>
               </div>
             </div>
@@ -291,7 +291,17 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
               </svg>
               <h3 className="text-lg font-semibold text-gray-900">Evidence Requirements</h3>
             </div>
-            <p className="text-gray-700">Processing register, data mapping documentation.</p>
+            <div className="text-gray-700">
+              {control.evidence_requirements && control.evidence_requirements.length > 0 ? (
+                <ul className="list-disc list-inside space-y-1">
+                  {control.evidence_requirements.map((requirement, index) => (
+                    <li key={index}>{requirement}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No specific evidence requirements specified.</p>
+              )}
+            </div>
           </div>
 
           {/* Status and Evidence Management */}
@@ -315,13 +325,7 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
                 </svg>
                 <h4 className="font-semibold text-gray-900">Control Evidence</h4>
               </div>
-              <p className="text-sm text-gray-600 mb-3">Upload evidence files to demonstrate compliance with this control requirement.</p>
-              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                Upload Evidence
-              </button>
+              <p className="text-sm text-gray-600">Evidence for this control is managed at the task level. Upload evidence for individual tasks below.</p>
             </div>
           </div>
 
