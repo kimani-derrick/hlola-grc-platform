@@ -91,10 +91,79 @@ export function useControlsData() {
   const countries = [...new Set(controls.map(c => c.country))];
   const frameworksList = [...new Set(controls.map(c => c.framework))];
 
-  // Calculate stats
-  const completedControls = controls.filter(c => c.status === 'completed').length;
-  const inProgressControls = controls.filter(c => c.status === 'in-progress').length;
-  const overallProgress = controls.length > 0 ? Math.round((completedControls / controls.length) * 100) : 0;
+  // Calculate stats based on tasks across all controls (like dashboard)
+  const [controlStats, setControlStats] = useState<{
+    completedTasks: number;
+    inProgressTasks: number;
+    overallProgress: number;
+  }>({
+    completedTasks: 0,
+    inProgressTasks: 0,
+    overallProgress: 0
+  });
+
+  // Fetch task stats for all controls
+  useEffect(() => {
+    const calculateControlStats = async () => {
+      if (controls.length === 0) {
+        setControlStats({
+          completedTasks: 0,
+          inProgressTasks: 0,
+          overallProgress: 0
+        });
+        return;
+      }
+
+      try {
+        let totalCompletedTasks = 0;
+        let totalInProgressTasks = 0;
+        let totalTasks = 0;
+
+        // For each control, get its task stats
+        for (const control of controls) {
+          try {
+            // Fetch tasks for this control
+            const tasksRes = await apiService.getTasksByControl(control.id);
+            if (tasksRes.success && tasksRes.data) {
+              const tasks = tasksRes.data || [];
+              const completedTasks = tasks.filter((task: any) => task.status === 'completed').length;
+              const inProgressTasks = tasks.filter((task: any) => task.status === 'in-progress').length;
+              const controlTotalTasks = tasks.length;
+
+              totalCompletedTasks += completedTasks;
+              totalInProgressTasks += inProgressTasks;
+              totalTasks += controlTotalTasks;
+            }
+          } catch (error) {
+            console.error(`Error fetching tasks for control ${control.id}:`, error);
+          }
+        }
+
+        const overallProgress = totalTasks > 0 ? Math.round((totalCompletedTasks / totalTasks) * 100) : 0;
+
+        console.log('🔍 DEBUG - Control Stats Calculation (Task-based):');
+        console.log('Total Tasks:', totalTasks);
+        console.log('Completed Tasks:', totalCompletedTasks);
+        console.log('In Progress Tasks:', totalInProgressTasks);
+        console.log('Overall Progress:', overallProgress);
+
+        setControlStats({
+          completedTasks: totalCompletedTasks,
+          inProgressTasks: totalInProgressTasks,
+          overallProgress
+        });
+      } catch (error) {
+        console.error('Error calculating control stats:', error);
+        setControlStats({
+          completedTasks: 0,
+          inProgressTasks: 0,
+          overallProgress: 0
+        });
+      }
+    };
+
+    calculateControlStats();
+  }, [controls]);
 
   return {
     controls,
@@ -103,8 +172,8 @@ export function useControlsData() {
     frameworksList,
     loading,
     error,
-    completedControls,
-    inProgressControls,
-    overallProgress
+    completedControls: controlStats.completedTasks, // Now shows completed tasks, not completed controls
+    inProgressControls: controlStats.inProgressTasks, // Now shows in-progress tasks, not in-progress controls
+    overallProgress: controlStats.overallProgress
   };
 }
