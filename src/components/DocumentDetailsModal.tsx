@@ -137,6 +137,148 @@ const getFileIcon = (fileType: string) => {
   return icons[fileType] || icons.default;
 };
 
+// Image preview component
+const ImagePreview = ({ documentId, title, fileType }: { documentId: string; title: string; fileType: string }) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await apiService.downloadDocument(documentId);
+        
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          setImageUrl(url);
+        } else {
+          setError(`Failed to load image: ${response.status} ${response.statusText}`);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Error loading image');
+        console.error('Error loading image:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (documentId) {
+      loadImage();
+    }
+
+    // Cleanup object URL on unmount
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [documentId]);
+
+  const handleDownload = async () => {
+    try {
+      const response = await apiService.downloadDocument(documentId);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', title || `image.${fileType}`);
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert('Failed to download image');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to download image');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white h-full rounded-lg border-2 border-gray-200 p-8 overflow-auto">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <p className="text-sm text-gray-600">Loading image...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white h-full rounded-lg border-2 border-gray-200 p-8 overflow-auto">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="text-red-600 mb-4">
+              <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-sm text-red-600 mb-4">{error}</p>
+            <button 
+              onClick={handleDownload}
+              className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+            >
+              Download Image
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white h-full rounded-lg border-2 border-gray-200 flex flex-col">
+      {/* Image Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+        <div className="flex items-center space-x-4">
+          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <p className="text-sm text-gray-600">{fileType.toUpperCase()} Image</p>
+          </div>
+        </div>
+        
+        <button 
+          onClick={handleDownload}
+          className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Download Image
+        </button>
+      </div>
+
+      {/* Image Content */}
+      <div className="flex-1 overflow-auto p-4 bg-gray-100 flex items-center justify-center">
+        {imageUrl && (
+          <div className="max-w-full max-h-full">
+            <img 
+              src={imageUrl} 
+              alt={title}
+              className="max-w-full max-h-full object-contain shadow-lg border border-gray-300 bg-white rounded"
+              style={{ maxHeight: 'calc(100vh - 200px)' }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Real document viewer content generator
 const getDocumentPreview = (fileType: string, title: string, documentId: string) => {
   if (fileType === 'pdf') {
@@ -277,6 +419,11 @@ const getDocumentPreview = (fileType: string, title: string, documentId: string)
         <TextFilePreview documentId={documentId} title={title} />
       </div>
     );
+  }
+
+  // Image preview for common image formats
+  if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg'].includes(fileType.toLowerCase())) {
+    return <ImagePreview documentId={documentId} title={title} fileType={fileType} />;
   }
   
   // Default preview for other file types
