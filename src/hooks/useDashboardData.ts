@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { apiService, DashboardData } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useEntity } from '../context/EntityContext';
+import { useActiveFrameworks } from '../context/ActiveFrameworksContext';
 
 // Function to calculate risk exposure based on framework risk levels
 function calculateRiskExposure(frameworks: any[]): number {
@@ -47,16 +48,24 @@ export interface DashboardMetrics {
   criticalIssues: number;
   riskExposure: number;
   complianceScore: number;
-  totalControls: number; // Add missing totalControls
+  totalControls: number;
+  completedControls: number;
+  inProgressControls: number;
+  notStartedControls: number;
+  controlsCompletionRate: number;
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export function useDashboardData(organizationId?: string) {
   const { user, isLoading: authLoading } = useAuth();
   const { selectedEntity } = useEntity();
+  const { activeFrameworkIds } = useActiveFrameworks();
   const [data, setData] = useState<DashboardMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Create a stable reference for active framework IDs to avoid useEffect dependency issues
+  const stableActiveFrameworkIds = useMemo(() => activeFrameworkIds, [activeFrameworkIds.join(',')]);
 
   const fetchDashboardData = async () => {
     // Use provided organizationId or user's organizationId
@@ -92,12 +101,32 @@ export function useDashboardData(organizationId?: string) {
       const auditGaps = auditGapsResponse.data || [];
       const allFrameworks = allFrameworksResponse.data || [];
       const assignedFrameworks = entityFrameworksResponse.data || [];
+      
+      // Fetch controls for active frameworks (same approach as controls page)
+      const allControls: any[] = [];
+      if (stableActiveFrameworkIds && stableActiveFrameworkIds.length > 0) {
+        for (const frameworkId of stableActiveFrameworkIds) {
+          try {
+            const controlsRes = await apiService.getControlsByFramework(frameworkId);
+            if (controlsRes.success && controlsRes.data) {
+              allControls.push(...controlsRes.data);
+            }
+          } catch (error) {
+            console.error(`Error fetching controls for framework ${frameworkId}:`, error);
+          }
+        }
+      }
+      const controls = allControls;
 
       // DEBUG: Log the raw API responses
       console.log('🔍 DEBUG - API Responses:');
       console.log('All Tasks:', allTasks.length, 'tasks');
       console.log('Documents:', documents);
       console.log('Audit Gaps:', auditGaps);
+      console.log('Active Framework IDs:', stableActiveFrameworkIds);
+      console.log('Assigned Frameworks:', assignedFrameworks);
+      console.log('Controls Data:', controls);
+      console.log('Controls Count:', controls.length);
 
       // Calculate metrics from actual task data (not stats API)
       const totalTasks = allTasks.length;
@@ -159,6 +188,49 @@ export function useDashboardData(organizationId?: string) {
       console.log('Raw completionRate:', completionRate);
       console.log('Final complianceScore:', complianceScore);
       
+      // Calculate controls metrics (same approach as controls page - task-based metrics)
+      const totalControls = Array.isArray(controls) ? controls.length : 0;
+      
+      // Calculate task-based metrics across all controls (same as controls page)
+      let completedTasksAcrossControls = 0;
+      let inProgressTasksAcrossControls = 0;
+      let totalTasksAcrossControls = 0;
+      
+      if (Array.isArray(controls) && controls.length > 0) {
+        // For each control, get its task stats (same logic as useControlsData)
+        for (const control of controls) {
+          try {
+            const tasksRes = await apiService.getTasksByControl(control.id);
+            if (tasksRes.success && tasksRes.data) {
+              const tasks = tasksRes.data || [];
+              const completedTasks = tasks.filter((task: any) => task.status === 'completed').length;
+              const inProgressTasks = tasks.filter((task: any) => task.status === 'in-progress').length;
+              const controlTotalTasks = tasks.length;
+
+              completedTasksAcrossControls += completedTasks;
+              inProgressTasksAcrossControls += inProgressTasks;
+              totalTasksAcrossControls += controlTotalTasks;
+            }
+          } catch (error) {
+            console.error(`Error fetching tasks for control ${control.id}:`, error);
+          }
+        }
+      }
+      
+      const completedControls = completedTasksAcrossControls; // Use completed tasks as "completed controls"
+      const inProgressControls = inProgressTasksAcrossControls; // Use in-progress tasks as "in-progress controls"
+      const notStartedControls = totalTasksAcrossControls - completedTasksAcrossControls - inProgressTasksAcrossControls;
+      const controlsCompletionRate = totalTasksAcrossControls > 0 ? (completedTasksAcrossControls / totalTasksAcrossControls) * 100 : 0;
+
+      // DEBUG: Log controls calculation
+      console.log('🔍 DEBUG - Controls Calculation (Task-based):');
+      console.log('Total Controls:', totalControls);
+      console.log('Total Tasks Across Controls:', totalTasksAcrossControls);
+      console.log('Completed Tasks (as Controls):', completedControls);
+      console.log('In Progress Tasks (as Controls):', inProgressControls);
+      console.log('Not Started Tasks (as Controls):', notStartedControls);
+      console.log('Controls Completion Rate:', controlsCompletionRate);
+
       // Determine risk level based on compliance score and critical issues
       let riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'low';
       if (complianceScore < 50 || criticalIssues > 5) {
@@ -185,7 +257,11 @@ export function useDashboardData(organizationId?: string) {
         criticalIssues,
         riskExposure,
         complianceScore,
-        totalControls: totalTasks, // Use total tasks as total controls
+        totalControls,
+        completedControls,
+        inProgressControls,
+        notStartedControls,
+        controlsCompletionRate,
         riskLevel,
       };
 
@@ -211,7 +287,7 @@ export function useDashboardData(organizationId?: string) {
     }
 
     fetchDashboardData();
-  }, [authLoading, organizationId, user?.organizationId, selectedEntity]);
+  }, [authLoading, organizationId, user?.organizationId, selectedEntity, stableActiveFrameworkIds]);
 
   return {
     data,

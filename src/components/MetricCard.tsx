@@ -1,94 +1,145 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
 interface MetricCardProps {
+  title: string;
   value: number;
-  label: string;
-  progress: number;
-  change: string;
-  changeType: 'positive' | 'negative' | 'neutral';
-  color: 'green' | 'orange' | 'red' | 'cyan';
-  icon?: React.ReactNode;
+  maxValue?: number;
+  percentage?: number;
+  status: 'critical' | 'warning' | 'good';
+  metrics: {
+    primary: { value: number; label: string; color?: string };
+    secondary: { value: number; label: string; color?: string };
+    tertiary: { value: number; label: string; color?: string };
+    quaternary: { value: number; label: string; color?: string };
+  };
+  icon: React.ReactNode;
+  gradient: string;
 }
 
-export default function MetricCard({ 
-  value, 
-  label, 
-  progress, 
-  change, 
-  changeType,
-  color,
-  icon
+export default function MetricCard({
+  title,
+  value,
+  maxValue = 100,
+  percentage,
+  status,
+  metrics,
+  icon,
+  gradient
 }: MetricCardProps) {
-  const colorClasses = {
-    green: {
-      bg: 'bg-green-50',
-      progress: 'bg-green-500',
-      dot: 'bg-green-500',
-      text: 'text-green-600'
+  const [animatedValue, setAnimatedValue] = useState(0);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const timer = setTimeout(() => {
+      setAnimatedValue(value);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [value]);
+
+  const statusConfig = {
+    critical: {
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200',
+      statusText: 'Critical',
+      statusColor: 'bg-red-100 text-red-800'
     },
-    orange: {
-      bg: 'bg-orange-50',
-      progress: 'bg-orange-500',
-      dot: 'bg-orange-500',
-      text: 'text-orange-600'
+    warning: {
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50',
+      borderColor: 'border-orange-200',
+      statusText: 'Warning',
+      statusColor: 'bg-orange-100 text-orange-800'
     },
-    red: {
-      bg: 'bg-red-50',
-      progress: 'bg-red-500',
-      dot: 'bg-red-500',
-      text: 'text-red-600'
-    },
-    cyan: {
-      bg: 'bg-cyan-50',
-      progress: 'bg-cyan-500',
-      dot: 'bg-cyan-500',
-      text: 'text-cyan-600'
+    good: {
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200',
+      statusText: 'Good',
+      statusColor: 'bg-green-100 text-green-800'
     }
   };
 
-  const changeIcon = changeType === 'positive' ? '↗' : changeType === 'negative' ? '↘' : '→';
-  const changeColor = changeType === 'positive' ? 'text-green-600' : changeType === 'negative' ? 'text-red-600' : 'text-gray-600';
+  const config = statusConfig[status];
+  const displayPercentage = percentage !== undefined ? percentage : (animatedValue / maxValue) * 100;
+
+  if (!isClient) {
+    return (
+      <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-gray-50 to-gray-100 animate-pulse">
+        <div className="h-32 bg-gray-200 rounded-lg"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`glass-card rounded-2xl p-6 hover-lift ${colorClasses[color].bg} border-l-4`} 
-         style={{ borderLeftColor: colorClasses[color].dot.replace('bg-', '#') === 'bg-green-500' ? '#22c55e' : 
-                                   colorClasses[color].dot.replace('bg-', '#') === 'bg-orange-500' ? '#f97316' :
-                                   colorClasses[color].dot.replace('bg-', '#') === 'bg-red-500' ? '#ef4444' : '#06b6d4' }}>
-      
+    <div className={`glass-card rounded-2xl p-6 bg-gradient-to-br ${gradient} border ${config.borderColor} hover:shadow-lg transition-all duration-300`}>
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-2 rounded-lg ${colorClasses[color].bg} ${colorClasses[color].text}`}>
-          {icon || <div className={`w-4 h-4 rounded-full ${colorClasses[color].dot}`}></div>}
-        </div>
-        <div className={`text-sm font-medium ${changeColor} flex items-center gap-1`}>
-          <span>{changeIcon}</span>
-          <span>{change}</span>
+        <div className="flex items-center space-x-3">
+          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${config.bgColor}`}>
+            {icon}
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.statusColor}`}>
+              <div className={`w-2 h-2 rounded-full mr-2 ${status === 'good' ? 'bg-green-500' : status === 'warning' ? 'bg-orange-500' : 'bg-red-500'}`}></div>
+              {config.statusText}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mb-4">
-        <div className={`text-3xl font-bold ${colorClasses[color].text} mb-1`}>
-          {value}
+      {/* Main Value Display */}
+      <div className="text-center mb-6">
+        <div className={`text-4xl font-bold ${config.color} mb-1`}>
+          {animatedValue.toLocaleString()}
         </div>
-        <div className="text-gray-600 text-sm font-medium">{label}</div>
+        <div className="text-sm text-gray-500">
+          {displayPercentage.toFixed(1)}% Complete
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-500">Progress</span>
-          <span className={`text-sm font-semibold ${colorClasses[color].text}`}>
-            {progress}%
-          </span>
-        </div>
+      {/* Progress Bar */}
+      <div className="mb-6">
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
-            className={`h-2 rounded-full ${colorClasses[color].progress} transition-all duration-1000 ease-out`}
-            style={{ 
-              width: `${progress}%`,
-              boxShadow: `0 0 8px ${colorClasses[color].progress.includes('green') ? '#22c55e40' : 
-                                   colorClasses[color].progress.includes('orange') ? '#f9731640' :
-                                   colorClasses[color].progress.includes('red') ? '#ef444440' : '#06b6d440'}`
-            }}
+            className={`h-2 rounded-full transition-all duration-1000 ease-out ${
+              status === 'good' ? 'bg-green-500' : 
+              status === 'warning' ? 'bg-orange-500' : 'bg-red-500'
+            }`}
+            style={{ width: `${Math.min(100, displayPercentage)}%` }}
           ></div>
+        </div>
+      </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="text-center">
+          <div className={`text-2xl font-bold ${metrics.primary.color || config.color}`}>
+            {metrics.primary.value.toLocaleString()}
+          </div>
+          <div className="text-xs text-gray-600">{metrics.primary.label}</div>
+        </div>
+        <div className="text-center">
+          <div className={`text-2xl font-bold ${metrics.secondary.color || 'text-gray-700'}`}>
+            {metrics.secondary.value.toLocaleString()}
+          </div>
+          <div className="text-xs text-gray-600">{metrics.secondary.label}</div>
+        </div>
+        <div className="text-center">
+          <div className={`text-lg font-semibold ${metrics.tertiary.color || 'text-blue-600'}`}>
+            {metrics.tertiary.value.toLocaleString()}{typeof metrics.tertiary.value === 'number' && metrics.tertiary.value <= 1 ? '%' : ''}
+          </div>
+          <div className="text-xs text-gray-600">{metrics.tertiary.label}</div>
+        </div>
+        <div className="text-center">
+          <div className={`text-lg font-semibold ${metrics.quaternary.color || 'text-orange-600'}`}>
+            {metrics.quaternary.value.toLocaleString()}
+          </div>
+          <div className="text-xs text-gray-600">{metrics.quaternary.label}</div>
         </div>
       </div>
     </div>
