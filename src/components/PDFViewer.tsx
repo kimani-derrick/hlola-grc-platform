@@ -21,6 +21,7 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
   const [rendering, setRendering] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const renderTaskRef = useRef<any>(null);
+  const renderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const loadPDF = async () => {
@@ -57,8 +58,14 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
   }, [documentId]);
 
   useEffect(() => {
-    const renderPage = async () => {
-      if (!pdfDocument || !canvasRef.current || rendering) return;
+    // Clear any existing timeout
+    if (renderTimeoutRef.current) {
+      clearTimeout(renderTimeoutRef.current);
+    }
+
+    // Debounce the render to prevent flickering
+    renderTimeoutRef.current = setTimeout(async () => {
+      if (!pdfDocument || !canvasRef.current) return;
 
       try {
         setRendering(true);
@@ -97,10 +104,15 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
       } finally {
         setRendering(false);
       }
-    };
+    }, 100); // 100ms debounce
 
-    renderPage();
-  }, [pdfDocument, currentPage, rendering]);
+    // Cleanup timeout on unmount or dependency change
+    return () => {
+      if (renderTimeoutRef.current) {
+        clearTimeout(renderTimeoutRef.current);
+      }
+    };
+  }, [pdfDocument, currentPage]);
 
   // Cleanup effect to cancel any pending render tasks
   useEffect(() => {
@@ -108,6 +120,10 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
       if (renderTaskRef.current) {
         renderTaskRef.current.cancel();
         renderTaskRef.current = null;
+      }
+      if (renderTimeoutRef.current) {
+        clearTimeout(renderTimeoutRef.current);
+        renderTimeoutRef.current = null;
       }
     };
   }, []);
