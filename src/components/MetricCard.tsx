@@ -9,13 +9,13 @@ interface MetricCardProps {
   percentage?: number;
   status: 'critical' | 'warning' | 'good';
   metrics: {
-    primary: { value: number; label: string; color?: string };
-    secondary: { value: number; label: string; color?: string };
-    tertiary: { value: number; label: string; color?: string };
-    quaternary: { value: number; label: string; color?: string };
-  };
+    primary?: { value: number; label: string; color?: string };
+    secondary?: { value: number; label: string; color?: string };
+    tertiary?: { value: number; label: string; color?: string };
+    quaternary?: { value: number; label: string; color?: string };
+  } | {};
   icon: React.ReactNode;
-  gradient: string;
+  gradient: string; // Tailwind gradient classes, e.g., "from-blue-50 to-blue-100"
 }
 
 export default function MetricCard({
@@ -97,9 +97,6 @@ export default function MetricCard({
         <div className={`text-4xl font-bold ${config.color} mb-1`}>
           {animatedValue.toLocaleString()}
         </div>
-        <div className="text-sm text-gray-500">
-          {displayPercentage.toFixed(1)}% Complete
-        </div>
       </div>
 
       {/* Progress Bar */}
@@ -116,32 +113,40 @@ export default function MetricCard({
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="text-center">
-          <div className={`text-2xl font-bold ${metrics.primary.color || config.color}`}>
-            {metrics.primary.value.toLocaleString()}
+      {metrics.primary && (
+        <div className={`grid gap-4 ${metrics.secondary ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <div className="text-center">
+            <div className={`text-2xl font-bold ${metrics.primary.color || config.color}`}>
+              {metrics.primary.value.toLocaleString()}
+            </div>
+            <div className="text-xs text-gray-600">{metrics.primary.label}</div>
           </div>
-          <div className="text-xs text-gray-600">{metrics.primary.label}</div>
+          {metrics.secondary && (
+            <div className="text-center">
+              <div className={`text-2xl font-bold ${metrics.secondary.color || 'text-gray-700'}`}>
+                {metrics.secondary.value.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-600">{metrics.secondary.label}</div>
+            </div>
+          )}
+          {metrics.tertiary && (
+            <div className="text-center">
+              <div className={`text-lg font-semibold ${metrics.tertiary.color || 'text-blue-600'}`}>
+                {metrics.tertiary.value.toLocaleString()}{typeof metrics.tertiary.value === 'number' && metrics.tertiary.value <= 1 ? '%' : ''}
+              </div>
+              <div className="text-xs text-gray-600">{metrics.tertiary.label}</div>
+            </div>
+          )}
+          {metrics.quaternary && (
+            <div className="text-center">
+              <div className={`text-lg font-semibold ${metrics.quaternary.color || 'text-orange-600'}`}>
+                {metrics.quaternary.value.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-600">{metrics.quaternary.label}</div>
+            </div>
+          )}
         </div>
-        <div className="text-center">
-          <div className={`text-2xl font-bold ${metrics.secondary.color || 'text-gray-700'}`}>
-            {metrics.secondary.value.toLocaleString()}
-          </div>
-          <div className="text-xs text-gray-600">{metrics.secondary.label}</div>
-        </div>
-        <div className="text-center">
-          <div className={`text-lg font-semibold ${metrics.tertiary.color || 'text-blue-600'}`}>
-            {metrics.tertiary.value.toLocaleString()}{typeof metrics.tertiary.value === 'number' && metrics.tertiary.value <= 1 ? '%' : ''}
-          </div>
-          <div className="text-xs text-gray-600">{metrics.tertiary.label}</div>
-        </div>
-        <div className="text-center">
-          <div className={`text-lg font-semibold ${metrics.quaternary.color || 'text-orange-600'}`}>
-            {metrics.quaternary.value.toLocaleString()}
-          </div>
-          <div className="text-xs text-gray-600">{metrics.quaternary.label}</div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

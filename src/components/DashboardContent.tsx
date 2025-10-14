@@ -195,69 +195,7 @@ export default function DashboardContent() {
       </div>
 
       {/* Key Metrics - Elegant Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        {/* Total Tasks Card */}
-        <MetricCard
-          title="Total Tasks"
-          value={entityData.tasks}
-          maxValue={100}
-          status={entityData.tasks > 150 ? "critical" : entityData.tasks > 100 ? "warning" : "good"}
-          metrics={{
-            primary: { value: entityData.completedTasks, label: "Completed", color: "text-green-600" },
-            secondary: { value: entityData.tasks - entityData.completedTasks, label: "Pending", color: "text-orange-600" },
-            tertiary: { value: entityData.inProgressTasks || 0, label: "In Progress", color: "text-blue-600" },
-            quaternary: { value: entityData.overdueTasks || 0, label: "Overdue", color: "text-red-600" }
-          }}
-          icon={
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-          }
-          gradient="from-blue-50 to-blue-100"
-        />
-
-        {/* Task Completion Rate Card */}
-        <MetricCard
-          title="Task Completion Rate"
-          value={entityData.completedTasks}
-          maxValue={entityData.tasks}
-          percentage={entityData.completionRate}
-          status={entityData.completionRate > 80 ? "good" : entityData.completionRate > 50 ? "warning" : "critical"}
-          metrics={{
-            primary: { value: entityData.tasks, label: "Total Tasks", color: "text-gray-700" },
-            secondary: { value: entityData.tasks - entityData.completedTasks, label: "Remaining", color: "text-orange-600" },
-            tertiary: { value: entityData.inProgressTasks || 0, label: "In Progress", color: "text-blue-600" },
-            quaternary: { value: entityData.overdueTasks || 0, label: "Overdue", color: "text-red-600" }
-          }}
-          icon={
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
-          gradient="from-green-50 to-green-100"
-        />
-
-        {/* Evidence Upload Progress Card */}
-        <MetricCard
-          title="Evidence Upload Progress"
-          value={entityData.uploadedDocuments}
-          maxValue={entityData.requiredDocuments}
-          percentage={entityData.uploadPercentage}
-          status={entityData.uploadPercentage >= 100 ? "good" : entityData.uploadPercentage > 50 ? "warning" : "critical"}
-          metrics={{
-            primary: { value: entityData.requiredDocuments, label: "Required", color: "text-gray-700" },
-            secondary: { value: Math.max(0, entityData.requiredDocuments - entityData.uploadedDocuments), label: "Missing", color: "text-orange-600" },
-            tertiary: { value: entityData.uploadedDocuments, label: "Uploaded", color: "text-green-600" },
-            quaternary: { value: entityData.uploadedDocuments > 0 ? Math.round((entityData.uploadedDocuments / entityData.requiredDocuments) * 100) : 0, label: "Progress", color: "text-blue-600" }
-          }}
-          icon={
-            <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-            </svg>
-          }
-          gradient="from-purple-50 to-purple-100"
-        />
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Framework Coverage Card */}
         <MetricCard
           title="Framework Coverage"
@@ -267,9 +205,7 @@ export default function DashboardContent() {
           status={entityData.frameworkCoverage > 80 ? "good" : entityData.frameworkCoverage > 50 ? "warning" : "critical"}
           metrics={{
             primary: { value: entityData.totalAvailableFrameworks, label: "Available", color: "text-gray-700" },
-            secondary: { value: entityData.totalAvailableFrameworks - entityData.assignedFrameworks, label: "Remaining", color: "text-orange-600" },
-            tertiary: { value: entityData.assignedFrameworks, label: "Assigned", color: "text-blue-600" },
-            quaternary: { value: entityData.frameworkCoverage, label: "Coverage", color: "text-green-600" }
+            secondary: { value: entityData.totalAvailableFrameworks - entityData.assignedFrameworks, label: "Remaining", color: "text-orange-600" }
           }}
           icon={
             <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,12 +222,7 @@ export default function DashboardContent() {
           maxValue={entityData.totalControls}
           percentage={entityData.controlsCompletionRate}
           status={entityData.controlsCompletionRate > 80 ? "good" : entityData.controlsCompletionRate > 50 ? "warning" : "critical"}
-          metrics={{
-            primary: { value: entityData.completedControls, label: "Completed", color: "text-green-600" },
-            secondary: { value: entityData.inProgressControls, label: "In Progress", color: "text-blue-600" },
-            tertiary: { value: entityData.notStartedControls, label: "Not Started", color: "text-gray-600" },
-            quaternary: { value: entityData.controlsCompletionRate, label: "Progress", color: "text-purple-600" }
-          }}
+          metrics={{}}
           icon={
             <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -299,6 +230,44 @@ export default function DashboardContent() {
           }
           gradient="from-indigo-50 to-indigo-100"
         />
+
+        {/* Total Tasks Card */}
+        <MetricCard
+          title="Total Tasks"
+          value={entityData.tasks}
+          maxValue={100}
+          status={entityData.tasks > 150 ? "critical" : entityData.tasks > 100 ? "warning" : "good"}
+          metrics={{
+            primary: { value: entityData.completedTasks, label: "Completed", color: "text-green-600" },
+            secondary: { value: entityData.tasks - entityData.completedTasks, label: "Pending", color: "text-orange-600" }
+          }}
+          icon={
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+          }
+          gradient="from-blue-50 to-blue-100"
+        />
+
+        {/* Evidence Upload Progress Card */}
+        <MetricCard
+          title="Evidence Upload Progress"
+          value={entityData.uploadedDocuments}
+          maxValue={entityData.requiredDocuments}
+          percentage={entityData.uploadPercentage}
+          status={entityData.uploadPercentage >= 100 ? "good" : entityData.uploadPercentage > 50 ? "warning" : "critical"}
+          metrics={{
+            primary: { value: entityData.requiredDocuments, label: "Required", color: "text-gray-700" },
+            secondary: { value: Math.max(0, entityData.requiredDocuments - entityData.uploadedDocuments), label: "Missing", color: "text-orange-600" }
+          }}
+          icon={
+            <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+          }
+          gradient="from-purple-50 to-purple-100"
+        />
+
       </div>
 
       {/* Recent Activities and Priority Actions */}
