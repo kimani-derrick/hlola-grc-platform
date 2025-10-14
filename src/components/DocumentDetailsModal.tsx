@@ -5,6 +5,7 @@ import { Document } from '../types/documents';
 import { categoryIcons, statusConfig } from '../data/documents';
 import { formatDate } from '../utils/dateUtils';
 import { apiService } from '../services/api';
+import PDFViewer from './PDFViewer';
 
 interface DocumentDetailsModalProps {
   document: Document | null;
@@ -139,54 +140,7 @@ const getFileIcon = (fileType: string) => {
 // Real document viewer content generator
 const getDocumentPreview = (fileType: string, title: string, documentId: string) => {
   if (fileType === 'pdf') {
-    return (
-      <div className="bg-white h-full rounded-lg border-2 border-gray-200 flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="w-24 h-24 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-            {getFileIcon('pdf')}
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">PDF Document Viewer</h3>
-          <p className="text-gray-600 mb-4">This is a preview of your PDF document</p>
-          <div className="bg-gray-50 rounded-lg p-6 max-w-2xl mx-auto text-left">
-            <h4 className="font-bold text-gray-900 mb-3">{title}</h4>
-            <p className="text-gray-700 text-sm leading-relaxed mb-4">
-              PDF documents require a specialized viewer. Click the download button below to view the full document.
-            </p>
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <button 
-                onClick={async () => {
-                  try {
-                    const response = await apiService.downloadDocument(documentId);
-                    if (response.ok) {
-                      const blob = await response.blob();
-                      const url = window.URL.createObjectURL(blob);
-                      const link = document.createElement('a');
-                      link.href = url;
-                      link.setAttribute('download', title || 'document.pdf');
-                      link.style.display = 'none';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                      window.URL.revokeObjectURL(url);
-                    } else {
-                      alert('Failed to download file');
-                    }
-                  } catch (err: any) {
-                    alert(err.message || 'Failed to download file');
-                  }
-                }}
-                className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Download PDF
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <PDFViewer documentId={documentId} title={title} />;
   }
   
   if (fileType === 'docx') {
