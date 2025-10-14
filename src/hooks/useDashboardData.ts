@@ -38,7 +38,7 @@ export interface DashboardMetrics {
   inProgressTasks: number;
   overdueTasks: number;
   completionRate: number;
-  uploadedDocuments: number;
+  uploadedDocuments: number; // Just uploaded documents
   requiredDocuments: number;
   uploadPercentage: number;
   assignedFrameworks: number;
@@ -119,29 +119,17 @@ export function useDashboardData(organizationId?: string) {
       console.log('Completed Tasks:', completedTasks);
       console.log('Calculated Completion Rate:', completionRate);
 
-      // Count evidence: completed tasks with evidence + uploaded documents
-      const completedTasksWithEvidence = allTasks.filter((task: any) => 
-        task.status === 'completed' && task.evidence_attached === true
-      ).length;
+      // Count evidence: only uploaded documents (not tasks)
       const uploadedDocuments = documents.length;
-      const totalEvidence = completedTasksWithEvidence + uploadedDocuments;
       const requiredDocuments = totalTasks; // Assuming each task requires evidence
-      const uploadPercentage = requiredDocuments > 0 ? (totalEvidence / requiredDocuments) * 100 : 0;
+      const uploadPercentage = requiredDocuments > 0 ? (uploadedDocuments / requiredDocuments) * 100 : 0;
 
       // DEBUG: Log evidence calculation
       console.log('🔍 DEBUG - Evidence Calculation:');
-      console.log('Completed Tasks with Evidence:', completedTasksWithEvidence);
       console.log('Uploaded Documents:', uploadedDocuments);
       console.log('Documents Array Length:', documents.length);
-      console.log('Total Evidence:', totalEvidence);
       console.log('Required Documents:', requiredDocuments);
       console.log('Upload Percentage:', uploadPercentage);
-      
-      // DEBUG: Log sample completed tasks with evidence
-      const sampleCompletedWithEvidence = allTasks.filter((task: any) => 
-        task.status === 'completed' && task.evidence_attached === true
-      ).slice(0, 3);
-      console.log('Sample Completed Tasks with Evidence:', sampleCompletedWithEvidence.map((t: any) => ({id: t.id, title: t.title, evidence_attached: t.evidence_attached})));
 
       const assignedFrameworksCount = assignedFrameworks.length || 0; // Use length of assigned frameworks array
       const totalAvailableFrameworks = allFrameworks.length || 60; // Use length of all frameworks array
@@ -188,7 +176,7 @@ export function useDashboardData(organizationId?: string) {
         inProgressTasks,
         overdueTasks,
         completionRate,
-        uploadedDocuments: totalEvidence,
+        uploadedDocuments: uploadedDocuments, // Just the uploaded documents
         requiredDocuments,
         uploadPercentage,
         assignedFrameworks: assignedFrameworksCount,

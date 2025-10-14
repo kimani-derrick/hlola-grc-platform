@@ -109,7 +109,7 @@ export default function DashboardContent() {
     inProgressTasks: dashboardData?.inProgressTasks || 0,
     overdueTasks: dashboardData?.overdueTasks || 0,
     completionRate: dashboardData?.completionRate || 0,
-    uploadedDocuments: dashboardData?.uploadedDocuments || 0,
+    uploadedDocuments: dashboardData?.uploadedDocuments || 0, // Just uploaded documents
     requiredDocuments: dashboardData?.requiredDocuments || 0,
     uploadPercentage: dashboardData?.uploadPercentage || 0,
     assignedFrameworks: dashboardData?.assignedFrameworks || 0,

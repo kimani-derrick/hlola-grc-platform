@@ -285,12 +285,12 @@ export default function EvidenceUploadGauge({
       {/* Compact Metrics - With Dividers */}
       <div className="mt-4 flex justify-between items-center text-xs">
         <div className="text-center flex-1">
-          <div className="font-bold text-green-500">{uploadedDocuments}</div>
-          <div className="text-gray-600">Uploaded</div>
+          <div className="font-bold text-green-500">{safeUploaded}</div>
+          <div className="text-gray-600">Evidence</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-gray-800">{requiredDocuments}</div>
+          <div className="font-bold text-gray-800">{safeRequired}</div>
           <div className="text-gray-600">Required</div>
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
@@ -300,7 +300,7 @@ export default function EvidenceUploadGauge({
         </div>
         <div className="w-px h-8 bg-gray-300 mx-2"></div>
         <div className="text-center flex-1">
-          <div className="font-bold text-orange-600">{Math.max(0, (requiredDocuments || 0) - (uploadedDocuments || 0))}</div>
+          <div className="font-bold text-orange-600">{Math.max(0, safeRequired - safeUploaded)}</div>
           <div className="text-gray-600">Missing</div>
         </div>
       </div>
