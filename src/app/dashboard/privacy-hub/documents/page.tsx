@@ -6,12 +6,13 @@ import DocumentCard from '../../../../components/DocumentCard';
 import DocumentTable from '../../../../components/DocumentTable';
 import DocumentDetailsModal from '../../../../components/DocumentDetailsModal';
 import { Document, DocumentFilters as DocumentFiltersType } from '../../../../types/documents';
-import { allDocuments, calculateStats } from '../../../../data/documents';
+import { useDocumentsData } from '../../../../hooks/useDocumentsData';
 import { filterDocuments, getUniqueFrameworks, getUniqueControls, getUniqueTasks } from '../../../../utils/documentUtils';
 
 
 
 export default function DocumentsPage() {
+  const { documents, stats, loading, error } = useDocumentsData();
   const [filters, setFilters] = useState<DocumentFiltersType>({
     searchQuery: '',
     selectedCategory: 'all',
@@ -25,13 +26,12 @@ export default function DocumentsPage() {
   });
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
-  const filteredDocuments = filterDocuments(allDocuments, filters);
-  const stats = calculateStats(allDocuments);
+  const filteredDocuments = filterDocuments(documents, filters);
   
   // Get unique frameworks, controls, and tasks for filters
-  const frameworks = useMemo(() => getUniqueFrameworks(allDocuments), []);
-  const controls = useMemo(() => getUniqueControls(allDocuments, filters.selectedFramework !== 'all' ? filters.selectedFramework : undefined), [filters.selectedFramework]);
-  const tasks = useMemo(() => getUniqueTasks(allDocuments, filters.selectedFramework !== 'all' ? filters.selectedFramework : undefined, filters.selectedControl !== 'all' ? filters.selectedControl : undefined), [filters.selectedFramework, filters.selectedControl]);
+  const frameworks = useMemo(() => getUniqueFrameworks(documents), [documents]);
+  const controls = useMemo(() => getUniqueControls(documents, filters.selectedFramework !== 'all' ? filters.selectedFramework : undefined), [documents, filters.selectedFramework]);
+  const tasks = useMemo(() => getUniqueTasks(documents, filters.selectedFramework !== 'all' ? filters.selectedFramework : undefined, filters.selectedControl !== 'all' ? filters.selectedControl : undefined), [documents, filters.selectedFramework, filters.selectedControl]);
 
   const evidenceTypeOptions = [
     { id: 'policy', name: 'Policy Documents' },
@@ -43,6 +43,45 @@ export default function DocumentsPage() {
     { id: 'assessment', name: 'Assessments' },
     { id: 'other', name: 'Other' }
   ];
+
+  // Loading state
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading documents...</p>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 max-w-7xl mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error loading documents</h3>
+                <p className="mt-1 text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -330,7 +369,7 @@ export default function DocumentsPage() {
             {/* Results count */}
             <div className="mt-4 pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600">
-                Showing <span className="font-semibold text-gray-900">{filteredDocuments.length}</span> of <span className="font-semibold text-gray-900">{allDocuments.length}</span> documents
+                Showing <span className="font-semibold text-gray-900">{filteredDocuments.length}</span> of <span className="font-semibold text-gray-900">{documents.length}</span> documents
               </p>
             </div>
           </div>

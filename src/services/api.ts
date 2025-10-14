@@ -214,6 +214,21 @@ class ApiService {
     } as any;
   }
 
+  async downloadDocument(filePath: string): Promise<Response> {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    return fetch(`${API_BASE_URL}/documents/${filePath}/download`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
   async assignFrameworkToEntity(entityId: string, frameworkId: string, payload?: { complianceScore?: number; auditReadinessScore?: number; certificationStatus?: string }): Promise<ApiResponse<any>> {
     const body = {
       complianceScore: payload?.complianceScore ?? 0,

@@ -1,14 +1,103 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Document } from '../types/documents';
 import { categoryIcons, statusConfig } from '../data/documents';
 import { formatDate } from '../utils/dateUtils';
+import { apiService } from '../services/api';
 
 interface DocumentDetailsModalProps {
   document: Document | null;
   onClose: () => void;
 }
+
+// Component to preview text files
+const TextFilePreview = ({ documentId, title }: { documentId: string; title: string }) => {
+  const [content, setContent] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.downloadDocument(documentId);
+        
+        if (response.ok) {
+          const text = await response.text();
+          setContent(text);
+        } else {
+          setError(`Failed to load file content: ${response.status} ${response.statusText}`);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Error loading file content');
+        console.error('Error fetching file content:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (documentId) {
+      fetchContent();
+    }
+  }, [documentId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+          <p className="text-sm text-gray-600">Loading file content...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-8">
+        <div className="text-red-600 mb-2">
+          <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <p className="text-sm text-red-600 mb-4">{error}</p>
+        <button 
+          onClick={async () => {
+            try {
+              const response = await apiService.downloadDocument(documentId);
+              if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', title || 'document');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+              } else {
+                alert('Failed to download file');
+              }
+            } catch (err: any) {
+              alert(err.message || 'Failed to download file');
+            }
+          }}
+          className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+        >
+          Download File
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-900 rounded-lg p-6 font-mono text-sm text-green-400">
+      <pre className="whitespace-pre-wrap">{content}</pre>
+    </div>
+  );
+};
 
 // File type icon mapper
 const getFileIcon = (fileType: string) => {
@@ -47,8 +136,8 @@ const getFileIcon = (fileType: string) => {
   return icons[fileType] || icons.default;
 };
 
-// Mock document viewer content generator
-const getDocumentPreview = (fileType: string, title: string) => {
+// Real document viewer content generator
+const getDocumentPreview = (fileType: string, title: string, documentId: string) => {
   if (fileType === 'pdf') {
     return (
       <div className="bg-white h-full rounded-lg border-2 border-gray-200 flex items-center justify-center">
@@ -60,24 +149,39 @@ const getDocumentPreview = (fileType: string, title: string) => {
           <p className="text-gray-600 mb-4">This is a preview of your PDF document</p>
           <div className="bg-gray-50 rounded-lg p-6 max-w-2xl mx-auto text-left">
             <h4 className="font-bold text-gray-900 mb-3">{title}</h4>
-            <p className="text-gray-700 text-sm leading-relaxed mb-3">
-              This document contains compliance evidence and supporting documentation for regulatory requirements.
-              The content includes policies, procedures, and implementation details necessary for audit purposes.
+            <p className="text-gray-700 text-sm leading-relaxed mb-4">
+              PDF documents require a specialized viewer. Click the download button below to view the full document.
             </p>
-            <p className="text-gray-700 text-sm leading-relaxed mb-3">
-              Key sections covered:
-            </p>
-            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 ml-4">
-              <li>Policy Overview and Objectives</li>
-              <li>Implementation Guidelines</li>
-              <li>Roles and Responsibilities</li>
-              <li>Compliance Requirements</li>
-              <li>Evidence Documentation</li>
-            </ul>
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <p className="text-xs text-gray-500 italic">
-                Note: In production, this would display the actual PDF content using PDF.js or similar library.
-              </p>
+              <button 
+                onClick={async () => {
+                  try {
+                    const response = await apiService.downloadDocument(documentId);
+                    if (response.ok) {
+                      const blob = await response.blob();
+                      const url = window.URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.setAttribute('download', title || 'document.pdf');
+                      link.style.display = 'none';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(url);
+                    } else {
+                      alert('Failed to download file');
+                    }
+                  } catch (err: any) {
+                    alert(err.message || 'Failed to download file');
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download PDF
+              </button>
             </div>
           </div>
         </div>
@@ -216,65 +320,7 @@ const getDocumentPreview = (fileType: string, title: string) => {
           </div>
         </div>
         
-        <div className="bg-gray-900 rounded-lg p-6 font-mono text-sm text-green-400">
-          <pre className="whitespace-pre-wrap">
-{`========================================
-${title.toUpperCase()}
-========================================
-
-Document Version: 1.0
-Last Updated: ${new Date().toLocaleDateString()}
-Author: Compliance Team
-
-----------------------------------------
-CONTENTS
-----------------------------------------
-
-1. Overview
-2. Compliance Requirements
-3. Implementation Guidelines
-4. Evidence Collection
-5. Audit Procedures
-
-----------------------------------------
-1. OVERVIEW
-----------------------------------------
-
-This document provides detailed information
-regarding compliance evidence and supporting
-documentation for regulatory requirements.
-
-The purpose is to maintain comprehensive
-records of all compliance activities and
-provide auditable evidence for regulatory
-reviews.
-
-----------------------------------------
-2. COMPLIANCE REQUIREMENTS
-----------------------------------------
-
-All requirements outlined in the relevant
-regulatory framework must be met and
-documented appropriately.
-
-Key requirements include:
-- Policy documentation
-- Control implementation
-- Regular assessments
-- Incident management
-- Training and awareness
-
-========================================
-END OF DOCUMENT
-========================================`}
-          </pre>
-        </div>
-        
-        <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-          <p className="text-xs text-gray-600">
-            <strong>Note:</strong> In production, this would display the actual text file content.
-          </p>
-        </div>
+        <TextFilePreview documentId={documentId} title={title} />
       </div>
     );
   }
@@ -395,7 +441,7 @@ export default function DocumentDetailsModal({ document, onClose }: DocumentDeta
         <div className="flex-1 overflow-hidden">
           {activeTab === 'preview' && (
             <div className="h-full p-6 bg-gray-50">
-              {getDocumentPreview(fileType, document.title)}
+              {getDocumentPreview(fileType, document.title, document.id)}
             </div>
           )}
 
