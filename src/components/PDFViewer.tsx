@@ -18,7 +18,9 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [rendering, setRendering] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const renderTaskRef = useRef<any>(null);
 
   useEffect(() => {
     const loadPDF = async () => {
@@ -56,9 +58,17 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
 
   useEffect(() => {
     const renderPage = async () => {
-      if (!pdfDocument || !canvasRef.current) return;
+      if (!pdfDocument || !canvasRef.current || rendering) return;
 
       try {
+        setRendering(true);
+        
+        // Cancel any existing render task
+        if (renderTaskRef.current) {
+          renderTaskRef.current.cancel();
+          renderTaskRef.current = null;
+        }
+
         const page = await pdfDocument.getPage(currentPage);
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
@@ -75,24 +85,41 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
           viewport: viewport,
         };
 
-        await page.render(renderContext).promise;
+        // Store the render task so we can cancel it if needed
+        const renderTask = page.render(renderContext);
+        renderTaskRef.current = renderTask;
+        
+        await renderTask.promise;
+        renderTaskRef.current = null;
       } catch (err) {
         console.error('Error rendering PDF page:', err);
         setError('Error rendering PDF page');
+      } finally {
+        setRendering(false);
       }
     };
 
     renderPage();
-  }, [pdfDocument, currentPage]);
+  }, [pdfDocument, currentPage, rendering]);
+
+  // Cleanup effect to cancel any pending render tasks
+  useEffect(() => {
+    return () => {
+      if (renderTaskRef.current) {
+        renderTaskRef.current.cancel();
+        renderTaskRef.current = null;
+      }
+    };
+  }, []);
 
   const goToPreviousPage = () => {
-    if (currentPage > 1) {
+    if (currentPage > 1 && !rendering) {
       setCurrentPage(currentPage - 1);
     }
   };
 
   const goToNextPage = () => {
-    if (currentPage < totalPages) {
+    if (currentPage < totalPages && !rendering) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -191,13 +218,13 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
         <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50">
           <button
             onClick={goToPreviousPage}
-            disabled={currentPage <= 1}
+            disabled={currentPage <= 1 || rendering}
             className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Previous
+            {rendering ? 'Rendering...' : 'Previous'}
           </button>
 
           <div className="flex items-center space-x-2">
@@ -208,10 +235,10 @@ export default function PDFViewer({ documentId, title }: PDFViewerProps) {
 
           <button
             onClick={goToNextPage}
-            disabled={currentPage >= totalPages}
+            disabled={currentPage >= totalPages || rendering}
             className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Next
+            {rendering ? 'Rendering...' : 'Next'}
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
