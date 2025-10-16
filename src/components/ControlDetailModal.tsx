@@ -11,6 +11,7 @@ interface ControlDetailModalProps {
   control: Control;
   isOpen: boolean;
   onClose: () => void;
+  onTaskCompleted?: () => void;
 }
 
 interface Task {
@@ -45,6 +46,15 @@ const mapApiTaskToTask = (apiTask: any): Task => {
   // Determine if task is overdue
   const isOverdue = apiTask.due_date && new Date(apiTask.due_date) < new Date() && apiTask.status !== 'completed';
   const status = isOverdue ? 'overdue' : (statusMap[apiTask.status] || 'not-started');
+  
+  console.log('🔄 Mapping task:', {
+    id: apiTask.id,
+    title: apiTask.title,
+    apiStatus: apiTask.status,
+    mappedStatus: status,
+    progress: apiTask.progress,
+    evidence_attached: apiTask.evidence_attached
+  });
 
   return {
     id: apiTask.id,
@@ -104,7 +114,7 @@ const getProgressColor = (progress: number) => {
   return 'bg-gray-300';
 };
 
-export default function ControlDetailModal({ control, isOpen, onClose }: ControlDetailModalProps) {
+export default function ControlDetailModal({ control, isOpen, onClose, onTaskCompleted }: ControlDetailModalProps) {
   const [selectedComplianceStatus, setSelectedComplianceStatus] = useState<string>('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskFilter, setTaskFilter] = useState('all');
@@ -196,13 +206,29 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
         setActiveTaskMenu(null);
         break;
       case 'mark-complete':
-        setTasks(prevTasks => 
-          prevTasks.map(task => 
-            task.id === taskId 
-              ? { ...task, status: 'completed' as const, progress: 100 }
-              : task
-          )
-        );
+        // Call API to complete the task
+        const completeTask = async () => {
+          try {
+            const response = await apiService.updateTaskStatus(taskId, 'completed', 100, 0);
+            if (response.success) {
+              // Update local state only after successful API call
+              setTasks(prevTasks => 
+                prevTasks.map(task => 
+                  task.id === taskId 
+                    ? { ...task, status: 'completed' as const, progress: 100 }
+                    : task
+                )
+              );
+              // Call parent callback to refresh control stats
+              onTaskCompleted?.();
+            } else {
+              console.error('Failed to complete task:', response.error);
+            }
+          } catch (error) {
+            console.error('Error completing task:', error);
+          }
+        };
+        completeTask();
         setActiveTaskMenu(null);
         break;
       case 'delegate':
@@ -216,9 +242,11 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
   };
 
   const handleTaskCreated = () => {
+    console.log('🔄 handleTaskCreated called - refreshing tasks list');
     // Refresh the tasks list
     if (control?.id) {
       const fetchTasks = async () => {
+        console.log('🔄 Fetching tasks for control:', control.id);
         setTasksLoading(true);
         setTasksError(null);
         
@@ -257,6 +285,16 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
     if (taskFilter === 'system') return task.type === 'system';
     if (taskFilter === 'manual') return task.type === 'manual';
     return true;
+  });
+
+  // Debug logging
+  console.log('🔍 ControlDetailModal Debug:', {
+    controlId: control?.id,
+    tasksLength: tasks.length,
+    filteredTasksLength: filteredTasks.length,
+    taskFilter,
+    tasksLoading,
+    tasksError
   });
 
   return (
@@ -667,7 +705,10 @@ export default function ControlDetailModal({ control, isOpen, onClose }: Control
             setIsTaskDetailOpen(false);
             setSelectedTask(null);
           }}
-          onTaskCompleted={handleTaskCreated}
+          onTaskCompleted={() => {
+            handleTaskCreated();
+            onTaskCompleted?.();
+          }}
         />
       )}
 

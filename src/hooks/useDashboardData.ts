@@ -59,10 +59,29 @@ export interface DashboardMetrics {
 export function useDashboardData(organizationId?: string) {
   const { user, isLoading: authLoading } = useAuth();
   const { selectedEntity } = useEntity();
-  const { activeFrameworkIds } = useActiveFrameworks();
+  const { activeFrameworkIds, setActiveFrameworkIds } = useActiveFrameworks();
   const [data, setData] = useState<DashboardMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Load assigned frameworks for the current entity
+  useEffect(() => {
+    const refreshAssignedFrameworks = async () => {
+      try {
+        if (!selectedEntity?.id) return;
+        const resp: any = await apiService.getEntityFrameworks(selectedEntity.id);
+        if (resp.success) {
+          const list = Array.isArray(resp.data) ? resp.data : [];
+          const ids = list.map((f: any) => f.framework_id || f.frameworkId || f.id).filter(Boolean);
+          setActiveFrameworkIds(ids);
+        }
+      } catch (error) {
+        console.error('Error loading assigned frameworks:', error);
+      }
+    };
+
+    refreshAssignedFrameworks();
+  }, [selectedEntity?.id, setActiveFrameworkIds]);
 
   // Create a stable reference for active framework IDs to avoid useEffect dependency issues
   const stableActiveFrameworkIds = useMemo(() => activeFrameworkIds, [activeFrameworkIds.join(',')]);
@@ -172,8 +191,8 @@ export function useDashboardData(organizationId?: string) {
 
       const criticalIssues = auditGaps.filter((gap: any) => gap.severity === 'critical').length;
       
-      // Calculate risk exposure based on assigned frameworks
-      const frameworks: any[] = allFrameworks || [];
+      // Calculate risk exposure based on assigned frameworks only
+      const frameworks: any[] = assignedFrameworks || [];
       const riskExposure = calculateRiskExposure(frameworks);
       
       // DEBUG: Log risk exposure calculation

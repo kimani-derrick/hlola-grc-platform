@@ -20,14 +20,18 @@ class TaskGenerator {
       
       for (const gap of gaps) {
         // Skip if task already exists for this control
-        const existingTask = await Task.findByControlId(gap.controlId, organizationId);
-        if (existingTask && existingTask.status !== 'completed') {
-          logger.debug('Skipping task creation - existing task found', {
-            controlId: gap.controlId,
-            existingTaskId: existingTask.id,
-            status: existingTask.status
-          });
-          continue;
+        const existingTasks = await Task.findByControlId(gap.controlId, organizationId);
+        if (existingTasks && existingTasks.length > 0) {
+          // Check if any existing task is not completed
+          const incompleteTask = existingTasks.find(task => task.status !== 'completed');
+          if (incompleteTask) {
+            logger.debug('Skipping task creation - existing incomplete task found', {
+              controlId: gap.controlId,
+              existingTaskId: incompleteTask.id,
+              status: incompleteTask.status
+            });
+            continue;
+          }
         }
         
         const taskData = {
@@ -248,9 +252,9 @@ class TaskGenerator {
    * @param {string} entityId - Entity ID
    * @returns {Object} Task statistics
    */
-  static async getTaskStatistics(entityId) {
+  static async getTaskStatistics(entityId, organizationId) {
     try {
-      const tasks = await Task.findByEntity(entityId);
+      const tasks = await Task.findByEntityId(entityId, organizationId);
       
       const stats = {
         total: tasks.length,

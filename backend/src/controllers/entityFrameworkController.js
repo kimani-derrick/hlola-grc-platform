@@ -55,16 +55,42 @@ const assignFrameworkToEntity = async (req, res, next) => {
       frameworkId: frameworkId
     });
 
-    // Trigger compliance event listener
+    // Create task assignments for all controls in this framework
     try {
-      const ComplianceEventListener = require('../services/complianceEventListener');
-      await ComplianceEventListener.onFrameworkAssigned(entityId, frameworkId);
+      const taskAssignmentHelper = require('../utils/taskAssignmentHelper');
+      const createdCount = await taskAssignmentHelper.createTaskAssignmentsForEntity(entityId);
+      logger.info('Created task assignments for framework', {
+        requestId: req.id,
+        entityId: entityId,
+        frameworkId: frameworkId,
+        taskAssignmentsCreated: createdCount
+      });
     } catch (error) {
-      logger.error('Error triggering compliance event for framework assignment', {
+      logger.error('Error creating task assignments for framework assignment', {
         error: error.message,
         entityId,
         frameworkId
       });
+    }
+
+    // Trigger compliance event listener (for compliance scoring only, not task creation)
+    try {
+      const ComplianceEventListener = require('../services/complianceEventListener');
+      await ComplianceEventListener.onFrameworkAssigned(entityId, frameworkId);
+      logger.info('Compliance event listener triggered successfully', {
+        requestId: req.id,
+        entityId,
+        frameworkId
+      });
+    } catch (error) {
+      logger.error('Error triggering compliance event for framework assignment', {
+        error: error.message,
+        stack: error.stack,
+        entityId,
+        frameworkId,
+        requestId: req.id
+      });
+      // Don't fail the API call, but log the error clearly
     }
 
     // Emit real-time event for framework assignment

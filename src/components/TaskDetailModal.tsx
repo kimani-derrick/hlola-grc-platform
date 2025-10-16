@@ -193,20 +193,30 @@ export default function TaskDetailModal({ task, isOpen, onClose, onTaskCompleted
   };
 
   const handleCompleteTask = async () => {
+    console.log('🎯 Complete Task button clicked!');
+    console.log('📋 Task ID:', task.id);
+    console.log('📋 Evidence count:', evidence.length);
+    console.log('📋 Current task status:', task.status);
+    
     try {
-      const response = await apiService.updateTaskStatus(task.id, 'completed');
+      console.log('🚀 Calling API to complete task...');
+      const response = await apiService.updateTaskStatus(task.id, 'completed', 100, 0);
+      console.log('📊 API Response:', response);
+      
       if (response.success) {
+        console.log('✅ Task completed successfully!');
         // Call the callback to refresh parent component
         if (onTaskCompleted) {
+          console.log('🔄 Calling onTaskCompleted callback...');
           onTaskCompleted();
         }
         // Close modal
         onClose();
       } else {
-        console.error('Failed to complete task:', response.error);
+        console.error('❌ Failed to complete task:', response.error);
       }
     } catch (error) {
-      console.error('Error completing task:', error);
+      console.error('❌ Error completing task:', error);
     }
   };
 
@@ -445,6 +455,13 @@ export default function TaskDetailModal({ task, isOpen, onClose, onTaskCompleted
             )}
 
             {/* Complete Task Button */}
+            {(() => {
+              console.log('🔍 Button render check:');
+              console.log('  - Evidence length:', evidence.length);
+              console.log('  - Task status:', task.status);
+              console.log('  - Should show button:', evidence.length > 0 && task.status !== 'completed');
+              return null;
+            })()}
             {evidence.length > 0 && task.status !== 'completed' && (
               <div className="pt-4 border-t border-gray-200">
                 <button

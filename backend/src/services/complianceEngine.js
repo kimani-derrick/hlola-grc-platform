@@ -305,7 +305,7 @@ class ComplianceEngine {
       
       const [documents, tasks] = await Promise.all([
         Document.findByEntity(entityId, entity.organization_id),
-        Task.findByEntity(entityId)
+        Task.findByEntityId(entityId, organizationId)
       ]);
       
       return { documents, tasks };
@@ -329,8 +329,15 @@ class ComplianceEngine {
     try {
       logger.info('Starting task analysis', { entityId, frameworkId, gapCount: gaps.length });
       
+      // Get entity to get organizationId
+      const Entity = require('../models/Entity');
+      const entity = await Entity.findById(entityId);
+      if (!entity) {
+        throw new Error('Entity not found');
+      }
+      
       // Get all tasks for this entity
-      const allTasks = await Task.findByEntity(entityId);
+      const allTasks = await Task.findByEntityId(entityId, entity.organization_id);
       logger.info('Retrieved tasks from database', { entityId, totalTasks: allTasks.length });
       
       // Filter tasks by framework

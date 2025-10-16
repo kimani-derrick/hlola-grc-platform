@@ -128,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           // Cache user data for instant loading on refresh
           localStorage.setItem('userData', JSON.stringify(userData));
+          localStorage.setItem('userId', data.user.id); // Store user ID for framework cache validation
           console.log('🔍 DEBUG - Cached user data on login:', userData);
           
           return true;
@@ -150,6 +151,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('authToken');
       sessionStorage.removeItem('authToken');
       localStorage.removeItem('userData');
+      localStorage.removeItem('userId');
+      // Clear active frameworks cache to prevent data leakage between users
+      localStorage.removeItem('activeFrameworks');
+      localStorage.removeItem('activeFrameworksUserId');
     }
     
     // Also sign out from NextAuth

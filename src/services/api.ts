@@ -381,10 +381,14 @@ class ApiService {
     });
   }
 
-  async updateTaskStatus(taskId: string, status: string): Promise<ApiResponse<any>> {
+  async updateTaskStatus(taskId: string, status: string, progress?: number, actualHours?: number): Promise<ApiResponse<any>> {
+    const body: any = { status };
+    if (progress !== undefined) body.progress = progress;
+    if (actualHours !== undefined) body.actualHours = actualHours;
+    
     return this.makeRequest(`/tasks/${taskId}/status`, {
       method: 'PUT',
-      body: JSON.stringify({ status })
+      body: JSON.stringify(body)
     });
   }
 

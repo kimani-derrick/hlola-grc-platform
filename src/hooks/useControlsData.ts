@@ -38,15 +38,18 @@ const mapApiControlToControl = (apiControl: any, frameworkName: string, framewor
 export function useControlsData() {
   const { activeFrameworkIds } = useActiveFrameworks();
   const [controls, setControls] = useState<Control[]>([]);
+  const [calculatedControls, setCalculatedControls] = useState<Control[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [frameworks, setFrameworks] = useState<any[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Load controls for active frameworks
   useEffect(() => {
     const loadActiveFrameworkControls = async () => {
       if (activeFrameworkIds.length === 0) {
         setControls([]);
+        setCalculatedControls([]);
         return;
       }
 
@@ -76,9 +79,11 @@ export function useControlsData() {
         }
         
         setControls(allControls);
+        setCalculatedControls([]); // Clear calculated controls when new controls are loaded
       } catch (err: any) {
         setError(err.message || 'Failed to load controls');
         console.error('Error loading controls:', err);
+        setCalculatedControls([]);
       } finally {
         setLoading(false);
       }
@@ -102,7 +107,7 @@ export function useControlsData() {
     overallProgress: 0
   });
 
-  // Fetch task stats for all controls
+  // Fetch task stats for all controls and update individual control completion rates
   useEffect(() => {
     const calculateControlStats = async () => {
       if (controls.length === 0) {
@@ -111,6 +116,7 @@ export function useControlsData() {
           inProgressTasks: 0,
           overallProgress: 0
         });
+        setCalculatedControls([]);
         return;
       }
 
@@ -118,8 +124,9 @@ export function useControlsData() {
         let totalCompletedTasks = 0;
         let totalInProgressTasks = 0;
         let totalTasks = 0;
+        const updatedControls: Control[] = [];
 
-        // For each control, get its task stats
+        // For each control, get its task stats and calculate completion rate
         for (const control of controls) {
           try {
             // Fetch tasks for this control
@@ -130,14 +137,43 @@ export function useControlsData() {
               const inProgressTasks = tasks.filter((task: any) => task.status === 'in-progress').length;
               const controlTotalTasks = tasks.length;
 
+              // Calculate completion rate for this control
+              const controlCompletionRate = controlTotalTasks > 0 ? Math.round((completedTasks / controlTotalTasks) * 100) : 0;
+              
+              // Determine control status based on task completion
+              let controlStatus: Control['status'] = 'not-started';
+              if (controlCompletionRate === 100) {
+                controlStatus = 'completed';
+              } else if (controlCompletionRate > 0) {
+                controlStatus = 'in-progress';
+              }
+
+              // Update the control with calculated completion rate and status
+              const updatedControl: Control = {
+                ...control,
+                completionRate: controlCompletionRate,
+                status: controlStatus
+              };
+              updatedControls.push(updatedControl);
+
               totalCompletedTasks += completedTasks;
               totalInProgressTasks += inProgressTasks;
               totalTasks += controlTotalTasks;
+
+              console.log(`🔍 DEBUG - Control ${control.title}: ${completedTasks}/${controlTotalTasks} tasks completed (${controlCompletionRate}%)`);
+            } else {
+              // If no tasks found, keep control as is
+              updatedControls.push(control);
             }
           } catch (error) {
             console.error(`Error fetching tasks for control ${control.id}:`, error);
+            // If error, keep control as is
+            updatedControls.push(control);
           }
         }
+
+        // Update calculated controls with completion rates and statuses
+        setCalculatedControls(updatedControls);
 
         const overallProgress = totalTasks > 0 ? Math.round((totalCompletedTasks / totalTasks) * 100) : 0;
 
@@ -163,10 +199,15 @@ export function useControlsData() {
     };
 
     calculateControlStats();
-  }, [controls]);
+  }, [controls, refreshTrigger]);
+
+  // Function to trigger refresh of control stats
+  const refreshControlStats = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   return {
-    controls,
+    controls: calculatedControls.length > 0 ? calculatedControls : controls, // Use calculated controls if available, otherwise use raw controls
     frameworks,
     countries,
     frameworksList,
@@ -174,6 +215,7 @@ export function useControlsData() {
     error,
     completedControls: controlStats.completedTasks, // Now shows completed tasks, not completed controls
     inProgressControls: controlStats.inProgressTasks, // Now shows in-progress tasks, not in-progress controls
-    overallProgress: controlStats.overallProgress
+    overallProgress: controlStats.overallProgress,
+    refreshControlStats // Expose the refresh function
   };
 }

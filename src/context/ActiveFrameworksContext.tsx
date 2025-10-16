@@ -27,12 +27,23 @@ interface ActiveFrameworksProviderProps {
 }
 
 export const ActiveFrameworksProvider: React.FC<ActiveFrameworksProviderProps> = ({ children }) => {
-  // Initialize with default value, then load from localStorage
-  const [activeFrameworkIds, setActiveFrameworkIds] = useState<string[]>(['1']); // Kenya is default active
+  // Initialize with empty array - will be populated by components that load assigned frameworks
+  const [activeFrameworkIds, setActiveFrameworkIds] = useState<string[]>([]);
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount, but clear if it's from a different user
   useEffect(() => {
     const savedActiveFrameworks = localStorage.getItem('activeFrameworks');
+    const savedUserId = localStorage.getItem('activeFrameworksUserId');
+    const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    
+    // Clear saved frameworks if user has changed
+    if (savedUserId && currentUserId && savedUserId !== currentUserId) {
+      localStorage.removeItem('activeFrameworks');
+      localStorage.removeItem('activeFrameworksUserId');
+      setActiveFrameworkIds([]);
+      return;
+    }
+    
     if (savedActiveFrameworks) {
       try {
         const parsed = JSON.parse(savedActiveFrameworks);
@@ -49,6 +60,11 @@ export const ActiveFrameworksProvider: React.FC<ActiveFrameworksProviderProps> =
   // Save to localStorage whenever activeFrameworkIds changes
   useEffect(() => {
     localStorage.setItem('activeFrameworks', JSON.stringify(activeFrameworkIds));
+    // Also save the current user ID to detect user changes
+    const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    if (currentUserId) {
+      localStorage.setItem('activeFrameworksUserId', currentUserId);
+    }
   }, [activeFrameworkIds]);
 
   const addActiveFramework = (id: string) => {
@@ -68,7 +84,10 @@ export const ActiveFrameworksProvider: React.FC<ActiveFrameworksProviderProps> =
   };
 
   const resetToDefault = () => {
-    setActiveFrameworkIds(['1']); // Reset to Kenya only
+    setActiveFrameworkIds([]); // Reset to empty - will be populated by assigned frameworks
+    // Clear localStorage as well
+    localStorage.removeItem('activeFrameworks');
+    localStorage.removeItem('activeFrameworksUserId');
   };
 
   const getActiveFrameworkCount = () => {

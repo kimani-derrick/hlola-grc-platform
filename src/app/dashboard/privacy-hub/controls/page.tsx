@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DashboardLayout from '../../../../components/DashboardLayout';
 import ControlDetailModal from '../../../../components/ControlDetailModal';
@@ -11,9 +11,12 @@ import ControlCard, { Control } from '../../../../components/controls/ControlCar
 import ControlsEmptyState from '../../../../components/controls/ControlsEmptyState';
 import { useActiveFrameworks } from '../../../../context/ActiveFrameworksContext';
 import { useControlsData } from '../../../../hooks/useControlsData';
+import { useEntity } from '../../../../context/EntityContext';
+import { apiService } from '../../../../services/api';
 
 export default function ControlsPage() {
-  const { activeFrameworkIds } = useActiveFrameworks();
+  const { activeFrameworkIds, setActiveFrameworkIds } = useActiveFrameworks();
+  const { selectedEntity } = useEntity();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -21,6 +24,25 @@ export default function ControlsPage() {
   const [selectedFramework, setSelectedFramework] = useState<string>('all');
   const [selectedControl, setSelectedControl] = useState<Control | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  // Load assigned frameworks for the current entity
+  useEffect(() => {
+    const refreshAssignedFrameworks = async () => {
+      try {
+        if (!selectedEntity?.id) return;
+        const resp: any = await apiService.getEntityFrameworks(selectedEntity.id);
+        if (resp.success) {
+          const list = Array.isArray(resp.data) ? resp.data : [];
+          const ids = list.map((f: any) => f.framework_id || f.frameworkId || f.id).filter(Boolean);
+          setActiveFrameworkIds(ids);
+        }
+      } catch (error) {
+        console.error('Error loading assigned frameworks:', error);
+      }
+    };
+
+    refreshAssignedFrameworks();
+  }, [selectedEntity?.id, setActiveFrameworkIds]);
   
   // Use custom hook for data management
   const {
@@ -31,7 +53,8 @@ export default function ControlsPage() {
     error,
     completedControls,
     inProgressControls,
-    overallProgress
+    overallProgress,
+    refreshControlStats
   } = useControlsData();
 
   // Filter controls based on selected criteria
@@ -154,6 +177,7 @@ export default function ControlsPage() {
             setIsDetailModalOpen(false);
             setSelectedControl(null);
           }}
+          onTaskCompleted={refreshControlStats}
         />
       )}
     </DashboardLayout>

@@ -2,7 +2,7 @@ const { pool } = require('../config/database');
 
 const query = (text, params) => pool.query(text, params);
 
-class Task {
+class TaskFixed {
   static async create({ 
     controlId, 
     title, 
@@ -43,16 +43,11 @@ class Task {
   static async findByControlId(controlId, organizationId) {
     // FIXED: Now uses task_assignments instead of organization_id
     const result = await query(
-      `SELECT DISTINCT t.id, t.control_id, t.title, t.description, t.category, t.auto_generated, t.created_at, t.updated_at,
+      `SELECT DISTINCT t.*, 
               u1.first_name as assignee_first_name, u1.last_name as assignee_last_name,
-              ta.status,  -- Use assignment status as main status
-              ta.priority,
-              ta.due_date,
-              ta.progress,
-              ta.actual_hours,
-              ta.estimated_hours,
-              ta.evidence_attached,
-              ta.blockers,
+              ta.status as assignment_status,
+              ta.priority as assignment_priority,
+              ta.due_date as assignment_due_date,
               ta.entity_id,
               e.name as entity_name
        FROM tasks t
@@ -81,7 +76,7 @@ class Task {
        JOIN entities e ON ta.entity_id = e.id
        JOIN controls c ON t.control_id = c.id
        WHERE ta.assigned_to = $1 AND e.organization_id = $2
-       ORDER BY ta.due_date ASC, ta.priority DESC`,
+       ORDER BY ta.assignment_due_date ASC, ta.priority DESC`,
       [userId, organizationId]
     );
     return result.rows;
@@ -101,7 +96,7 @@ class Task {
        JOIN controls c ON t.control_id = c.id
        LEFT JOIN users u1 ON ta.assigned_to = u1.id
        WHERE ta.entity_id = $1
-       ORDER BY ta.due_date ASC, ta.priority DESC`,
+       ORDER BY ta.assignment_due_date ASC, ta.priority DESC`,
       [entityId]
     );
     return result.rows;
@@ -188,44 +183,31 @@ class Task {
   }
 
   // Keep other methods that don't depend on organization_id
-  static async findAll(filters = {}, organizationId) {
-    // FIXED: Now uses task_assignments instead of organization_id
+  static async findAll(filters = {}) {
     let queryText = `
-      SELECT DISTINCT t.id, t.control_id, t.title, t.description, t.category, t.auto_generated, t.created_at, t.updated_at,
+      SELECT DISTINCT t.*, 
              c.title as control_title, c.description as control_description,
              f.id as framework_id, f.name as framework_name, f.region as framework_region,
-             u1.first_name as assignee_first_name, u1.last_name as assignee_last_name,
-             ta.status,  -- Use assignment status as main status
-             ta.priority,
-             ta.due_date,
-             ta.progress,
-             ta.actual_hours,
-             ta.estimated_hours,
-             ta.evidence_attached,
-             ta.blockers,
-             ta.entity_id,
-             e.name as entity_name
+             u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
       FROM tasks t
-      JOIN task_assignments ta ON t.id = ta.task_id
-      JOIN entities e ON ta.entity_id = e.id
       JOIN controls c ON t.control_id = c.id
       JOIN frameworks f ON c.framework_id = f.id
-      LEFT JOIN users u1 ON ta.assigned_to = u1.id
-      WHERE e.organization_id = $1
+      LEFT JOIN users u1 ON t.assignee_id = u1.id
+      WHERE 1=1
     `;
-    const params = [organizationId];
-    let paramCount = 2;
+    const params = [];
+    let paramCount = 1;
 
     if (filters.status) {
-      queryText += ` AND ta.status = $${paramCount++}`;
+      queryText += ` AND t.status = $${paramCount++}`;
       params.push(filters.status);
     }
     if (filters.priority) {
-      queryText += ` AND ta.priority = $${paramCount++}`;
+      queryText += ` AND t.priority = $${paramCount++}`;
       params.push(filters.priority);
     }
     if (filters.assigneeId) {
-      queryText += ` AND ta.assigned_to = $${paramCount++}`;
+      queryText += ` AND t.assignee_id = $${paramCount++}`;
       params.push(filters.assigneeId);
     }
     if (filters.controlId) {
@@ -274,7 +256,7 @@ class Task {
     if (blockers !== undefined) { updates.push(`blockers = $${paramCount++}`); values.push(blockers); }
 
     if (updates.length === 0) {
-      return await Task.findById(id);
+      return await TaskFixed.findById(id);
     }
 
     updates.push(`updated_at = CURRENT_TIMESTAMP`);
@@ -287,47 +269,6 @@ class Task {
     return result.rows[0];
   }
 
-  static async updateStatus(id, { status, progress, actualHours }) {
-    // This method updates the task assignment status, not the task itself
-    // We need to find the task assignment and update it
-    const updates = [];
-    const values = [];
-    let paramCount = 1;
-
-    if (status !== undefined) { 
-      updates.push(`status = $${paramCount++}`); 
-      values.push(status);
-      
-      if (status === 'completed') {
-        updates.push(`completed_at = CURRENT_TIMESTAMP`);
-      } else if (status !== 'completed') {
-        updates.push(`completed_at = NULL`);
-      }
-    }
-    if (progress !== undefined) { updates.push(`progress = $${paramCount++}`); values.push(progress); }
-    if (actualHours !== undefined) { updates.push(`actual_hours = $${paramCount++}`); values.push(actualHours); }
-
-    if (updates.length === 0) {
-      return await Task.findById(id);
-    }
-
-    updates.push(`updated_at = CURRENT_TIMESTAMP`);
-    values.push(id);
-
-    // Update the task assignment status
-    const result = await query(
-      `UPDATE task_assignments SET ${updates.join(', ')} WHERE task_id = $${paramCount} RETURNING *`,
-      values
-    );
-    
-    if (result.rows.length === 0) {
-      return null;
-    }
-
-    // Return the updated task with assignment details
-    return await Task.findById(id);
-  }
-
   static async delete(id) {
     const result = await query(
       `DELETE FROM tasks WHERE id = $1 RETURNING id`,
@@ -335,182 +276,6 @@ class Task {
     );
     return result.rows[0];
   }
-
-  static async countAll(filters = {}, organizationId) {
-    // FIXED: Now uses task_assignments instead of organization_id
-    let queryText = `
-      SELECT COUNT(DISTINCT t.id) as count
-      FROM tasks t
-      JOIN task_assignments ta ON t.id = ta.task_id
-      JOIN entities e ON ta.entity_id = e.id
-      WHERE e.organization_id = $1
-    `;
-    const params = [organizationId];
-    let paramCount = 2;
-
-    if (filters.status) {
-      queryText += ` AND ta.status = $${paramCount++}`;
-      params.push(filters.status);
-    }
-    if (filters.priority) {
-      queryText += ` AND ta.priority = $${paramCount++}`;
-      params.push(filters.priority);
-    }
-    if (filters.assigneeId) {
-      queryText += ` AND ta.assigned_to = $${paramCount++}`;
-      params.push(filters.assigneeId);
-    }
-    if (filters.controlId) {
-      queryText += ` AND t.control_id = $${paramCount++}`;
-      params.push(filters.controlId);
-    }
-    if (filters.category) {
-      queryText += ` AND t.category = $${paramCount++}`;
-      params.push(filters.category);
-    }
-
-    const result = await query(queryText, params);
-    return parseInt(result.rows[0].count, 10);
-  }
-
-  static async getTaskStats(organizationId, filters = {}) {
-    // FIXED: Now uses task_assignments instead of organization_id
-    let queryText = `
-      SELECT 
-        COUNT(DISTINCT t.id) as total_tasks,
-        COUNT(CASE WHEN ta.status = 'not-started' THEN 1 END) as pending_tasks,
-        COUNT(CASE WHEN ta.status = 'in-progress' THEN 1 END) as in_progress_tasks,
-        COUNT(CASE WHEN ta.status = 'completed' THEN 1 END) as completed_tasks,
-        COUNT(CASE WHEN ta.status = 'blocked' THEN 1 END) as blocked_tasks,
-        COUNT(CASE WHEN ta.status = 'cancelled' THEN 1 END) as cancelled_tasks,
-        COUNT(CASE WHEN ta.priority = 'high' THEN 1 END) as high_priority_tasks,
-        COUNT(CASE WHEN ta.priority = 'medium' THEN 1 END) as medium_priority_tasks,
-        COUNT(CASE WHEN ta.priority = 'low' THEN 1 END) as low_priority_tasks,
-        COUNT(CASE WHEN ta.due_date < CURRENT_DATE AND ta.status != 'completed' THEN 1 END) as overdue_tasks,
-        COUNT(CASE WHEN ta.due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days' AND ta.status != 'completed' THEN 1 END) as due_soon_tasks
-      FROM tasks t
-      JOIN task_assignments ta ON t.id = ta.task_id
-      JOIN entities e ON ta.entity_id = e.id
-      WHERE e.organization_id = $1
-    `;
-    const params = [organizationId];
-    let paramCount = 2;
-
-    if (filters.entityId) {
-      queryText += ` AND ta.entity_id = $${paramCount++}`;
-      params.push(filters.entityId);
-    }
-    if (filters.assigneeId) {
-      queryText += ` AND ta.assigned_to = $${paramCount++}`;
-      params.push(filters.assigneeId);
-    }
-
-    const result = await query(queryText, params);
-    return result.rows[0];
-  }
-
-  static async findAllUnassigned(filters = {}) {
-    // FIXED: Now returns tasks that are not assigned to any entity
-    let queryText = `
-      SELECT t.*, 
-             c.title as control_title, c.description as control_description,
-             c.framework_id, c.control_id as control_code,
-             f.name as framework_name, f.region, f.country
-      FROM tasks t
-      JOIN controls c ON t.control_id = c.id
-      LEFT JOIN frameworks f ON c.framework_id = f.id
-      WHERE t.id NOT IN (
-        SELECT DISTINCT task_id FROM task_assignments
-      )
-    `;
-    const params = [];
-    let paramCount = 1;
-
-    if (filters.status) {
-      queryText += ` AND t.status = $${paramCount++}`;
-      params.push(filters.status);
-    }
-    if (filters.priority) {
-      queryText += ` AND t.priority = $${paramCount++}`;
-      params.push(filters.priority);
-    }
-    if (filters.assigneeId) {
-      queryText += ` AND t.assignee_id = $${paramCount++}`;
-      params.push(filters.assigneeId);
-    }
-    if (filters.controlId) {
-      queryText += ` AND t.control_id = $${paramCount++}`;
-      params.push(filters.controlId);
-    }
-    if (filters.category) {
-      queryText += ` AND t.category = $${paramCount++}`;
-      params.push(filters.category);
-    }
-    if (filters.frameworkId) {
-      queryText += ` AND c.framework_id = $${paramCount++}`;
-      params.push(filters.frameworkId);
-    }
-
-    // Add sorting
-    const sortBy = filters.sortBy || 'created_at';
-    const sortOrder = filters.sortOrder || 'DESC';
-    queryText += ` ORDER BY t.${sortBy} ${sortOrder}`;
-
-    // Add pagination
-    if (filters.limit) {
-      queryText += ` LIMIT $${paramCount++}`;
-      params.push(parseInt(filters.limit));
-    }
-    if (filters.offset) {
-      queryText += ` OFFSET $${paramCount++}`;
-      params.push(parseInt(filters.offset));
-    }
-
-    const result = await query(queryText, params);
-    return result.rows;
-  }
-
-  static async countAllUnassigned(filters = {}) {
-    // FIXED: Now counts tasks that are not assigned to any entity
-    let queryText = `
-      SELECT COUNT(*) as count
-      FROM tasks t
-      JOIN controls c ON t.control_id = c.id
-      WHERE t.id NOT IN (
-        SELECT DISTINCT task_id FROM task_assignments
-      )
-    `;
-    const params = [];
-    let paramCount = 1;
-
-    if (filters.status) {
-      queryText += ` AND t.status = $${paramCount++}`;
-      params.push(filters.status);
-    }
-    if (filters.priority) {
-      queryText += ` AND t.priority = $${paramCount++}`;
-      params.push(filters.priority);
-    }
-    if (filters.assigneeId) {
-      queryText += ` AND t.assignee_id = $${paramCount++}`;
-      params.push(filters.assigneeId);
-    }
-    if (filters.controlId) {
-      queryText += ` AND t.control_id = $${paramCount++}`;
-      params.push(filters.controlId);
-    }
-    if (filters.category) {
-      queryText += ` AND t.category = $${paramCount++}`;
-      params.push(filters.category);
-    }
-    if (filters.frameworkId) {
-      queryText += ` AND c.framework_id = $${paramCount++}`;
-      params.push(filters.frameworkId);
-    }
-
-    const result = await query(queryText, params);
-    return parseInt(result.rows[0].count, 10);
-  }
 }
 
-module.exports = Task;
+module.exports = TaskFixed;
