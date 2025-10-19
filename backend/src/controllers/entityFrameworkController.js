@@ -55,25 +55,7 @@ const assignFrameworkToEntity = async (req, res, next) => {
       frameworkId: frameworkId
     });
 
-    // Create task assignments for all controls in this framework
-    try {
-      const taskAssignmentHelper = require('../utils/taskAssignmentHelper');
-      const createdCount = await taskAssignmentHelper.createTaskAssignmentsForEntity(entityId);
-      logger.info('Created task assignments for framework', {
-        requestId: req.id,
-        entityId: entityId,
-        frameworkId: frameworkId,
-        taskAssignmentsCreated: createdCount
-      });
-    } catch (error) {
-      logger.error('Error creating task assignments for framework assignment', {
-        error: error.message,
-        entityId,
-        frameworkId
-      });
-    }
-
-    // Trigger compliance event listener (for compliance scoring only, not task creation)
+    // Trigger compliance event listener to assign controls first
     try {
       const ComplianceEventListener = require('../services/complianceEventListener');
       await ComplianceEventListener.onFrameworkAssigned(entityId, frameworkId);
@@ -91,6 +73,31 @@ const assignFrameworkToEntity = async (req, res, next) => {
         requestId: req.id
       });
       // Don't fail the API call, but log the error clearly
+    }
+
+    // Create task assignments for all controls in this framework (AFTER controls are assigned)
+    try {
+      logger.info('Starting task assignment process for framework', {
+        requestId: req.id,
+        entityId: entityId,
+        frameworkId: frameworkId
+      });
+      const taskAssignmentHelper = require('../utils/taskAssignmentHelper');
+      const createdCount = await taskAssignmentHelper.createTaskAssignmentsForEntity(entityId);
+      logger.info('Created task assignments for framework', {
+        requestId: req.id,
+        entityId: entityId,
+        frameworkId: frameworkId,
+        taskAssignmentsCreated: createdCount
+      });
+    } catch (error) {
+      logger.error('Error creating task assignments for framework assignment', {
+        error: error.message,
+        stack: error.stack,
+        entityId,
+        frameworkId,
+        requestId: req.id
+      });
     }
 
     // Emit real-time event for framework assignment
