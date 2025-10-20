@@ -511,6 +511,24 @@ class Task {
     const result = await query(queryText, params);
     return parseInt(result.rows[0].count, 10);
   }
+
+  static async findByFrameworkId(frameworkId) {
+    // Get only the original framework tasks (auto_generated = false)
+    const result = await query(
+      `SELECT t.id, t.control_id, t.title, t.description, t.category, t.auto_generated, t.created_at, t.updated_at,
+              t.status, t.priority, t.due_date, t.progress, t.actual_hours, t.estimated_hours,
+              t.evidence_attached, t.blockers, t.assignee_id,
+              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name,
+              c.title as control_title
+       FROM tasks t
+       JOIN controls c ON t.control_id = c.id
+       LEFT JOIN users u1 ON t.assignee_id = u1.id
+       WHERE c.framework_id = $1 AND t.auto_generated = false
+       ORDER BY t.created_at DESC`,
+      [frameworkId]
+    );
+    return result.rows;
+  }
 }
 
 module.exports = Task;

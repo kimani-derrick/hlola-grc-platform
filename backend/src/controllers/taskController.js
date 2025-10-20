@@ -539,6 +539,43 @@ const getTaskStats = async (req, res, next) => {
   }
 };
 
+const getTasksByFramework = async (req, res, next) => {
+  try {
+    const { frameworkId } = req.params;
+    const { organizationId } = req.user;
+
+    logger.info('Fetching tasks by framework', {
+      requestId: req.id,
+      frameworkId: frameworkId,
+      organizationId: organizationId
+    });
+
+    // Get all tasks for controls in this framework
+    const tasks = await Task.findByFrameworkId(frameworkId);
+
+    logger.info('Tasks fetched by framework successfully', {
+      requestId: req.id,
+      frameworkId: frameworkId,
+      taskCount: tasks.length
+    });
+
+    res.json({
+      success: true,
+      tasks: tasks,
+      count: tasks.length
+    });
+  } catch (error) {
+    logger.error('Error fetching tasks by framework', {
+      requestId: req.id,
+      frameworkId: req.params.frameworkId,
+      organizationId: req.user.organizationId,
+      error: error.message,
+      stack: error.stack
+    });
+    next(error);
+  }
+};
+
 module.exports = {
   createTask,
   getTask,
@@ -547,6 +584,7 @@ module.exports = {
   getTasksByControl,
   getTasksByUser,
   getTasksByEntity,
+  getTasksByFramework,
   updateTask,
   updateTaskStatus,
   deleteTask,

@@ -255,6 +255,19 @@ class ApiService {
   }
 
 
+  // Tasks by Framework
+  async getTasksByFramework(frameworkId: string): Promise<ApiResponse<any[]>> {
+    const response = await this.makeRequest(`/tasks/frameworks/${frameworkId}`);
+    if (!response.success) return response as ApiResponse<any[]>;
+    const anyResp: any = response as any;
+    const tasks = anyResp?.data?.tasks || anyResp?.tasks || anyResp?.data || [];
+    return {
+      success: true,
+      data: tasks,
+      error: undefined
+    } as ApiResponse<any[]>;
+  }
+
   // Tasks by Control
   async getTasksByControl(controlId: string): Promise<ApiResponse<any[]>> {
     const response = await this.makeRequest(`/tasks/controls/${controlId}`);

@@ -7,6 +7,7 @@ const {
   getTasksByControl,
   getTasksByUser,
   getTasksByEntity,
+  getTasksByFramework,
   updateTask,
   updateTaskStatus,
   deleteTask,
@@ -34,5 +35,6 @@ router.delete('/:id', requireRole(['admin']), deleteTask);
 router.get('/controls/:controlId', getTasksByControl);
 router.get('/users/:userId', getTasksByUser);
 router.get('/entities/:entityId', getTasksByEntity);
+router.get('/frameworks/:frameworkId', getTasksByFramework);
 
 module.exports = router;

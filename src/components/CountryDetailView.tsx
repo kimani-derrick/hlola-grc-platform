@@ -1,7 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Framework, ControlDetail, Priority } from '../types/frameworks';
 import ControlDetailsModal from './ControlDetailsModal';
+import { apiService } from '../services/api';
 
 interface CountryDetailViewProps {
   selectedFramework: Framework;
@@ -26,7 +28,35 @@ export default function CountryDetailView({
   getRiskLevelColor,
   getPriorityColor
 }: CountryDetailViewProps) {
+  const [frameworkTasks, setFrameworkTasks] = useState<any[]>([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  
   const computedControlsCount = (controls && controls.length) || selectedFramework.controls || selectedFramework.requirements || 0;
+
+  // Fetch tasks for this framework
+  useEffect(() => {
+    const fetchFrameworkTasks = async () => {
+      try {
+        setTasksLoading(true);
+        const response = await apiService.getTasksByFramework(selectedFramework.id);
+        if (response.success) {
+          setFrameworkTasks(response.data || []);
+        } else {
+          console.error('Failed to fetch framework tasks:', response.error);
+          setFrameworkTasks([]);
+        }
+      } catch (error) {
+        console.error('Error fetching framework tasks:', error);
+        setFrameworkTasks([]);
+      } finally {
+        setTasksLoading(false);
+      }
+    };
+
+    if (selectedFramework.id) {
+      fetchFrameworkTasks();
+    }
+  }, [selectedFramework.id]);
   const evidenceCount = controls && controls.length > 0
     ? controls.reduce((sum, c) => sum + ((c as any).evidence ? (c as any).evidence.length : 0), 0)
     : 0;
@@ -106,7 +136,9 @@ export default function CountryDetailView({
                   </div>
                   <div className="bg-green-50 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-green-600 mb-1">Tasks</div>
-                    <div className="text-3xl font-bold text-gray-900">{selectedFramework.tasks.length}</div>
+                    <div className="text-3xl font-bold text-gray-900">
+                      {tasksLoading ? '...' : frameworkTasks.length}
+                    </div>
                   </div>
                   {/* Evidence removed in view-only controls context */}
                 </div>
