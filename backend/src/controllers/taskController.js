@@ -11,6 +11,7 @@ const createTask = async (req, res, next) => {
     logger.info('Creating task', {
       requestId: req.id,
       organizationId: organizationId,
+      userId: userId,
       controlId: controlId,
       title: title,
       assigneeId: assigneeId
@@ -37,6 +38,57 @@ const createTask = async (req, res, next) => {
       estimatedHours
     });
 
+    // Get user's entity ID and automatically assign task to it
+    let userEntityId = null;
+    try {
+      const User = require('../models/User');
+      const user = await User.findById(userId);
+      logger.info('User lookup result', {
+        requestId: req.id,
+        userId: userId,
+        userFound: !!user,
+        userEntityId: user?.entity_id,
+        userData: user
+      });
+      
+      if (user && user.entity_id) {
+        userEntityId = user.entity_id;
+        try {
+          const assignment = await Task.assignToEntity(task.id, user.entity_id, assigneeId, priority || 'medium', dueDate);
+          logger.info('Task assigned to entity', {
+            requestId: req.id,
+            taskId: task.id,
+            entityId: user.entity_id,
+            assignment: assignment
+          });
+        } catch (assignError) {
+          logger.error('Error assigning task to entity', {
+            requestId: req.id,
+            taskId: task.id,
+            entityId: user.entity_id,
+            error: assignError.message,
+            stack: assignError.stack
+          });
+        }
+      } else {
+        logger.warn('User entity not found, task created without entity assignment', {
+          requestId: req.id,
+          taskId: task.id,
+          userId: userId,
+          userFound: !!user,
+          userEntityId: user?.entity_id
+        });
+      }
+    } catch (error) {
+      logger.error('Error in user lookup or task assignment', {
+        requestId: req.id,
+        taskId: task.id,
+        userId: userId,
+        error: error.message,
+        stack: error.stack
+      });
+    }
+
     logger.info('Task created successfully', {
       requestId: req.id,
       taskId: task.id,
@@ -46,7 +98,7 @@ const createTask = async (req, res, next) => {
     // Emit real-time event for task creation
     realtimeEventEmitter.emitTaskCreated({
       taskId: task.id,
-      entityId: task.entity_id,
+      entityId: userEntityId,
       controlId: task.control_id,
       frameworkId: task.framework_id,
       title: task.title,
