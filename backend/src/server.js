@@ -30,6 +30,9 @@ const complianceRoutes = require('./routes/compliance');
 const reportRoutes = require('./routes/reports');
 const commentRoutes = require('./routes/comments');
 const platformAdminRoutes = require('./routes/platformAdmin');
+const adminFrameworksRoutes = require('./routes/admin/adminFrameworks');
+const adminControlsRoutes = require('./routes/admin/adminControls');
+const adminTasksRoutes = require('./routes/admin/adminTasks');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -96,6 +99,9 @@ app.use('/api/organizations', organizationRoutes);
 app.use('/api/entities', entityRoutes);
 app.use('/api/frameworks', frameworkRoutes);
 app.use('/api/admin', platformAdminRoutes);
+app.use('/api/admin/frameworks', adminFrameworksRoutes);
+app.use('/api/admin/controls', adminControlsRoutes);
+app.use('/api/admin/tasks', adminTasksRoutes);
 app.use('/api', entityFrameworkRoutes);
 app.use('/api/controls', controlRoutes);
 app.use('/api', controlAssignmentRoutes);
@@ -120,6 +126,9 @@ app.get('/', (req, res) => {
       organizations: '/api/organizations',
       entities: '/api/entities',
       frameworks: '/api/frameworks',
+      adminFrameworks: '/api/admin/frameworks',
+      adminControls: '/api/admin/controls',
+      adminTasks: '/api/admin/tasks',
       entityFrameworks: '/api/entities/:entityId/frameworks',
       controls: '/api/controls',
       controlAssignments: '/api/entities/:entityId/controls',

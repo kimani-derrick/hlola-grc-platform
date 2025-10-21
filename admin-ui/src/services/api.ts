@@ -7,6 +7,39 @@ interface ApiResponse<T = any> {
   error?: string;
 }
 
+interface FrameworksResponse {
+  success: boolean;
+  message?: string;
+  frameworks: Framework[];
+  pagination: {
+    total: number;
+    limit: number | null;
+    offset: number;
+  };
+}
+
+interface ControlsResponse {
+  success: boolean;
+  message?: string;
+  controls: Control[];
+  pagination: {
+    total: number;
+    limit: number | null;
+    offset: number;
+  };
+}
+
+interface TasksResponse {
+  success: boolean;
+  message?: string;
+  tasks: Task[];
+  pagination: {
+    total: number;
+    limit: number | null;
+    offset: number;
+  };
+}
+
 interface LoginRequest {
   email: string;
   password: string;
@@ -25,6 +58,95 @@ interface LoginResponse {
 interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+// Framework interfaces
+interface Framework {
+  id: string;
+  name: string;
+  description: string;
+  version?: string;
+  region: string;
+  country?: string;
+  category: string;
+  type: string;
+  icon?: string;
+  color: string;
+  compliance_deadline?: string;
+  priority: string;
+  risk_level: string;
+  status: string;
+  requirements_count: number;
+  applicable_countries: string[];
+  industry_scope: string;
+  created_at: string;
+  updated_at: string;
+  is_active: boolean;
+  max_fine_amount: string;
+  max_fine_currency: string;
+}
+
+interface CreateFrameworkRequest {
+  name: string;
+  description: string;
+  version?: string;
+  category: string;
+  region: string;
+  type?: string;
+  priority?: string;
+  risk_level?: string;
+  industry_scope?: string;
+  max_fine_amount?: string;
+  max_fine_currency?: string;
+}
+
+// Control interfaces
+interface Control {
+  id: string;
+  framework_id: string;
+  control_id: string;
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  priority: string;
+  implementation_level?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CreateControlRequest {
+  framework_id: string;
+  control_id: string;
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  priority: string;
+  implementation_level?: string;
+}
+
+// Task interfaces
+interface Task {
+  id: string;
+  control_id: string;
+  title: string;
+  description: string;
+  priority: string;
+  frequency: string;
+  estimated_hours: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CreateTaskRequest {
+  control_id: string;
+  title: string;
+  description: string;
+  priority: string;
+  frequency: string;
+  estimated_hours: number;
 }
 
 class ApiService {
@@ -75,7 +197,7 @@ class ApiService {
       return {
         success: false,
         error: 'Network error',
-        message: `Unable to connect to the server: ${error.message}`,
+        message: `Unable to connect to the server: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -123,6 +245,122 @@ class ApiService {
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
+
+  // Framework CRUD methods
+  async getFrameworks(): Promise<FrameworksResponse> {
+    return this.makeRequest('/api/admin/frameworks') as Promise<FrameworksResponse>;
+  }
+
+  async getFramework(id: string): Promise<ApiResponse<Framework>> {
+    return this.makeRequest<Framework>(`/api/admin/frameworks/${id}`);
+  }
+
+  async createFramework(data: CreateFrameworkRequest): Promise<ApiResponse<Framework>> {
+    return this.makeRequest<Framework>('/api/admin/frameworks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateFramework(id: string, data: Partial<CreateFrameworkRequest>): Promise<ApiResponse<Framework>> {
+    return this.makeRequest<Framework>(`/api/admin/frameworks/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteFramework(id: string): Promise<ApiResponse> {
+    return this.makeRequest(`/api/admin/frameworks/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Control CRUD methods
+  async getControls(): Promise<ControlsResponse> {
+    return this.makeRequest('/api/admin/controls') as Promise<ControlsResponse>;
+  }
+
+  async getControl(id: string): Promise<ApiResponse<Control>> {
+    return this.makeRequest<Control>(`/api/admin/controls/${id}`);
+  }
+
+  async getControlsByFramework(frameworkId: string): Promise<ApiResponse<Control[]>> {
+    return this.makeRequest<Control[]>(`/api/admin/controls/framework/${frameworkId}`);
+  }
+
+  async createControl(data: CreateControlRequest): Promise<ApiResponse<Control>> {
+    return this.makeRequest<Control>('/api/admin/controls', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateControl(id: string, data: Partial<CreateControlRequest>): Promise<ApiResponse<Control>> {
+    return this.makeRequest<Control>(`/api/admin/controls/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteControl(id: string): Promise<ApiResponse> {
+    return this.makeRequest(`/api/admin/controls/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Task CRUD methods
+  async getTasks(): Promise<TasksResponse> {
+    return this.makeRequest('/api/admin/tasks') as Promise<TasksResponse>;
+  }
+
+  async getTask(id: string): Promise<ApiResponse<Task>> {
+    return this.makeRequest<Task>(`/api/admin/tasks/${id}`);
+  }
+
+  async getTasksByControl(controlId: string): Promise<ApiResponse<Task[]>> {
+    return this.makeRequest<Task[]>(`/api/admin/tasks/controls/${controlId}`);
+  }
+
+  async getTasksByFramework(frameworkId: string): Promise<ApiResponse<Task[]>> {
+    return this.makeRequest<Task[]>(`/api/admin/tasks/frameworks/${frameworkId}`);
+  }
+
+  async createTask(data: CreateTaskRequest): Promise<ApiResponse<Task>> {
+    return this.makeRequest<Task>('/api/admin/tasks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateTask(id: string, data: Partial<CreateTaskRequest>): Promise<ApiResponse<Task>> {
+    return this.makeRequest<Task>(`/api/admin/tasks/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteTask(id: string): Promise<ApiResponse> {
+    return this.makeRequest(`/api/admin/tasks/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export default new ApiService();
+
+// Export interfaces for use in components
+export type {
+  Framework,
+  CreateFrameworkRequest,
+  Control,
+  CreateControlRequest,
+  Task,
+  CreateTaskRequest,
+  ApiResponse,
+  FrameworksResponse,
+  ControlsResponse,
+  TasksResponse,
+  LoginRequest,
+  LoginResponse,
+  ChangePasswordRequest
+};

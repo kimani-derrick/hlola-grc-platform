@@ -573,6 +573,209 @@ class Task {
     );
     return result.rows;
   }
+
+  // Admin-specific method to get all assigned tasks across all organizations
+  static async findAllAssignedForAdmin(filters = {}) {
+    let queryText = `
+      SELECT DISTINCT t.id, t.control_id, t.title, t.description, t.category, t.auto_generated, t.created_at, t.updated_at,
+             c.title as control_title, c.description as control_description,
+             f.id as framework_id, f.name as framework_name, f.region as framework_region,
+             u1.first_name as assignee_first_name, u1.last_name as assignee_last_name,
+             ta.status,  -- Use assignment status as main status
+             ta.priority,
+             ta.due_date,
+             ta.progress,
+             ta.actual_hours,
+             ta.estimated_hours,
+             ta.evidence_attached,
+             ta.blockers,
+             ta.entity_id,
+             e.name as entity_name
+      FROM tasks t
+      JOIN task_assignments ta ON t.id = ta.task_id
+      JOIN entities e ON ta.entity_id = e.id
+      JOIN controls c ON t.control_id = c.id
+      JOIN frameworks f ON c.framework_id = f.id
+      LEFT JOIN users u1 ON ta.assigned_to = u1.id
+    `;
+    const params = [];
+    let paramCount = 1;
+
+    if (filters.status) {
+      queryText += ` AND ta.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND ta.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.assigneeId) {
+      queryText += ` AND ta.assigned_to = $${paramCount++}`;
+      params.push(filters.assigneeId);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+
+    // Add sorting
+    queryText += ` ORDER BY t.created_at DESC`;
+
+    // Add pagination
+    if (filters.limit) {
+      queryText += ` LIMIT $${paramCount++}`;
+      params.push(parseInt(filters.limit));
+    }
+    if (filters.offset) {
+      queryText += ` OFFSET $${paramCount++}`;
+      params.push(parseInt(filters.offset));
+    }
+
+    const result = await query(queryText, params);
+    return result.rows;
+  }
+
+  // Admin-specific method to count all assigned tasks across all organizations
+  static async countAllAssignedForAdmin(filters = {}) {
+    let queryText = `
+      SELECT COUNT(DISTINCT t.id) as count
+      FROM tasks t
+      JOIN task_assignments ta ON t.id = ta.task_id
+      JOIN entities e ON ta.entity_id = e.id
+      JOIN controls c ON t.control_id = c.id
+      JOIN frameworks f ON c.framework_id = f.id
+    `;
+    const params = [];
+    let paramCount = 1;
+
+    if (filters.status) {
+      queryText += ` AND ta.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND ta.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.assigneeId) {
+      queryText += ` AND ta.assigned_to = $${paramCount++}`;
+      params.push(filters.assigneeId);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+
+    const result = await query(queryText, params);
+    return parseInt(result.rows[0].count);
+  }
+
+  // Admin-specific method to get ALL base tasks (for Admin UI content management)
+  static async findAllForAdmin(filters = {}) {
+    let queryText = `
+      SELECT t.*, 
+             c.title as control_title, c.description as control_description,
+             c.framework_id, c.control_id as control_code,
+             f.name as framework_name, f.region, f.country
+      FROM tasks t
+      JOIN controls c ON t.control_id = c.id
+      JOIN frameworks f ON c.framework_id = f.id
+      WHERE c.is_active = true AND f.is_active = true
+    `;
+    const params = [];
+    let paramCount = 1;
+
+    if (filters.status) {
+      queryText += ` AND t.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND t.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.frameworkId) {
+      queryText += ` AND c.framework_id = $${paramCount++}`;
+      params.push(filters.frameworkId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+    if (filters.search) {
+      queryText += ` AND (t.title ILIKE $${paramCount} OR t.description ILIKE $${paramCount})`;
+      params.push(`%${filters.search}%`);
+      paramCount++;
+    }
+
+    // Add sorting
+    queryText += ` ORDER BY t.created_at DESC`;
+
+    // Add pagination
+    if (filters.limit) {
+      queryText += ` LIMIT $${paramCount++}`;
+      params.push(parseInt(filters.limit));
+    }
+    if (filters.offset) {
+      queryText += ` OFFSET $${paramCount++}`;
+      params.push(parseInt(filters.offset));
+    }
+
+    const result = await query(queryText, params);
+    return result.rows;
+  }
+
+  // Admin-specific method to count ALL base tasks
+  static async countAllForAdmin(filters = {}) {
+    let queryText = `
+      SELECT COUNT(t.id) as count
+      FROM tasks t
+      JOIN controls c ON t.control_id = c.id
+      JOIN frameworks f ON c.framework_id = f.id
+      WHERE c.is_active = true AND f.is_active = true
+    `;
+    const params = [];
+    let paramCount = 1;
+
+    if (filters.status) {
+      queryText += ` AND t.status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters.priority) {
+      queryText += ` AND t.priority = $${paramCount++}`;
+      params.push(filters.priority);
+    }
+    if (filters.controlId) {
+      queryText += ` AND t.control_id = $${paramCount++}`;
+      params.push(filters.controlId);
+    }
+    if (filters.frameworkId) {
+      queryText += ` AND c.framework_id = $${paramCount++}`;
+      params.push(filters.frameworkId);
+    }
+    if (filters.category) {
+      queryText += ` AND t.category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+    if (filters.search) {
+      queryText += ` AND (t.title ILIKE $${paramCount} OR t.description ILIKE $${paramCount})`;
+      params.push(`%${filters.search}%`);
+      paramCount++;
+    }
+
+    const result = await query(queryText, params);
+    return parseInt(result.rows[0].count);
+  }
 }
 
 module.exports = Task;

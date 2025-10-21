@@ -1,17 +1,21 @@
 import { useMemo } from 'react';
 import { Framework, Control, Task } from '@/types';
-import { mockControls, mockTasks } from '@/services/mockData';
 
-export const useDataFiltering = (selectedFramework: Framework | null, selectedControl: Control | null) => {
+export const useDataFiltering = (
+  selectedFramework: Framework | null, 
+  selectedControl: Control | null,
+  allControls: Control[] = [],
+  allTasks: Task[] = []
+) => {
   const getCurrentControls = useMemo((): Control[] => {
     if (!selectedFramework) return [];
-    return mockControls.filter(control => control.frameworkId === selectedFramework.id);
-  }, [selectedFramework]);
+    return allControls.filter(control => control.framework_id === selectedFramework.id);
+  }, [selectedFramework, allControls]);
 
   const getCurrentTasks = useMemo((): Task[] => {
     if (!selectedControl) return [];
-    return mockTasks.filter(task => task.controlId === selectedControl.id);
-  }, [selectedControl]);
+    return allTasks.filter(task => task.control_id === selectedControl.id);
+  }, [selectedControl, allTasks]);
 
   return {
     getCurrentControls,

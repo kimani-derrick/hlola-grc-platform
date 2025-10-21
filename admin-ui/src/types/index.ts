@@ -2,43 +2,52 @@ export type Framework = {
   id: string;
   name: string;
   description: string;
+  version?: string;
   region: string;
+  country?: string;
   category: string;
   type: string;
-  priority: string;
-  riskLevel: string;
-  status: string;
-  controlsCount: number;
-  tasksCount: number;
-  createdAt: string;
+  icon?: string;
   color: string;
+  compliance_deadline?: string;
+  priority: string;
+  risk_level: string;
+  status: string;
+  requirements_count: number;
+  applicable_countries: string[];
+  industry_scope: string;
+  created_at: string;
+  updated_at: string;
+  is_active: boolean;
+  max_fine_amount: string;
+  max_fine_currency: string;
 };
 
 export type Control = {
   id: string;
-  frameworkId: string;
-  code: string;
+  framework_id: string;
+  control_id: string;
   title: string;
+  description: string;
   category: string;
+  subcategory?: string;
   priority: string;
-  riskLevel: string;
-  status: string;
-  tasksCount: number;
-  frameworkName: string;
+  implementation_level?: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type Task = {
   id: string;
-  controlId: string;
+  control_id: string;
   title: string;
   description: string;
-  category: string;
   priority: string;
+  frequency: string;
+  estimated_hours: number;
   status: string;
-  dueDate: string;
-  estimatedHours: number;
-  controlCode: string;
-  frameworkName: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type Stats = {
@@ -47,7 +56,6 @@ export type Stats = {
   totalTasks: number;
   activeFrameworks: number;
   pendingTasks: number;
-  completedTasks: number;
 };
 
 export type BreadcrumbItem = string;

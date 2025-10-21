@@ -3,6 +3,18 @@ const Control = require('../models/Control');
 const realtimeEventEmitter = require('../services/realtimeEventEmitter');
 const logger = require('../config/logger');
 
+// Helper function to get organization context for platform admin vs regular user
+const getOrganizationContext = (req) => {
+  if (req.platformAdmin) {
+    // Platform admin has access to all data - no organization filter
+    return { isPlatformAdmin: true, organizationId: null };
+  } else if (req.user) {
+    // Regular user - filter by their organization
+    return { isPlatformAdmin: false, organizationId: req.user.organizationId };
+  }
+  throw new Error('No authentication context found');
+};
+
 const createTask = async (req, res, next) => {
   try {
     const { organizationId, userId } = req.user;
@@ -162,12 +174,13 @@ const getTask = async (req, res, next) => {
 
 const getAllTasks = async (req, res, next) => {
   try {
-    const { organizationId } = req.user;
+    const { isPlatformAdmin, organizationId } = getOrganizationContext(req);
     const filters = req.query;
 
     logger.info('Fetching all tasks', {
       requestId: req.id,
       organizationId: organizationId,
+      isPlatformAdmin: isPlatformAdmin,
       filters: filters
     });
 
@@ -186,7 +199,7 @@ const getAllTasks = async (req, res, next) => {
   } catch (error) {
     logger.error('Error fetching tasks', {
       requestId: req.id,
-      organizationId: req.user.organizationId,
+      organizationId: req.user?.organizationId || 'platform-admin',
       error: error.message,
       stack: error.stack
     });
@@ -196,12 +209,13 @@ const getAllTasks = async (req, res, next) => {
 
 const getAllTasksUnassigned = async (req, res, next) => {
   try {
-    const { organizationId } = req.user;
+    const { isPlatformAdmin, organizationId } = getOrganizationContext(req);
     const filters = req.query;
 
     logger.info('Fetching all tasks (including unassigned)', {
       requestId: req.id,
       organizationId: organizationId,
+      isPlatformAdmin: isPlatformAdmin,
       filters: filters
     });
 
@@ -221,7 +235,7 @@ const getAllTasksUnassigned = async (req, res, next) => {
   } catch (error) {
     logger.error('Error fetching all tasks (unassigned)', {
       requestId: req.id,
-      organizationId: req.user.organizationId,
+      organizationId: req.user?.organizationId || 'platform-admin',
       error: error.message,
       stack: error.stack
     });
@@ -646,11 +660,47 @@ const getTasksByFramework = async (req, res, next) => {
   }
 };
 
+// Admin-specific function to get all base tasks (for Admin UI content management)
+const getAllTasksForAdmin = async (req, res, next) => {
+  try {
+    const filters = req.query;
+
+    logger.info('Fetching all base tasks for admin', {
+      requestId: req.id,
+      filters: filters
+    });
+
+    // Get ALL base tasks (not assigned/unassigned, just all tasks in the system)
+    const [tasks, total] = await Promise.all([
+      Task.findAllForAdmin(filters), // Get all base tasks
+      Task.countAllForAdmin(filters) // Get total count
+    ]);
+
+    res.status(200).json({
+      success: true,
+      tasks,
+      pagination: {
+        total,
+        limit: filters.limit ? parseInt(filters.limit) : null,
+        offset: filters.offset ? parseInt(filters.offset) : null
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching all base tasks for admin', {
+      requestId: req.id,
+      error: error.message,
+      stack: error.stack
+    });
+    next(error);
+  }
+};
+
 module.exports = {
   createTask,
   getTask,
   getAllTasks,
   getAllTasksUnassigned,
+  getAllTasksForAdmin,
   getTasksByControl,
   getTasksByUser,
   getTasksByEntity,

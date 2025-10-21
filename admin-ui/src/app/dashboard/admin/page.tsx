@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Layers, 
@@ -15,10 +15,11 @@ import {
 } from 'lucide-react';
 
 // Import our new abstractions
-import { mockFrameworks, stats } from '@/services/mockData';
+import { mockFrameworks } from '@/services/mockData';
 import { useNavigation } from '@/hooks/useNavigation';
 import { useDataFiltering } from '@/hooks/useDataFiltering';
 import { useAuth } from '@/contexts/AuthContext';
+import apiService, { Framework, Control, Task } from '@/services/api';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { StatsCards } from '@/components/StatsCards';
 import { FrameworksSection } from '@/components/sections/FrameworksSection';
@@ -31,6 +32,13 @@ export default function AdminDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { logout, admin } = useAuth();
 
+  // Real data state
+  const [frameworks, setFrameworks] = useState<Framework[]>([]);
+  const [controls, setControls] = useState<Control[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // Use our custom hooks
   const {
     selectedFramework,
@@ -42,7 +50,65 @@ export default function AdminDashboard() {
     handleBackToControls,
   } = useNavigation();
 
-  const { getCurrentControls, getCurrentTasks } = useDataFiltering(selectedFramework, selectedControl);
+  const { getCurrentControls, getCurrentTasks } = useDataFiltering(selectedFramework, selectedControl, controls, tasks);
+
+  // Calculate stats from real data
+  const calculateStats = () => {
+    const activeFrameworks = frameworks.filter(f => f.is_active).length;
+    const pendingTasks = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
+    
+    return {
+      totalFrameworks: frameworks.length,
+      totalControls: controls.length,
+      totalTasks: tasks.length,
+      activeFrameworks,
+      pendingTasks
+    };
+  };
+
+  const stats = calculateStats();
+
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch all data in parallel
+        const [frameworksResponse, controlsResponse, tasksResponse] = await Promise.all([
+          apiService.getFrameworks(),
+          apiService.getControls(),
+          apiService.getTasks()
+        ]);
+
+        if (frameworksResponse.success && frameworksResponse.frameworks) {
+          setFrameworks(frameworksResponse.frameworks);
+        } else {
+          console.error('Failed to fetch frameworks:', frameworksResponse.message);
+        }
+
+        if (controlsResponse.success && controlsResponse.controls) {
+          setControls(controlsResponse.controls);
+        } else {
+          console.error('Failed to fetch controls:', controlsResponse.message);
+        }
+
+        if (tasksResponse.success && tasksResponse.tasks) {
+          setTasks(tasksResponse.tasks);
+        } else {
+          console.error('Failed to fetch tasks:', tasksResponse.message);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Navigation handlers with tab switching
   const handleFrameworkClickWithTab = (framework: any) => {
@@ -169,7 +235,7 @@ export default function AdminDashboard() {
                    activeTab.replace('-', ' ')}
                 </h2>
                 <p className="text-slate-600 text-sm">
-                  {selectedFramework && selectedControl ? `Tasks for control ${selectedControl.code} in ${selectedFramework.name}` :
+                  {selectedFramework && selectedControl ? `Tasks for control ${selectedControl.control_id} in ${selectedFramework.name}` :
                    selectedFramework ? `Controls within the ${selectedFramework.name} framework` :
                    activeTab === 'frameworks' && 'Manage compliance frameworks and their controls'}
                   {activeTab === 'controls' && !selectedFramework && 'Select a framework to view its controls'}
@@ -193,29 +259,46 @@ export default function AdminDashboard() {
 
             {/* Content Body */}
             <div className="p-6">
-              {activeTab === 'frameworks' && (
-                <FrameworksSection 
-                  frameworks={mockFrameworks} 
-                  onFrameworkClick={handleFrameworkClickWithTab} 
-                />
-              )}
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="w-8 h-8 border-4 border-hlola-blue border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-3 text-slate-600">Loading data...</span>
+                </div>
+              ) : error ? (
+                <div className="text-center py-12">
+                  <div className="text-red-500 mb-4">{error}</div>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="px-4 py-2 bg-hlola-blue text-white rounded-lg hover:opacity-90"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {activeTab === 'frameworks' && (
+                    <FrameworksSection 
+                      frameworks={frameworks} 
+                      onFrameworkClick={handleFrameworkClickWithTab} 
+                    />
+                  )}
 
-              {activeTab === 'controls' && (
-                <ControlsSection 
-                  selectedFramework={selectedFramework}
-                  controls={getCurrentControls}
-                  onControlClick={handleControlClickWithTab}
-                />
-              )}
+                  {activeTab === 'controls' && (
+                    <ControlsSection 
+                      selectedFramework={selectedFramework}
+                      controls={getCurrentControls}
+                      onControlClick={handleControlClickWithTab}
+                    />
+                  )}
 
-              {activeTab === 'tasks' && (
-                <TasksSection 
-                  selectedControl={selectedControl}
-                  tasks={getCurrentTasks}
-                />
-              )}
+                  {activeTab === 'tasks' && (
+                    <TasksSection 
+                      selectedControl={selectedControl}
+                      tasks={getCurrentTasks}
+                    />
+                  )}
 
-              {activeTab === 'bulk-import' && (
+                  {activeTab === 'bulk-import' && (
                 <div className="text-center py-12">
                   <Upload className="w-16 h-16 text-slate-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-hlola-blue mb-2">Bulk Import</h3>
@@ -226,7 +309,7 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {activeTab === 'audit-logs' && (
+                  {activeTab === 'audit-logs' && (
                 <div className="space-y-4">
                   {[
                     { action: 'Framework Created', item: 'GDPR', user: 'Admin User', time: '2 hours ago' },
@@ -250,6 +333,8 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </div>
+                  )}
+                </>
               )}
             </div>
           </div>
