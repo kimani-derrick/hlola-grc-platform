@@ -210,6 +210,7 @@ export default function CountryDetailView({
         controlId={selectedControl || undefined}
         isOpen={!!selectedControl}
         onClose={onControlClose}
+        isActiveFramework={isActiveFramework}
       />
     </>
   );

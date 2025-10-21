@@ -232,15 +232,24 @@ const getAllTasksUnassigned = async (req, res, next) => {
 const getTasksByControl = async (req, res, next) => {
   try {
     const { controlId } = req.params;
+    const { isActive } = req.query; // Get tab context from query param
     const { organizationId } = req.user;
 
     logger.info('Fetching tasks for control', {
       requestId: req.id,
       controlId: controlId,
-      organizationId: organizationId
+      organizationId: organizationId,
+      isActive: isActive === 'true'
     });
 
-    const tasks = await Task.findByControlId(controlId, organizationId);
+    let tasks;
+    if (isActive === 'true') {
+      // Active tab: Show assigned tasks
+      tasks = await Task.findByControlId(controlId, organizationId);
+    } else {
+      // Library tab: Show base tasks
+      tasks = await Task.findBaseTasksByControlId(controlId);
+    }
 
     res.status(200).json({
       success: true,

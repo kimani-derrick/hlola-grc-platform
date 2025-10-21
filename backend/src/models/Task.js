@@ -66,6 +66,22 @@ class Task {
     return result.rows;
   }
 
+  static async findBaseTasksByControlId(controlId) {
+    // Get base tasks for a control (auto_generated = false) - for Library tab
+    const result = await query(
+      `SELECT t.id, t.control_id, t.title, t.description, t.category, t.auto_generated, t.created_at, t.updated_at,
+              t.status, t.priority, t.due_date, t.progress, t.actual_hours, t.estimated_hours,
+              t.evidence_attached, t.blockers, t.assignee_id,
+              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name
+       FROM tasks t
+       LEFT JOIN users u1 ON t.assignee_id = u1.id
+       WHERE t.control_id = $1 AND t.auto_generated = false
+       ORDER BY t.created_at DESC`,
+      [controlId]
+    );
+    return result.rows;
+  }
+
   static async findByUserId(userId, organizationId) {
     // FIXED: Now uses task_assignments instead of organization_id
     const result = await query(

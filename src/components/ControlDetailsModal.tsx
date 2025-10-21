@@ -9,9 +9,10 @@ interface ControlDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   controlId?: string; // Add controlId prop
+  isActiveFramework?: boolean; // Add isActiveFramework prop
 }
 
-export default function ControlDetailsModal({ control, isOpen, onClose, controlId }: ControlDetailsModalProps) {
+export default function ControlDetailsModal({ control, isOpen, onClose, controlId, isActiveFramework = false }: ControlDetailsModalProps) {
   // Add state for tasks
   const [tasks, setTasks] = useState<any[]>([]);
   const [loadingTasks, setLoadingTasks] = useState(false);
@@ -22,13 +23,13 @@ export default function ControlDetailsModal({ control, isOpen, onClose, controlI
     if (isOpen && controlId) {
       fetchTasks();
     }
-  }, [isOpen, controlId]);
+  }, [isOpen, controlId, isActiveFramework]);
 
   const fetchTasks = async () => {
     try {
       setLoadingTasks(true);
       setTasksError(null);
-      const response = await apiService.getTasksByControl(controlId!);
+      const response = await apiService.getTasksByControl(controlId!, isActiveFramework);
       if (response.success) {
         // The API returns tasks in response.data, but the actual tasks are in response.data
         const tasks = (response as any).data || [];

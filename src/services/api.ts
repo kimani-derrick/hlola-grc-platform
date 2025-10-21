@@ -270,8 +270,9 @@ class ApiService {
   }
 
   // Tasks by Control
-  async getTasksByControl(controlId: string): Promise<ApiResponse<any[]>> {
-    const response = await this.makeRequest(`/tasks/controls/${controlId}`);
+  async getTasksByControl(controlId: string, isActive?: boolean): Promise<ApiResponse<any[]>> {
+    const queryParam = isActive !== undefined ? `?isActive=${isActive}` : '';
+    const response = await this.makeRequest(`/tasks/controls/${controlId}${queryParam}`);
     if (!response.success) return response as ApiResponse<any[]>;
     const anyResp: any = response as any;
     const tasks = anyResp?.data?.tasks || anyResp?.tasks || anyResp?.data || [];
