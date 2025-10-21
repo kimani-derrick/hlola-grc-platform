@@ -29,6 +29,7 @@ const auditTimelineRoutes = require('./routes/auditTimeline');
 const complianceRoutes = require('./routes/compliance');
 const reportRoutes = require('./routes/reports');
 const commentRoutes = require('./routes/comments');
+const platformAdminRoutes = require('./routes/platformAdmin');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -45,7 +46,7 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3002'],
+  origin: ['http://localhost:3000', 'http://localhost:3002', 'http://localhost:3003'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -94,6 +95,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/entities', entityRoutes);
 app.use('/api/frameworks', frameworkRoutes);
+app.use('/api/admin', platformAdminRoutes);
 app.use('/api', entityFrameworkRoutes);
 app.use('/api/controls', controlRoutes);
 app.use('/api', controlAssignmentRoutes);
