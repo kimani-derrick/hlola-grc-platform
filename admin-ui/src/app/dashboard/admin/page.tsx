@@ -279,7 +279,8 @@ export default function AdminDashboard() {
                   {activeTab === 'frameworks' && (
                     <FrameworksSection 
                       frameworks={frameworks} 
-                      onFrameworkClick={handleFrameworkClickWithTab} 
+                      onFrameworkClick={handleFrameworkClickWithTab}
+                      loading={loading}
                     />
                   )}
 
