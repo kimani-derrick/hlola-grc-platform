@@ -529,6 +529,34 @@ class Task {
     );
     return result.rows;
   }
+
+  static async findAssignedTasksByFrameworkId(frameworkId, organizationId) {
+    // Get all assigned tasks for this framework across all controls and entities
+    const result = await query(
+      `SELECT DISTINCT t.id, t.control_id, t.title, t.description, t.category, t.auto_generated, t.created_at, t.updated_at,
+              u1.first_name as assignee_first_name, u1.last_name as assignee_last_name,
+              ta.status,
+              ta.priority,
+              ta.due_date,
+              ta.progress,
+              ta.actual_hours,
+              ta.estimated_hours,
+              ta.evidence_attached,
+              ta.blockers,
+              ta.entity_id,
+              e.name as entity_name,
+              c.title as control_title
+       FROM tasks t
+       JOIN controls c ON t.control_id = c.id
+       JOIN task_assignments ta ON t.id = ta.task_id
+       JOIN entities e ON ta.entity_id = e.id
+       LEFT JOIN users u1 ON ta.assigned_to = u1.id
+       WHERE c.framework_id = $1 AND e.organization_id = $2
+       ORDER BY t.created_at DESC`,
+      [frameworkId, organizationId]
+    );
+    return result.rows;
+  }
 }
 
 module.exports = Task;

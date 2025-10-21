@@ -594,21 +594,30 @@ const getTaskStats = async (req, res, next) => {
 const getTasksByFramework = async (req, res, next) => {
   try {
     const { frameworkId } = req.params;
+    const { isActive } = req.query; // Get tab context from query param
     const { organizationId } = req.user;
 
     logger.info('Fetching tasks by framework', {
       requestId: req.id,
       frameworkId: frameworkId,
-      organizationId: organizationId
+      organizationId: organizationId,
+      isActive: isActive === 'true'
     });
 
-    // Get all tasks for controls in this framework
-    const tasks = await Task.findByFrameworkId(frameworkId);
+    let tasks;
+    if (isActive === 'true') {
+      // Active tab: Show assigned tasks
+      tasks = await Task.findAssignedTasksByFrameworkId(frameworkId, organizationId);
+    } else {
+      // Library tab: Show base tasks
+      tasks = await Task.findByFrameworkId(frameworkId);
+    }
 
     logger.info('Tasks fetched by framework successfully', {
       requestId: req.id,
       frameworkId: frameworkId,
-      taskCount: tasks.length
+      taskCount: tasks.length,
+      isActive: isActive === 'true'
     });
 
     res.json({

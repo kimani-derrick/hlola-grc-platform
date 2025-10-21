@@ -15,6 +15,7 @@ interface CountryDetailViewProps {
   onControlClose: () => void;
   getRiskLevelColor: (riskLevel: string) => string;
   getPriorityColor: (priority: Priority) => string;
+  isActiveFramework?: boolean; // Add this prop
 }
 
 export default function CountryDetailView({
@@ -26,7 +27,8 @@ export default function CountryDetailView({
   onControlSelect,
   onControlClose,
   getRiskLevelColor,
-  getPriorityColor
+  getPriorityColor,
+  isActiveFramework = false
 }: CountryDetailViewProps) {
   const [frameworkTasks, setFrameworkTasks] = useState<any[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
@@ -38,7 +40,10 @@ export default function CountryDetailView({
     const fetchFrameworkTasks = async () => {
       try {
         setTasksLoading(true);
-        const response = await apiService.getTasksByFramework(selectedFramework.id);
+        const response = await apiService.getTasksByFramework(
+          selectedFramework.id, 
+          isActiveFramework
+        );
         if (response.success) {
           setFrameworkTasks(response.data || []);
         } else {
@@ -56,7 +61,7 @@ export default function CountryDetailView({
     if (selectedFramework.id) {
       fetchFrameworkTasks();
     }
-  }, [selectedFramework.id]);
+  }, [selectedFramework.id, isActiveFramework]);
   const evidenceCount = controls && controls.length > 0
     ? controls.reduce((sum, c) => sum + ((c as any).evidence ? (c as any).evidence.length : 0), 0)
     : 0;

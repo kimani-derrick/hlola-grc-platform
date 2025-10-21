@@ -492,6 +492,7 @@ export default function FrameworksPage() {
               onControlClose={() => setSelectedControl(null)}
               getRiskLevelColor={getRiskLevelColor}
               getPriorityColor={(priority) => getPriorityColor(priority as Priority)}
+              isActiveFramework={activeFrameworkTab === 'active'}
             />
           )}
         </div>
