@@ -1,14 +1,59 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ControlDetail } from '../types/frameworks';
+import { apiService } from '../services/api';
 
 interface ControlDetailsModalProps {
   control: ControlDetail | null;
   isOpen: boolean;
   onClose: () => void;
+  controlId?: string; // Add controlId prop
 }
 
-export default function ControlDetailsModal({ control, isOpen, onClose }: ControlDetailsModalProps) {
+export default function ControlDetailsModal({ control, isOpen, onClose, controlId }: ControlDetailsModalProps) {
+  // Add state for tasks
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [tasksError, setTasksError] = useState<string | null>(null);
+
+  // Fetch tasks on control change
+  useEffect(() => {
+    if (isOpen && controlId) {
+      fetchTasks();
+    }
+  }, [isOpen, controlId]);
+
+  const fetchTasks = async () => {
+    try {
+      setLoadingTasks(true);
+      setTasksError(null);
+      const response = await apiService.getTasksByControl(controlId!);
+      if (response.success) {
+        // The API returns tasks in response.data, but the actual tasks are in response.data
+        const tasks = (response as any).data || [];
+        setTasks(tasks);
+      } else {
+        setTasksError(response.error || 'Failed to load tasks');
+      }
+    } catch (error) {
+      setTasksError('Error loading tasks');
+    } finally {
+      setLoadingTasks(false);
+    }
+  };
+
+  // Calculate compliance from tasks
+  const calculateComplianceFromTasks = () => {
+    if (tasks.length === 0) return { progress: 0, status: 'Not Started' };
+    
+    const completedTasks = tasks.filter(t => t.status === 'completed').length;
+    const progress = Math.round((completedTasks / tasks.length) * 100);
+    const status = progress === 100 ? 'Completed' : progress > 0 ? 'In Progress' : 'Not Started';
+    
+    return { progress, status };
+  };
+
   if (!isOpen || !control) return null;
 
   return (
@@ -50,76 +95,125 @@ export default function ControlDetailsModal({ control, isOpen, onClose }: Contro
           {/* Compliance Status */}
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="text-lg font-semibold text-gray-900 mb-3">Compliance Status</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">Progress</span>
-                  <span className="text-sm font-medium text-gray-900">{control.compliance.progress}%</span>
+            {(() => {
+              const compliance = calculateComplianceFromTasks();
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-600">Progress</span>
+                      <span className="text-sm font-medium text-gray-900">{compliance.progress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-teal-500 h-2 rounded-full"
+                        style={{ width: `${compliance.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-600">Status</div>
+                    <div className={`inline-flex px-2 py-1 rounded-full text-sm font-medium ${
+                      compliance.status === 'In Progress' 
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : compliance.status === 'Not Started'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {compliance.status}
+                    </div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-teal-500 h-2 rounded-full"
-                    style={{ width: `${control.compliance.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-600">Status</div>
-                <div className={`inline-flex px-2 py-1 rounded-full text-sm font-medium ${
-                  control.compliance.status === 'In Progress' 
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : control.compliance.status === 'Not Started'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-green-100 text-green-800'
-                }`}>
-                  {control.compliance.status}
-                </div>
-              </div>
-            </div>
+              );
+            })()}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-sm text-gray-600">
-              <div>Last Updated: {control.compliance.lastUpdated}</div>
-              <div>Next Review: {control.compliance.nextReview}</div>
+              <div>Tasks: {tasks.length}</div>
+              <div>Completed: {tasks.filter(t => t.status === 'completed').length}</div>
             </div>
           </div>
 
-          {/* Requirements */}
+          {/* Tasks Section */}
           <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h4>
-            <ul className="space-y-2">
-              {control.requirements.map((requirement, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="text-teal-600 mt-1">•</span>
-                  <span className="text-gray-600">{requirement}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Implementation Steps */}
-          <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-3">Implementation Steps</h4>
-            <ol className="space-y-2">
-              {control.implementation.map((step, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="bg-teal-100 text-teal-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mt-0.5">
-                    {index + 1}
-                  </span>
-                  <span className="text-gray-600">{step}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          {/* Evidence Required */}
-          <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-3">Evidence Required</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {control.evidence.map((item, index) => (
-                <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span className="text-gray-700">{item}</span>
+            <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center justify-between">
+              <span>Tasks ({tasks.length})</span>
+              {loadingTasks && <span className="text-sm text-gray-500">Loading...</span>}
+            </h4>
+            
+            {tasksError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
+                {tasksError}
+              </div>
+            )}
+            
+            {!loadingTasks && tasks.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No tasks assigned to this control yet.
+              </div>
+            )}
+            
+            <div className="space-y-3">
+              {tasks.map((task) => (
+                <div key={task.id} className="border border-gray-200 rounded-lg p-4 hover:border-teal-300 transition-colors">
+                  <div className="flex items-start justify-between mb-2">
+                    <h5 className="font-medium text-gray-900">{task.title}</h5>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      task.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      {task.status?.replace('_', ' ')}
+                    </span>
+                  </div>
+                  
+                  {task.description && (
+                    <p className="text-sm text-gray-600 mb-3">{task.description}</p>
+                  )}
+                  
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    {task.assignee_first_name && (
+                      <div className="flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        {task.assignee_first_name} {task.assignee_last_name}
+                      </div>
+                    )}
+                    
+                    {task.due_date && (
+                      <div className="flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Due: {new Date(task.due_date).toLocaleDateString()}
+                      </div>
+                    )}
+                    
+                    {task.priority && (
+                      <div className="flex items-center gap-1">
+                        <span className={`w-2 h-2 rounded-full ${
+                          task.priority === 'high' ? 'bg-red-500' :
+                          task.priority === 'medium' ? 'bg-yellow-500' :
+                          'bg-green-500'
+                        }`} />
+                        {task.priority} priority
+                      </div>
+                    )}
+                  </div>
+                  
+                  {task.progress !== undefined && task.progress !== null && (
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-gray-500">Progress</span>
+                        <span className="text-xs font-medium text-gray-700">{task.progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div
+                          className="bg-teal-500 h-1.5 rounded-full transition-all"
+                          style={{ width: `${task.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

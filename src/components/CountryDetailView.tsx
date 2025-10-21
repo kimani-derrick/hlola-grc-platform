@@ -202,6 +202,7 @@ export default function CountryDetailView({
       {/* Control Details Modal */}
       <ControlDetailsModal
         control={selectedControl ? controlDetails[selectedControl] : null}
+        controlId={selectedControl || undefined}
         isOpen={!!selectedControl}
         onClose={onControlClose}
       />
