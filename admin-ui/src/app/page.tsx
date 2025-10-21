@@ -30,9 +30,7 @@ export default function LoginPage() {
     
     if (result.success) {
       // Force redirect after successful login
-      setTimeout(() => {
-        router.push('/dashboard/admin');
-      }, 100);
+      router.push('/dashboard/admin');
     } else {
       setError(result.message || 'Login failed');
     }

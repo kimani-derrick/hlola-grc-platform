@@ -52,8 +52,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Verify token with server
       const response = await apiService.getCurrentAdmin();
       
-      if (response.success && response.data) {
-        setAdmin(response.data);
+      if (response.success && response.admin) {
+        setAdmin(response.admin);
         setToken(token);
       } else {
         // Token is invalid, clear it
@@ -77,8 +77,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const response = await apiService.login({ email, password });
       
-      if (response.success && response.data?.token && response.data?.admin) {
-        const { token: newToken, admin: adminData } = response.data;
+      if (response.success && response.token && response.admin) {
+        const { token: newToken, admin: adminData } = response;
         
         // Store token and admin data
         apiService.setToken(newToken);
