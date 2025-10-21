@@ -286,16 +286,20 @@ export default function AdminDashboard() {
 
                   {activeTab === 'controls' && (
                     <ControlsSection 
-                      selectedFramework={selectedFramework}
                       controls={getCurrentControls}
                       onControlClick={handleControlClickWithTab}
+                      loading={loading}
                     />
                   )}
 
                   {activeTab === 'tasks' && (
                     <TasksSection 
-                      selectedControl={selectedControl}
                       tasks={getCurrentTasks}
+                      onTaskClick={(task) => {
+                        // TODO: Implement task click handler
+                        console.log('Task clicked:', task);
+                      }}
+                      loading={loading}
                     />
                   )}
 

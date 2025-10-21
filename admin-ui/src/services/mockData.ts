@@ -1,6 +1,6 @@
 import { Framework, Control, Task, Stats } from '@/types';
 
-export const mockFrameworks: Framework[] = [
+export const mockFrameworks = [
   {
     id: '1',
     name: 'GDPR',
@@ -9,11 +9,10 @@ export const mockFrameworks: Framework[] = [
     category: 'privacy',
     type: 'regulation',
     priority: 'high',
-    riskLevel: 'critical',
+    risk_level: 'critical',
     status: 'active',
-    controlsCount: 12,
-    tasksCount: 45,
-    createdAt: '2024-01-15',
+    requirements_count: 12,
+    created_at: '2024-01-15',
     color: '#4F46E5'
   },
   {
@@ -48,7 +47,7 @@ export const mockFrameworks: Framework[] = [
   }
 ];
 
-export const mockControls: Control[] = [
+export const mockControls = [
   // GDPR Controls
   {
     id: '1',
@@ -106,7 +105,7 @@ export const mockControls: Control[] = [
     title: 'Data Breach Notification',
     category: 'incident',
     priority: 'high',
-    riskLevel: 'critical',
+    risk_level: 'critical',
     status: 'active',
     tasksCount: 3,
     frameworkName: 'Kenya DPA'
@@ -138,7 +137,7 @@ export const mockControls: Control[] = [
   }
 ];
 
-export const mockTasks: Task[] = [
+export const mockTasks = [
   // Tasks for Control A.5.1.1 (GDPR)
   {
     id: '1',
@@ -235,7 +234,7 @@ export const mockTasks: Task[] = [
   }
 ];
 
-export const stats: Stats = {
+export const stats = {
   totalFrameworks: 3,
   totalControls: 35,
   totalTasks: 136,

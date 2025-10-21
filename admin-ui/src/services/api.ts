@@ -111,6 +111,9 @@ interface Control {
   subcategory?: string;
   priority: string;
   implementation_level?: string;
+  status: string;
+  tasksCount?: number;
+  complianceScore?: number;
   created_at: string;
   updated_at: string;
 }
@@ -132,10 +135,13 @@ interface Task {
   control_id: string;
   title: string;
   description: string;
+  category: string;
   priority: string;
   frequency: string;
   estimated_hours: number;
   status: string;
+  dueDate?: string;
+  progress?: number;
   created_at: string;
   updated_at: string;
 }

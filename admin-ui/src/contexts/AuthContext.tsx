@@ -77,8 +77,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const response = await apiService.login({ email, password });
       
-      if (response.success && response.token && response.admin) {
-        const { token: newToken, admin: adminData } = response;
+      if (response.success && response.data?.token && response.data?.admin) {
+        const { token: newToken, admin: adminData } = response.data;
         
         // Store token and admin data
         apiService.setToken(newToken);
