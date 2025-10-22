@@ -1,5 +1,5 @@
 import { Task } from '@/types';
-import { TaskCard } from '../TaskCard';
+import { HorizontalTaskCard } from '../HorizontalTaskCard';
 import { TaskFiltersComponent } from '../TaskFilters';
 import { Pagination } from '../Pagination';
 import { LoadingSkeleton } from '../LoadingSkeleton';
@@ -27,7 +27,7 @@ export const TasksSection = ({ tasks, onTaskClick, loading = false }: TasksSecti
     activeFilterCount
   } = useTaskFilters(tasks);
 
-  const pagination = usePagination(filteredTasks, 18);
+  const pagination = usePagination(filteredTasks, 10);
 
   return (
     <div className="space-y-6">
@@ -60,14 +60,14 @@ export const TasksSection = ({ tasks, onTaskClick, loading = false }: TasksSecti
         </div>
       </div>
 
-      {/* Grid Layout */}
+      {/* Horizontal List Layout */}
       {loading ? (
-        <LoadingSkeleton count={18} />
+        <LoadingSkeleton count={10} />
       ) : pagination.paginatedData.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+          <div className="space-y-4">
             {pagination.paginatedData.map((task) => (
-              <TaskCard
+              <HorizontalTaskCard
                 key={task.id}
                 task={task}
                 onClick={onTaskClick}

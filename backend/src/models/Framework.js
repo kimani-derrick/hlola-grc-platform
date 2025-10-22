@@ -39,37 +39,45 @@ class Framework {
   }
 
   static async findAll(filters = {}) {
-    let queryText = `SELECT * FROM frameworks WHERE is_active = true`;
+    let queryText = `
+      SELECT f.*, 
+             COUNT(DISTINCT c.id) as actual_controls_count,
+             COUNT(DISTINCT t.id) as actual_tasks_count
+      FROM frameworks f
+      LEFT JOIN controls c ON f.id = c.framework_id AND c.is_active = true
+      LEFT JOIN tasks t ON c.id = t.control_id
+      WHERE f.is_active = true
+    `;
     const params = [];
     let paramCount = 1;
 
     if (filters.category) {
-      queryText += ` AND category = $${paramCount++}`;
+      queryText += ` AND f.category = $${paramCount++}`;
       params.push(filters.category);
     }
 
     if (filters.region) {
-      queryText += ` AND region = $${paramCount++}`;
+      queryText += ` AND f.region = $${paramCount++}`;
       params.push(filters.region);
     }
 
     if (filters.type) {
-      queryText += ` AND type = $${paramCount++}`;
+      queryText += ` AND f.type = $${paramCount++}`;
       params.push(filters.type);
     }
 
     if (filters.status) {
-      queryText += ` AND status = $${paramCount++}`;
+      queryText += ` AND f.status = $${paramCount++}`;
       params.push(filters.status);
     }
 
     if (filters.search) {
-      queryText += ` AND (name ILIKE $${paramCount} OR description ILIKE $${paramCount})`;
+      queryText += ` AND (f.name ILIKE $${paramCount} OR f.description ILIKE $${paramCount})`;
       params.push(`%${filters.search}%`);
       paramCount++;
     }
 
-    queryText += ` ORDER BY created_at DESC`;
+    queryText += ` GROUP BY f.id ORDER BY f.created_at DESC`;
 
     if (filters.limit) {
       queryText += ` LIMIT $${paramCount++}`;

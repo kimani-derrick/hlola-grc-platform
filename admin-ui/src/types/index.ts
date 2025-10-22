@@ -14,6 +14,8 @@ export type Framework = {
   risk_level: string;
   status: string;
   requirements_count: number;
+  actual_controls_count?: number;
+  actual_tasks_count?: number;
   applicable_countries: string[];
   industry_scope: string;
   created_at: string;

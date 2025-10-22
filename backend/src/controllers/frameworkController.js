@@ -3,7 +3,7 @@ const logger = require('../config/logger');
 
 const createFramework = async (req, res, next) => {
   try {
-    const { name, description, region, country, category, type, icon, color, complianceDeadline, priority, riskLevel, status, requirementsCount, applicableCountries, industryScope } = req.body;
+    const { name, description, region, country, category, type, icon, color, complianceDeadline, priority, riskLevel, status, requirementsCount, applicableCountries, industryScope, maxFineAmount, maxFineCurrency } = req.body;
 
     logger.info('Creating framework', {
       requestId: req.id,
@@ -27,7 +27,9 @@ const createFramework = async (req, res, next) => {
       status,
       requirementsCount,
       applicableCountries,
-      industryScope
+      industryScope,
+      maxFineAmount,
+      maxFineCurrency
     });
 
     logger.info('Framework created successfully', {

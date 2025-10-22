@@ -1,5 +1,5 @@
 import { Control } from '@/types';
-import { ControlCard } from '../ControlCard';
+import { HorizontalControlCard } from '../HorizontalControlCard';
 import { ControlFiltersComponent } from '../ControlFilters';
 import { Pagination } from '../Pagination';
 import { LoadingSkeleton } from '../LoadingSkeleton';
@@ -27,7 +27,7 @@ export const ControlsSection = ({ controls, onControlClick, loading = false }: C
     activeFilterCount
   } = useControlFilters(controls);
 
-  const pagination = usePagination(filteredControls, 18);
+  const pagination = usePagination(filteredControls, 10);
 
   return (
     <div className="space-y-6">
@@ -60,14 +60,14 @@ export const ControlsSection = ({ controls, onControlClick, loading = false }: C
         </div>
       </div>
 
-      {/* Grid Layout */}
+      {/* Horizontal List Layout */}
       {loading ? (
-        <LoadingSkeleton count={18} />
+        <LoadingSkeleton count={10} />
       ) : pagination.paginatedData.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+          <div className="space-y-4">
             {pagination.paginatedData.map((control) => (
-              <ControlCard
+              <HorizontalControlCard
                 key={control.id}
                 control={control}
                 onClick={onControlClick}

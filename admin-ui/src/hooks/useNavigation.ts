@@ -36,6 +36,8 @@ export const useNavigation = () => {
     selectedFramework,
     selectedControl,
     breadcrumb,
+    setSelectedFramework,
+    setSelectedControl,
     handleFrameworkClick,
     handleControlClick,
     handleBackToFrameworks,

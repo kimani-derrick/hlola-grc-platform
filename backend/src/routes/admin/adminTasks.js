@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   createTask,
+  createTaskForAdmin,
   getTask,
   getAllTasks,
   getAllTasksUnassigned,
@@ -24,7 +25,7 @@ router.use(authenticatePlatformAdmin);
 router.use(requirePlatformAdmin);
 
 // Task Management
-router.post('/', validateRequest(createTaskSchema), createTask);
+router.post('/', validateRequest(createTaskSchema), createTaskForAdmin);
 router.get('/stats', getTaskStats);
 router.get('/all', getAllTasksUnassigned); // Get all tasks including unassigned ones
 router.get('/', getAllTasksForAdmin); // Get all tasks across frameworks for admin

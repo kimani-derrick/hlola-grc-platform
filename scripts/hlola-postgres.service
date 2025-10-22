@@ -1,0 +1,17 @@
+[Unit]
+Description=HLOLA GRC Platform PostgreSQL Database
+Requires=docker.service
+After=docker.service
+StartLimitInterval=0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/derrick/Documents/workspace/hlola-grc-platform-main/scripts/start-postgres.sh
+ExecStop=/usr/bin/docker stop hlola-grc-db
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

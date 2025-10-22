@@ -73,11 +73,11 @@ export const FrameworkCard = ({ framework, onClick }: FrameworkCardProps) => {
             {/* Stats - Stacked vertically for compactness */}
             <div className="flex justify-between items-center mt-auto">
               <div className="text-center">
-                <div className="text-lg sm:text-xl font-bold text-hlola-blue">{framework.requirements_count || 0}</div>
+                <div className="text-lg sm:text-xl font-bold text-hlola-blue">{framework.actual_controls_count || 0}</div>
                 <div className="text-xs text-slate-500">Controls</div>
               </div>
               <div className="text-center">
-                <div className="text-lg sm:text-xl font-bold text-hlola-blue">0</div>
+                <div className="text-lg sm:text-xl font-bold text-hlola-blue">{framework.actual_tasks_count || 0}</div>
                 <div className="text-xs text-slate-500">Tasks</div>
               </div>
             </div>

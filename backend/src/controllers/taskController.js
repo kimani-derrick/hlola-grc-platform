@@ -135,6 +135,61 @@ const createTask = async (req, res, next) => {
   }
 };
 
+// Admin-specific task creation (no organization context needed)
+const createTaskForAdmin = async (req, res, next) => {
+  try {
+    const { controlId, title, description, priority, category, assigneeId, dueDate, estimatedHours } = req.body;
+
+    logger.info('Creating task for admin', {
+      requestId: req.id,
+      controlId: controlId,
+      title: title,
+      assigneeId: assigneeId
+    });
+
+    // Verify control exists
+    const control = await Control.findById(controlId);
+    if (!control) {
+      return res.status(404).json({
+        success: false,
+        error: 'Control not found',
+        message: 'The specified control does not exist'
+      });
+    }
+
+    const task = await Task.create({
+      controlId,
+      title,
+      description,
+      priority,
+      category,
+      assigneeId,
+      dueDate,
+      estimatedHours
+    });
+
+    logger.info('Task created successfully for admin', {
+      requestId: req.id,
+      taskId: task.id,
+      controlId: controlId,
+      title: title
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Task created successfully',
+      task
+    });
+  } catch (error) {
+    logger.error('Error creating task for admin', {
+      requestId: req.id,
+      error: error.message,
+      stack: error.stack
+    });
+    next(error);
+  }
+};
+
 const getTask = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -697,6 +752,7 @@ const getAllTasksForAdmin = async (req, res, next) => {
 
 module.exports = {
   createTask,
+  createTaskForAdmin,
   getTask,
   getAllTasks,
   getAllTasksUnassigned,
