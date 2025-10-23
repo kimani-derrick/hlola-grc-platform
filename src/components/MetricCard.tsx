@@ -13,7 +13,7 @@ interface MetricCardProps {
     secondary?: { value: number; label: string; color?: string };
     tertiary?: { value: number; label: string; color?: string };
     quaternary?: { value: number; label: string; color?: string };
-  } | {};
+  } | Record<string, unknown>;
   icon: React.ReactNode;
   gradient: string; // Tailwind gradient classes, e.g., "from-blue-50 to-blue-100"
 }

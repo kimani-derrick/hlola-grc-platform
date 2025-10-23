@@ -13,6 +13,7 @@ import { useActiveFrameworks } from '../../../../context/ActiveFrameworksContext
 import { useControlsData } from '../../../../hooks/useControlsData';
 import { useEntity } from '../../../../context/EntityContext';
 import { apiService } from '../../../../services/api';
+import { Framework } from '../../../../types/common';
 
 export default function ControlsPage() {
   const { activeFrameworkIds, setActiveFrameworkIds } = useActiveFrameworks();
@@ -30,10 +31,10 @@ export default function ControlsPage() {
     const refreshAssignedFrameworks = async () => {
       try {
         if (!selectedEntity?.id) return;
-        const resp: any = await apiService.getEntityFrameworks(selectedEntity.id);
+        const resp = await apiService.getEntityFrameworks(selectedEntity.id);
         if (resp.success) {
           const list = Array.isArray(resp.data) ? resp.data : [];
-          const ids = list.map((f: any) => f.framework_id || f.frameworkId || f.id).filter(Boolean);
+          const ids = list.map((f: Framework) => f.framework_id || f.frameworkId || f.id).filter(Boolean);
           setActiveFrameworkIds(ids);
         }
       } catch (error) {
