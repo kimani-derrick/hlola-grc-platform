@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { env } from '../../config/environment';
 import Image from 'next/image';
 
 interface OnboardingData {
@@ -108,7 +109,7 @@ export default function OnboardingPage() {
       const lastName = data.lastName.trim();
 
       // First, create the organization
-      const orgResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/organizations`, {
+      const orgResponse = await fetch(`${env.apiUrl}/organizations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +128,7 @@ export default function OnboardingPage() {
       const orgData = await orgResponse.json();
 
       // Then, create the user
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/auth/register`, {
+      const userResponse = await fetch(`${env.apiUrl}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

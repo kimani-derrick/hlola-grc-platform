@@ -16,7 +16,7 @@ export const authOptions = {
 
         try {
           // Call our backend API
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/auth/login`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.hlola.io/api'}/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
