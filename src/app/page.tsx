@@ -12,7 +12,6 @@ import PricingSection from "../components/PricingSection";
 import FAQSection from "../components/FAQSection";
 import CTASection from "../components/CTASection";
 import Footer from "../components/Footer";
-import EnvDebug from "../components/EnvDebug";
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
@@ -25,7 +24,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans">
-      <EnvDebug />
       <Navigation scrollY={scrollY} />
       <HeroSection />
       <TrustSection />
