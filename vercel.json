@@ -1,6 +1,6 @@
 {
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://api.hlola.io/api",
+    "NEXT_PUBLIC_API_URL": "https://api.hlola.io",
     "NEXTAUTH_URL": "https://hlola.io",
     "NEXTAUTH_SECRET": "your-production-secret-key-change-this"
   }
