@@ -1,9 +1,0 @@
-This is a test evidence document created via text input.
-It demonstrates the new text evidence upload feature.
-The content includes:
-- Multiple lines of text
-- Structured information
-- Evidence for compliance task completion
-
-Created on: Tue Oct 21 03:42:48 PM EAT 2025
-Category: Evidence Note
