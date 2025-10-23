@@ -12,7 +12,7 @@ interface ControlDetailsModalProps {
   isActiveFramework?: boolean; // Add isActiveFramework prop
 }
 
-export default function ControlDetailsModal({ control, isOpen, onClose, controlId, isActiveFramework = false }: ControlDetailsModalProps) {
+export default function ControlDetailsModal({ control, isOpen, onClose, controlId, isActiveFramework = true }: ControlDetailsModalProps) {
   // Add state for tasks
   const [tasks, setTasks] = useState<any[]>([]);
   const [loadingTasks, setLoadingTasks] = useState(false);

@@ -25,7 +25,7 @@ export default function FrameworksPage() {
   const [activeTab, setActiveTab] = useState<'controls'>('controls');
   const [selectedFilter, setSelectedFilter] = useState<'Legal' | 'Other'>('Legal');
   const [selectedEntityName, setSelectedEntityName] = useState<string>('Entity 2');
-  const [activeFrameworkTab, setActiveFrameworkTab] = useState<'active' | 'library'>('library');
+  const [activeFrameworkTab, setActiveFrameworkTab] = useState<'active' | 'library'>('active');
   const [popupFramework, setPopupFramework] = useState<Framework | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedControl, setSelectedControl] = useState<string | null>(null);

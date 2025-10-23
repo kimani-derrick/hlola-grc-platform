@@ -28,7 +28,7 @@ export default function CountryDetailView({
   onControlClose,
   getRiskLevelColor,
   getPriorityColor,
-  isActiveFramework = false
+  isActiveFramework = true
 }: CountryDetailViewProps) {
   const [frameworkTasks, setFrameworkTasks] = useState<any[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);

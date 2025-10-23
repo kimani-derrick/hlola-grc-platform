@@ -304,19 +304,24 @@ const getTasksByControl = async (req, res, next) => {
     const { isActive } = req.query; // Get tab context from query param
     const { organizationId } = req.user;
 
+    // Default to Active tab (assigned tasks) when viewing tasks within a control
+    // Only use Library tab (base tasks) when explicitly requested
+    const useActiveTab = isActive !== 'false';
+
     logger.info('Fetching tasks for control', {
       requestId: req.id,
       controlId: controlId,
       organizationId: organizationId,
-      isActive: isActive === 'true'
+      isActive: useActiveTab,
+      originalIsActive: isActive
     });
 
     let tasks;
-    if (isActive === 'true') {
-      // Active tab: Show assigned tasks
+    if (useActiveTab) {
+      // Active tab: Show assigned tasks (default for control view)
       tasks = await Task.findByControlId(controlId, organizationId);
     } else {
-      // Library tab: Show base tasks
+      // Library tab: Show base tasks (only when explicitly requested)
       tasks = await Task.findBaseTasksByControlId(controlId);
     }
 
@@ -488,6 +493,17 @@ const updateTaskStatus = async (req, res, next) => {
       status: status
     });
 
+    // Get user's entity_id to update the correct task assignment
+    const User = require('../models/User');
+    const user = await User.findById(userId);
+    if (!user || !user.entity_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'User entity not found',
+        message: 'User must be assigned to an entity to update task status'
+      });
+    }
+
     // Check if task exists and user has permission
     const existingTask = await Task.findById(id, organizationId);
     if (!existingTask) {
@@ -530,42 +546,67 @@ const updateTaskStatus = async (req, res, next) => {
       });
     }
 
-    const updatedTask = await Task.updateStatus(id, { status, progress, actualHours });
+    // Check if task is assigned to user's entity, if not assign it first
+    let taskAssignment = await Task.findAssignmentById(id, user.entity_id);
+    
+    if (!taskAssignment) {
+      // Task is not assigned to user's entity, assign it first
+      logger.info('Task not assigned to user entity, creating assignment', {
+        requestId: req.id,
+        taskId: id,
+        entityId: user.entity_id,
+        userId: userId
+      });
+      
+      taskAssignment = await Task.assignToEntity(id, user.entity_id, userId, 'medium', null);
+      
+      if (!taskAssignment) {
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to assign task',
+          message: 'Could not assign task to your entity'
+        });
+      }
+    }
+
+    // Update the task assignment status for the user's entity
+    const updatedTask = await Task.updateAssignmentStatus(id, user.entity_id, status, progress, actualHours);
 
     if (!updatedTask) {
       return res.status(404).json({
         success: false,
-        error: 'Task not found',
-        message: 'The requested task does not exist'
+        error: 'Task assignment not found',
+        message: 'The requested task assignment does not exist for your entity'
       });
     }
 
     logger.info('Task status updated successfully', {
       requestId: req.id,
       taskId: updatedTask.id,
-      status: updatedTask.status
+      entityId: user.entity_id,
+      status: status
     });
 
     // Trigger compliance event listener
     try {
       const ComplianceEventListener = require('../services/complianceEventListener');
-      await ComplianceEventListener.onTaskStatusUpdated(updatedTask, existingTask.status, updatedTask.status);
+      await ComplianceEventListener.onTaskStatusUpdated(updatedTask, existingTask.status, status);
     } catch (error) {
       logger.error('Error triggering compliance event for task status update', {
         error: error.message,
         taskId: updatedTask.id,
-        entityId: updatedTask.entity_id
+        entityId: user.entity_id
       });
     }
 
     // Emit real-time event for task status change
     realtimeEventEmitter.emitTaskStatusChanged({
       taskId: updatedTask.id,
-      entityId: updatedTask.entity_id,
+      entityId: user.entity_id,
       controlId: updatedTask.control_id,
       frameworkId: updatedTask.framework_id,
       oldStatus: existingTask.status,
-      newStatus: updatedTask.status,
+      newStatus: status,
       priority: updatedTask.priority,
       assigneeId: updatedTask.assignee_id,
       updatedBy: userId
@@ -675,19 +716,24 @@ const getTasksByFramework = async (req, res, next) => {
     const { isActive } = req.query; // Get tab context from query param
     const { organizationId } = req.user;
 
+    // Default to Active tab (assigned tasks) when viewing tasks within a framework
+    // Only use Library tab (base tasks) when explicitly requested
+    const useActiveTab = isActive !== 'false';
+
     logger.info('Fetching tasks by framework', {
       requestId: req.id,
       frameworkId: frameworkId,
       organizationId: organizationId,
-      isActive: isActive === 'true'
+      isActive: useActiveTab,
+      originalIsActive: isActive
     });
 
     let tasks;
-    if (isActive === 'true') {
-      // Active tab: Show assigned tasks
+    if (useActiveTab) {
+      // Active tab: Show assigned tasks (default for framework view)
       tasks = await Task.findAssignedTasksByFrameworkId(frameworkId, organizationId);
     } else {
-      // Library tab: Show base tasks
+      // Library tab: Show base tasks (only when explicitly requested)
       tasks = await Task.findByFrameworkId(frameworkId);
     }
 

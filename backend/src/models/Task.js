@@ -178,7 +178,7 @@ class Task {
     }
 
     if (updates.length === 0) {
-      return await TaskFixed.findAssignmentById(taskId, entityId);
+      return await Task.findAssignmentById(taskId, entityId);
     }
 
     updates.push(`updated_at = CURRENT_TIMESTAMP`);
@@ -191,6 +191,15 @@ class Task {
        RETURNING *`,
       values
     );
+    
+    // If this is a completion, also update the base task status
+    if (status === 'completed' && result.rows.length > 0) {
+      await query(
+        `UPDATE tasks SET status = 'completed', progress = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+        [progress || 100, taskId]
+      );
+    }
+    
     return result.rows[0];
   }
 

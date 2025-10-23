@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import DashboardLayout from '../../../components/DashboardLayout';
+import ChatDemo from '../../../components/ChatDemo';
 
 interface Message {
   id: string;
@@ -78,64 +79,71 @@ export default function AIAssistantPage() {
     return [
       {
         id: 'bank-welcome',
-        title: `Welcome ${name}! Let’s set up Banking Compliance`,
-        content: `Hi ${name} from ${company}! 👋\n\nI’ll guide you through a pre-configured banking compliance path. We’ll handle scope, activate required frameworks (PCI DSS, ISO 27001, SOC 2, AML/KYC, and GDPR if applicable), install baseline controls, seed risks, provision policies, and enable evidence tracking.\n\nYou just confirm each step — I’ll do the heavy lifting.`,
+        title: `Welcome ${name}! Let's set up Banking Compliance`,
+        content: `Hi ${name}, welcome to your compliance assistant! 👋\n\nThink of me as your personal guide to keeping ${company} safe and legally compliant. I'll help you:\n\n• Protect customer payment information\n• Keep data secure and private\n• Meet banking regulations\n• Track what needs to be done\n\nNo technical expertise needed - just answer a few questions and I'll set everything up for you. Ready to get started?`,
         type: 'guide',
         options: ['Begin Banking Guided Setup']
       },
       {
-        id: 'scope-readiness',
-        title: 'Step 1: Establish Scope & Readiness',
-        content: 'I will preconfigure scope for a bank: cardholder data, PII, transactions, internal systems, third parties; environments and regions. You can refine later.',
+        id: 'conversation-demo',
+        title: '',
+        content: `Before we start, here's how I can help you, ${name}:\n\n[User avatar] ${name}: "We process credit card payments - what do I need to be compliant?"\n\n[AI avatar] Assistant: "Perfect! Since ${company} handles card payments, I'll set up payment security protections for you. This includes:\n• Encrypting card data when you store it\n• Securing your payment forms\n• Setting up quarterly security checks\n• Protecting cardholder information\n\nI'll add these to your compliance checklist. Sound good?"\n\n[User avatar] ${name}: "Yes, what about customer data privacy?"\n\n[AI avatar] Assistant: "Great question! I'll also set up data privacy protections:\n• Customer consent tracking\n• Data retention policies\n• Privacy notices\n• Data access controls\n\n${company} operates in your region, so I've included the relevant privacy regulations. You'll get a simple checklist of what to do."\n\n[User avatar] ${name}: "What if we have a security incident?"\n\n[AI avatar] Assistant: "I've got you covered! I'm creating an incident response plan that includes:\n• Who to contact immediately\n• Steps to contain the issue\n• How to notify affected customers\n• Required reporting procedures\n\nYou'll have clear instructions ready to go."\n\n"Ready to set all this up for ${company}? It'll take just a few minutes."`,
         type: 'guide',
-        options: ['Do it for me', 'Skip and use defaults']
+        options: ['Continue to Setup', 'Skip Demo']
+      },
+      {
+        id: 'scope-readiness',
+        title: 'Step 1: Understand Your Business',
+        content: 'Let me learn about what your business does and what information you handle. This helps me recommend the right protections for you. I\'ll set up protections for customer payment data, personal information, transactions, and your internal systems.',
+        type: 'guide',
+        options: ['Tell me about your business', 'Use banking defaults']
       },
       {
         id: 'frameworks-auto',
-        title: 'Step 2: Activate Required Frameworks',
-        content: `I will activate the following frameworks now: ${plannedFrameworks.join(', ')}. You can say \'remove PCI DSS\' or \'add ISO 27701\' at any time.`,
+        title: 'Step 2: Set Up Your Protection Plan',
+        content: `I'll set up the essential security protections for ${company}: card payment security, information security, data privacy, and anti-money laundering checks. You can always add or remove protections later.`,
         type: 'guide',
-        options: ['Activate frameworks now']
+        options: ['Set up protections now']
       },
       {
         id: 'controls-pack',
-        title: 'Step 3: Install Baseline Controls Pack',
-        content: 'I will install curated baseline controls: access control, encryption, logging/monitoring, change management, vendor risk, incident response, business continuity, AML/KYC checks, and PCI DSS required controls.',
+        title: 'Step 3: Put Basic Protections in Place',
+        content: 'I\'ll set up essential security measures: password protection, data encryption, activity monitoring, emergency response plan, vendor security checks, and business continuity planning.',
         type: 'guide',
-        options: ['Install baseline controls']
+        options: ['Set up basic protections']
       },
       {
         id: 'data-inventory',
-        title: 'Step 4: Create Data Inventory & Flows',
-        content: 'I will generate starter records for data inventory (customer PII, transactions, auth logs, card data tokens) and a default data flow map (web → API → core banking → data warehouse).',
+        title: 'Step 4: Map Your Data',
+        content: 'I\'ll create a simple list of what customer information you collect and how it flows through your systems. This helps ensure we protect everything properly and know where your data goes.',
         type: 'guide',
-        options: ['Generate starter inventory']
+        options: ['Create data map']
       },
       {
         id: 'risk-seed',
-        title: 'Step 5: Seed Risk Register',
-        content: 'I will add predefined banking risks (card data breach, insider fraud, vendor outage, AML false negatives) with likelihood/impact and suggested treatments.',
+        title: 'Step 5: Identify Potential Problems',
+        content: 'I\'ll add common banking risks to your list: payment data breaches, internal fraud, vendor problems, and money laundering issues. For each risk, I\'ll suggest simple ways to prevent or handle them.',
         type: 'guide',
-        options: ['Seed risks']
+        options: ['Add common risks']
       },
       {
         id: 'policy-kit',
-        title: 'Step 6: Provision Policy Kit',
-        content: 'I will create editable policy templates (Information Security, Access Control, Encryption, Incident Response, Vendor Management, AML/KYC, Privacy).',
+        title: 'Step 6: Create Your Security Policies',
+        content: 'I\'ll create simple policy templates for you: data security rules, access control guidelines, incident response procedures, vendor management, and privacy policies. You can customize them for ${company}.',
         type: 'guide',
         options: ['Create policy templates']
       },
       {
         id: 'evidence-automation',
-        title: 'Step 7: Enable Evidence & Monitoring',
-        content: 'I will enable evidence placeholders and scheduled checks (access reviews, log retention, encryption key rotation, AML sampling) so you can upload proof or connect integrations later.',
+        title: 'Step 7: Set Up Proof Tracking',
+        content: 'I\'ll create a system to track proof that your security measures are working. This includes regular check-ins for access reviews, data retention, security updates, and compliance monitoring.',
         type: 'guide',
-        options: ['Enable evidence tracking']
+        options: ['Set up proof tracking']
       },
       {
         id: 'roadmap',
-        title: 'Step 8: Your Initial Roadmap',
-        content: 'All set. I created your initial banking roadmap: finalize scope, assign control owners, upload key policies, connect SIEM, schedule quarterly reviews, and prepare PCI DSS readiness. We can walk through each milestone or jump to chat.',
+        title: 'Step 8: Your Action Plan',
+        content: `Perfect! I've created your personalized action plan for ${company}. You'll have clear tasks like: assign team members to security areas, upload your policies, set up monitoring, and schedule regular reviews. We can go through each step together or you can start chatting with me anytime.`,
         type: 'guide',
         options: ['Finish setup and continue to Assistant']
       }
@@ -531,10 +539,6 @@ export default function AIAssistantPage() {
                 <p className="text-sm text-gray-600">Your intelligent compliance copilot</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600">Online</span>
-            </div>
           </div>
         </div>
 
@@ -565,15 +569,29 @@ export default function AIAssistantPage() {
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
                   {guidedTourSteps[currentStep].title}
                 </h2>
-                <div className="text-lg text-gray-700 whitespace-pre-line max-w-3xl mx-auto">
-                  {guidedTourSteps[currentStep].content}
-                </div>
+                
+                {/* Show ChatDemo for conversation-demo step */}
+                {guidedTourSteps[currentStep].id === 'conversation-demo' ? (
+                  <div className="max-w-4xl mx-auto">
+                    <ChatDemo
+                      userName={onboardingData?.name || 'there'}
+                      companyName={onboardingData?.company || 'your organization'}
+                      onComplete={() => handleGuidedTourOption('Continue to Setup')}
+                      onSkip={() => handleGuidedTourOption('Skip Demo')}
+                    />
+                  </div>
+                ) : (
+                  <div className="text-lg text-gray-700 whitespace-pre-line max-w-3xl mx-auto">
+                    {guidedTourSteps[currentStep].content}
+                  </div>
+                )}
                 
               </div>
 
-              {/* Options */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-                {guidedTourSteps[currentStep].options.map((option, index) => {
+              {/* Options - Hide for conversation-demo step */}
+              {guidedTourSteps[currentStep].id !== 'conversation-demo' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                  {guidedTourSteps[currentStep].options.map((option, index) => {
                   const isSelected = false;
                   const isContinueButton = option.includes('Continue with');
                   
@@ -614,7 +632,8 @@ export default function AIAssistantPage() {
                     </button>
                   );
                 })}
-              </div>
+                </div>
+              )}
 
               {/* In-Guide Chat Box */}
               <div className="mt-8 border-t pt-6">
