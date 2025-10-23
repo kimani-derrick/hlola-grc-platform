@@ -26,7 +26,7 @@ export const env: EnvironmentConfig = {
   // API Configuration
   apiUrl: process.env.NODE_ENV === 'production' 
     ? 'https://api.hlola.io/api'
-    : getEnvVar('API_URL', 'http://localhost:3001') + '/api',
+    : 'http://localhost:3001/api',
   
   // NextAuth Configuration
   nextAuthUrl: getEnvVar('NEXTAUTH_URL', 'http://localhost:3000'),
